@@ -12,4 +12,8 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Deploy target for builds run outside Lovable (e.g. Vercel CI): emit the Vercel
+  // Build Output API into .vercel/output so the server renders there. Lovable's own
+  // publish pipeline pins its Cloudflare layout, so this only affects self-hosted builds.
+  nitro: { preset: "vercel" },
 });
