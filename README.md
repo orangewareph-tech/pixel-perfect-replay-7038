@@ -21,7 +21,26 @@ npm i
 npm run dev
 ```
 
+## Deploy to Vercel
+
+This repo builds straight to Vercel's Build Output API (`.vercel/output`) — no
+extra plugins or config to maintain. `vercel.json` keeps the build command
+explicit, and `.nvmrc` pins Node 22 so the deployed function runs on the Node 22
+runtime.
+
+1. Push this repository to GitHub and import it into Vercel.
+2. Vercel installs dependencies (Bun is picked up from `bun.lock`) and runs
+   `npm run build`, which produces the serverless function plus static assets.
+3. In **Settings → Environment Variables**, add `FAL_API_KEY` (the video service
+   key) for the Production environment, then deploy.
+4. Optional, for a one-off deploy straight from your machine:
+   `npm run build && npx vercel deploy --prebuilt`.
+
+Deploying from Lovable is unaffected — Lovable's own publish pipeline keeps its
+Cloudflare layout, and the Vercel target only applies to builds run outside it.
+
 ## Built with
+
 
 - TanStack Start
 - TypeScript
