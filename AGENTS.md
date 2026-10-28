@@ -8,3 +8,11 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Rules
+
+- Production builds run outside Lovable must keep emitting Vercel's Build Output
+  API (the deploy preset in `vite.config.ts` plus `vercel.json`), because the site
+  is self-hosted on Vercel; Lovable's own publish pipeline is unaffected and still
+  builds for its own target.
+
