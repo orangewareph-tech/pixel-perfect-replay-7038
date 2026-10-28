@@ -24,7 +24,7 @@ const REVIEWS = [
   { name: "Ana L., Manila", text: "Super bilis, wala pang 1 minute. GCash pa, sobrang dali. Sulit ang P149!" },
 ];
 
-const FAQ = [
+const FAQ: [string, string][] = [
   ["Pila ka dugay? (How long?)", "60 seconds lang! Usually 30–60 seconds ang generation."],
   ["Pwede GCash?", "Oo! GCash, Maya, ug PayMongo (cards) accepted."],
   ["Same gihapon ang mga nawong?", "Oo, 100%. Among AI gi-instruct nga dili usbon ang mga nawong."],
