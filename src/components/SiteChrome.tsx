@@ -1,0 +1,61 @@
+import { Link } from "@tanstack/react-router";
+import logo from "@/assets/logo.png";
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="MagicPh AI" width={40} height={40} className="h-10 w-10" />
+          <span className="font-display text-xl font-bold text-primary">MagicPh <span className="text-gold">AI</span></span>
+        </Link>
+        <Link to="/create" className="rounded-full bg-festive px-4 py-2 text-sm font-bold text-primary-foreground shadow-festive">
+          Upload Photo
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer className="bg-night-grad text-night-foreground">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="" width={44} height={44} loading="lazy" className="h-11 w-11" />
+            <span className="font-display text-2xl font-bold">MagicPh <span className="text-gold">AI</span></span>
+          </div>
+          <p className="mt-3 text-sm opacity-80">Ang Pasko, Magic! Family Pic to Christmas Video in 60 seconds.</p>
+        </div>
+        <div className="space-y-1 text-sm">
+          <h4 className="mb-2 font-display text-lg text-gold">Contact</h4>
+          <a className="block hover:text-gold" href="https://facebook.com/magicphai" target="_blank" rel="noreferrer">Facebook Page</a>
+          <a className="block hover:text-gold" href="https://tiktok.com/@magicphai" target="_blank" rel="noreferrer">TikTok</a>
+          <a className="block hover:text-gold" href="mailto:hello@magicph.ai">hello@magicph.ai</a>
+        </div>
+        <p className="self-end text-xs opacity-70 md:text-right">Powered by Fal.ai Kling v2.5 Turbo + Google Flow 10s<br />© 2026 MagicPh AI</p>
+      </div>
+    </footer>
+  );
+}
+
+export function Snow({ count = 30 }: { count?: number }) {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {Array.from({ length: count }).map((_, i) => (
+        <span
+          key={i}
+          className="animate-snow absolute top-0 block rounded-full bg-night-foreground"
+          style={{
+            left: `${(i * 37) % 100}%`,
+            width: `${2 + (i % 4)}px`,
+            height: `${2 + (i % 4)}px`,
+            animationDuration: `${6 + (i % 7)}s`,
+            animationDelay: `${(i % 10) * 0.6}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
