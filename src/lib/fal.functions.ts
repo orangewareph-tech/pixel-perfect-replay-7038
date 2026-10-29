@@ -5,8 +5,8 @@ const MODEL = "fal-ai/kling-video/v2.5-turbo/pro/image-to-video";
 const NEGATIVE = "distorted face, blurry, cartoon, changed ethnicity";
 
 function key() {
-  const k = process.env["FAL_API_KEY"];
-  if (!k) throw new Error("Video service is not set up yet (missing FAL_API_KEY).");
+  const k = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
+  if (!k) throw new Error("Video service is not set up yet (missing FAL_KEY).");
   return k;
 }
 

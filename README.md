@@ -31,7 +31,7 @@ runtime.
 1. Push this repository to GitHub and import it into Vercel.
 2. Vercel installs dependencies (Bun is picked up from `bun.lock`) and runs
    `npm run build`, which produces the serverless function plus static assets.
-3. In **Settings → Environment Variables**, add `FAL_API_KEY` (the video service
+3. In **Settings → Environment Variables**, add `FAL_KEY` (the video service
    key) for the Production environment, then deploy.
 4. Optional, for a one-off deploy straight from your machine:
    `npm run build && npx vercel deploy --prebuilt`.
