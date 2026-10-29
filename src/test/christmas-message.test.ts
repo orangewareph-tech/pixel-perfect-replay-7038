@@ -3,9 +3,8 @@ import { messageInputSchema } from "@/lib/christmas-message";
 import { christmasMessagePrompt } from "@/lib/christmas-message-prompt.server";
 
 describe("personal Christmas messages", () => {
-  for (const [template, theme] of [["simbang", "Simbang Gabi"], ["crafting", "Parol Making"], ["caroling", "Pinoy Aguinaldo"]]) it(`supports personalized greetings for ${template}`, () => {
-    const input = messageInputSchema.parse({ recipient: "Rosa", greeting: "Malipayong Pasko", template });
-    expect(JSON.parse(christmasMessagePrompt(input).prompt).selectedTemplate).toContain(theme);
+  for (const template of ["simbang", "crafting", "caroling"]) it(`rejects retired ${template} template`, () => {
+    expect(messageInputSchema.safeParse({ recipient: "Rosa", greeting: "Malipayong Pasko", template }).success).toBe(false);
   });
   it("requires a recipient", () => {
     expect(messageInputSchema.safeParse({ recipient: " ", greeting: "Malipayong Pasko", template: "parol" }).success).toBe(false);

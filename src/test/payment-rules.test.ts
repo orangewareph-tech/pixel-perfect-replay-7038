@@ -3,7 +3,7 @@ import { canClaimPayment, withinDailyBudget, withinHourlyLimit, installedDisplay
 import { christmasTotal } from "@/lib/christmas-music";
 
 describe("paid video rules", () => {
-  for (const template of ["simbang", "crafting", "caroling"]) it(`accepts ${template} for both paid duration offers`, () => {
+  for (const template of ["parol", "snow", "bokeh", "globe", "fire"]) it(`accepts ${template} for both paid duration offers`, () => {
     for (const duration of [5, 10]) expect(paymentChoicesSchema.parse({ template, duration, music: "pasko-sa-nayon" }).template).toBe(template);
     expect(paymentChoicesSchema.safeParse({ template: "MagicFam", duration: 5, music: "pasko-sa-nayon" }).success).toBe(false);
   });

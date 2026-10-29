@@ -19,11 +19,7 @@ export function isAdminEmail(email: string | undefined | null): boolean {
 
 // Check if owner tester (old logic + new admin)
 export function isOwnerTester(email: string | undefined, role: { role: string } | null | undefined) {
-  // New: Check ADMIN_EMAILS list (no need role check for test button)
-  if (email && isAdminEmail(email)) {
-    return true;
-  }
-  // Old: Keep existing logic for backward compatibility
+  // Paid bypass always requires a server-verified admin role row, never an email alone.
   return email?.toLowerCase() === OWNER_EMAIL && role?.role === "admin";
 }
 
