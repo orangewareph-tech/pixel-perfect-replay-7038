@@ -42,7 +42,7 @@ describe("enhanced Christmas template payloads", () => {
   });
   it("Low movement stays gentle and Extreme adds rapid motion", () => {
     const low = buildVideoInput("photo", TEMPLATES[0].scene, 10, "low");
-    expect(low.prompt).toContain("slow, subtle movement");
+    expect(low.prompt).toContain("gentle slow realistic movement");
     expect(low.prompt).not.toContain("Extreme movement");
     expect(low.negative_prompt).toContain("rapid zoom");
     const ext = buildVideoInput("photo", TEMPLATES[0].scene, 10, "extreme");
