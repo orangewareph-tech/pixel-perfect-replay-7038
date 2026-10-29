@@ -42,8 +42,8 @@ export const checkVideo = createServerFn({ method: "POST" })
     return { status: "COMPLETED", videoUrl: out.video?.url ?? null };
   });
 
-// Fetches the finished MP4 server-side and returns it as a data URL so the
-// browser can save it with one click (cross-origin URLs ignore `download`).
+// Small ranged chunks avoid RPC output limits for longer MP4s; the browser
+// assembles a local Blob for one-click saving of cross-origin videos.
 export const downloadVideo = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ videoUrl: z.string().url().max(2000), offset: z.number().int().min(0).max(60 * 1024 * 1024).default(0) }).parse(d))
   .handler(async ({ data }) => {
