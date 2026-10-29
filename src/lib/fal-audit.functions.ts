@@ -27,6 +27,13 @@ export const auditAccess = createServerFn({ method: "GET" }).middleware([require
 
 const requestError = (status: number) => status === 401 ? "FAL_KEY invalid" : status === 403 ? "Access denied: key permissions or balance" : status === 402 ? "Insufficient balance" : status === 404 ? "Model not found" : status === 429 ? "Fal.ai rate limit — try later" : `Fal.ai request failed (HTTP ${status})`;
 
+export const freeConnectionCheck = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async () => {
+  const key = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
+  if (!key) return { connected: false, detail: "Video service configuration unavailable; no video submitted." };
+  const response = await fetch(`https://api.fal.ai/v1/models/requests/by-endpoint?endpoint_id=${encodeURIComponent(VIDEO_MODEL)}&limit=1`, { headers: { Authorization: `Key ${key}` }, signal: AbortSignal.timeout(15000) }).catch(() => null);
+  return { connected: response?.ok ?? false, detail: response?.ok ? "Google sign-in verified and video-service connection reachable. No generation charge." : "Google sign-in verified; video-service connection not verified. No video submitted." };
+});
+
 export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
   const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
   if (!isAuditAdmin(role)) throw new Error("Administrator access required");
