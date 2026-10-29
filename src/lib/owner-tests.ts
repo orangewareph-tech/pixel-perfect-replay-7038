@@ -30,7 +30,6 @@ export function canReserveOwnerTest(started: number[], spent: number, duration: 
 
 // NEW: Admin limits for test button
 export const ADMIN_LIMITS = {
-  maxPerHour: 3,
   maxPerDay: 10,
   maxCostPerDay: 10, // $10
   costPer5s: 0.35,
@@ -52,22 +51,13 @@ export function canAdminTest(email: string, recentTests: AdminTestRecord[]): { a
   }
 
   const now = new Date();
-  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  const hourTests = recentTests.filter(
-    (t) => t.email.toLowerCase() === email.toLowerCase() && new Date(t.timestamp) > oneHourAgo
-  );
 
   const dayTests = recentTests.filter(
     (t) => t.email.toLowerCase() === email.toLowerCase() && new Date(t.timestamp) > todayStart
   );
 
   const dayCost = dayTests.reduce((sum, t) => sum + t.cost, 0);
-
-  if (hourTests.length >= ADMIN_LIMITS.maxPerHour) {
-    return { allowed: false, reason: `Limit: ${ADMIN_LIMITS.maxPerHour} videos/hour - Try again later` };
-  }
 
   if (dayTests.length >= ADMIN_LIMITS.maxPerDay) {
     return { allowed: false, reason: `Limit: ${ADMIN_LIMITS.maxPerDay} videos/day` };
@@ -92,6 +82,6 @@ export function getAdminInfo(email: string | undefined | null) {
     badge: "👑 ADMIN TEST MODE - FREE - Bypass P149",
     cost5s: `$${ADMIN_LIMITS.costPer5s}`,
     cost10s: `$${ADMIN_LIMITS.costPer10s}`,
-    limits: `${ADMIN_LIMITS.maxPerHour}/hour, ${ADMIN_LIMITS.maxPerDay}/day`,
+    limits: `${ADMIN_LIMITS.maxPerDay}/day`,
   };
 }

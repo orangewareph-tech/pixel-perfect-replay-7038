@@ -80,7 +80,7 @@ function AdminDashboard() {
           <p>FAL_KEY: <b className={status.falKey ? "text-primary" : "text-destructive"}>{status.falKey ? "Connected" : "Missing — add FAL_KEY in project secrets"}</b></p>
           <p>Model: <code>{status.model}</code></p>
           <p>Cost: 5s ${ADMIN_LIMITS.costPer5s} · 10s ${ADMIN_LIMITS.costPer10s}</p>
-          <p>Limits: {ADMIN_LIMITS.maxPerHour}/hour · {ADMIN_LIMITS.maxPerDay}/day</p>
+          <p>Limits: {ADMIN_LIMITS.maxPerDay}/day</p>
         </section>
 
         <section className="space-y-5 rounded-xl border bg-card p-5">
