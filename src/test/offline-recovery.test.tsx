@@ -40,7 +40,7 @@ describe("Offline recovery", () => {
     expect(update).toHaveBeenCalledOnce();
     expect(messagingUpdate).not.toHaveBeenCalled();
     expect(register).not.toHaveBeenCalled();
-    delete (navigator as Navigator & { serviceWorker?: unknown }).serviceWorker;
+    Reflect.deleteProperty(navigator, "serviceWorker");
   });
 
   it("evicts only this app's caches, recovers tabs and unregisters even when cleanup fails", async () => {

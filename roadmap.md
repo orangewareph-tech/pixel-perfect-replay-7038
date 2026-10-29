@@ -1,7 +1,6 @@
-# Video duration selection
 # Offline recovery
-- [ ] Replace the broken navigation worker with a same-path cleanup release, preserving home-screen support.
-- [ ] Add non-blocking offline warning, retry, and video-generation guard; verify cache cleanup and online recovery.
+- [x] Replace the broken navigation worker with a same-path cleanup release, preserving home-screen support.
+- [x] Add non-blocking offline warning, retry, and video-generation guard; verify cache cleanup and online recovery.
 
 # Video duration selection
 - [x] Add reusable duration offers, saved selection, and pricing estimates.

@@ -43,6 +43,20 @@ Cloudflare layout, and the Vercel target only applies to builds run outside it.
 
 ## Christmas music
 
+## Offline recovery release
+
+Home-screen icons and the manifest remain available. New app-shell caching is
+disabled for this release: `public/sw.js` replaces the previous Workbox worker
+at the same deployed URL, removes only its scoped Workbox caches and
+`magicph-assets`, recovers open tabs, and unregisters itself. Keep this file
+available for returning installed-app users; deleting the old worker is not
+sufficient. Publish/deploy this release to the same origin before installed
+apps can recover. Reopening while online lets the browser check for the update.
+An already-open app stays usable while disconnected, but new page loads and
+video generation require internet. Offline warnings never replace the app.
+
+## Christmas music
+
 The five magic templates and four playable music upgrades are available.
 Eight asset-hosted MP3s provide 5/10-second original synthesized festive bell
 instrumentals. These are not recordings or covers of the named songs; the music
