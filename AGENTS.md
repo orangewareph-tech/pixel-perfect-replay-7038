@@ -11,6 +11,8 @@
 
 ## Rules
 
+- Keep template images, accessible labels, badges and CDN-hosted sample clips in the shared browser-safe template catalogue; label animated generated samples honestly and keep preview actions separate from selection.
+
 - Keep the creation wizard's choices in the create route and save a one-time IndexedDB draft only across sign-in, so large private photos survive account navigation without entering URLs; progress rendering stays in a shared presentation component.
 
 - Customer videos require authenticated ownership and an atomically claimed approved video_payments row; never trust client credits, approval timers or passwords. Reserve before Fal submission, retain ambiguous failures for reconciliation, and count administrator tests in the shared UTC daily budget so retries cannot create unpaid charges.
