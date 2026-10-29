@@ -13,7 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { registerAppServiceWorker } from "../lib/pwa";
+import { retireAppServiceWorkers } from "../lib/pwa";
 import { InstallBanner } from "../components/InstallBanner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -139,7 +139,7 @@ function RootComponent() {
   }, [queryClient, router]);
 
   useEffect(() => {
-    void registerAppServiceWorker();
+    void retireAppServiceWorkers();
   }, []);
 
   return (

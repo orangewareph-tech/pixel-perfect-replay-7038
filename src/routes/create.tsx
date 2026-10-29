@@ -15,6 +15,7 @@ import { MusicSelector } from "@/components/MusicSelector";
 import { MusicVideoPlayer } from "@/components/MusicVideoPlayer";
 import { useChristmasChoices } from "@/hooks/use-christmas-choices";
 import { useMusicFile } from "@/hooks/use-music-file";
+import { canGenerateVideo, useOnlineStatus } from "@/hooks/use-online-status";
 import { christmasTotal, DEFAULT_MUSIC_VOLUME, musicOption, musicSchema, musicCheckoutLabel } from "@/lib/christmas-music";
 
 export const Route = createFileRoute("/create")({
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/create")({
 const STEPS = ["Upload", "Template", "Preview", "Payment", "Video"];
 
 function Create() {
+  const online = useOnlineStatus();
   const { template: templateParam, duration: durationParam, music: musicParam } = Route.useSearch();
   const [duration, setDuration] = useVideoDuration(durationParam);
   const offer = DURATION_OFFERS[duration];
@@ -104,6 +106,7 @@ function Create() {
   }
 
   async function generate() {
+    if (!canGenerateVideo(online)) { setErr("Need internet to generate video"); return; }
     if (!photo) { setErr("Please upload a family photo first."); setStep(0); return; }
     if (!musicReady) { setErr("Music is still loading. Please wait and try again."); return; }
     setStep(4); setProgress(3); setGenErr(null); setVideoUrl(null);
@@ -199,6 +202,7 @@ function Create() {
         {step === 3 && (
           <section>
             <h1 className="text-center text-3xl font-bold text-primary">Choose & Pay</h1>
+            {!online && <p role="alert" className="mt-3 text-center text-destructive">Need internet to generate video</p>}
             <MagicTemplateSelector value={tpl} onChange={setTpl} />
             <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
             <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
@@ -216,8 +220,8 @@ function Create() {
               ))}
             </div>
             <a href="https://paymongo.com" target="_blank" rel="noreferrer" className="mt-4 block rounded-full bg-festive py-3 text-center font-bold text-primary-foreground">Pay with Card via PayMongo</a>
-            <Button onClick={generate} disabled={!musicReady} className="mt-3 h-auto w-full whitespace-normal rounded-full bg-gold-grad py-3 font-extrabold text-gold-foreground shadow-glow">I've paid ₱{total} — Generate {duration} Sec Magic{music !== "no-music" ? " + Music 🎵" : " ✨"}</Button>
-            <Button variant="ghost" onClick={generate} disabled={!musicReady} className="mt-2 w-full text-sm text-muted-foreground underline">Skip payment (demo)</Button>
+            <Button onClick={generate} disabled={!musicReady || !online} className="mt-3 h-auto w-full whitespace-normal rounded-full bg-gold-grad py-3 font-extrabold text-gold-foreground shadow-glow">I've paid ₱{total} — Generate {duration} Sec Magic{music !== "no-music" ? " + Music 🎵" : " ✨"}</Button>
+            <Button variant="ghost" onClick={generate} disabled={!musicReady || !online} className="mt-2 w-full text-sm text-muted-foreground underline">Skip payment (demo)</Button>
             {err && <p role="alert" className="mt-3 text-destructive">{err}</p>}
             <button onClick={() => setStep(2)} className="mt-4 text-sm font-bold text-primary">← Back</button>
           </section>

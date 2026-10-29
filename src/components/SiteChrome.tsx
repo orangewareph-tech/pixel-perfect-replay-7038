@@ -1,12 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
-import { Search, LogOut } from "lucide-react";
+import { Search, LogOut, RefreshCw } from "lucide-react";
+import { useOnlineStatus } from "@/hooks/use-online-status";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 export function Header() {
+  const online = useOnlineStatus();
   const queryClient = useQueryClient(); const navigate = useNavigate();
   const { data: signedIn = false } = useQuery({ queryKey: ["header-session"], queryFn: async () => Boolean((await supabase.auth.getUser()).data.user), retry: false });
   return (
@@ -23,6 +25,10 @@ export function Header() {
         </Link>
         </div>
       </div>
+      {!online && <div role="status" className="flex flex-wrap items-center justify-center gap-2 bg-secondary px-4 py-2 text-center text-sm text-secondary-foreground">
+        <span>Offline ka — some features may not work</span>
+        <Button variant="outline" size="sm" onClick={() => window.location.reload()}><RefreshCw aria-hidden="true" />Try Again — Balik Online</Button>
+      </div>}
     </header>
   );
 }
