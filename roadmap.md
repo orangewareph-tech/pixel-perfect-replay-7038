@@ -1,3 +1,11 @@
+# Secure payment launch
+- [ ] Protect customer generation with authenticated, single-use approved payment credits.
+- [ ] Add manual payment receipt submission and administrator review using the uploaded InstaPay QR.
+- [ ] Add protected administrator dashboard and installed-app status checks.
+- [ ] Connect Paymongo and Stripe — provider setup and approval required; no payment secrets currently configured.
+- [ ] Confirm custom account-based rate limits and daily spending limit before implementation.
+- [ ] Verify unpaid generation is blocked and manual approval grants exactly one video.
+
 # Full app testing
 - [x] Run all 36 automated tests; verify five templates, eight playable music clips, saved preferences, four prices, mobile layout, signed-out audit redirect, offline checkout recovery, and real 5s/10s video downloads (5s contains audible AAC music).
 - [ ] Verify protected audit with the owner's account — blocked until the owner signs in or identifies a test account.
