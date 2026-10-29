@@ -45,9 +45,12 @@ export type AdminTestRecord = {
 };
 
 // NEW: Check if admin can test with detailed reason (for test button)
-export function canAdminTest(email: string, recentTests: AdminTestRecord[]): { allowed: boolean; reason?: string } {
+export type AdminTestQuota = { allowed: boolean; videosLeft: number; costLeft: number; reason?: string };
+
+// How many more free admin renders may start right now, given today's browser-side history.
+export function adminTestQuota(email: string, recentTests: AdminTestRecord[]): AdminTestQuota {
   if (!isAdminEmail(email)) {
-    return { allowed: false, reason: "Not admin - orangewareph@gmail.com only" };
+    return { allowed: false, videosLeft: 0, costLeft: 0, reason: "Not admin - orangewareph@gmail.com only" };
   }
 
   const now = new Date();
@@ -58,16 +61,24 @@ export function canAdminTest(email: string, recentTests: AdminTestRecord[]): { a
   );
 
   const dayCost = dayTests.reduce((sum, t) => sum + t.cost, 0);
+  const videosLeft = Math.max(0, ADMIN_LIMITS.maxPerDay - dayTests.length);
+  const costLeft = Math.max(0, Number((ADMIN_LIMITS.maxCostPerDay - dayCost).toFixed(2)));
 
-  if (dayTests.length >= ADMIN_LIMITS.maxPerDay) {
-    return { allowed: false, reason: `Limit: ${ADMIN_LIMITS.maxPerDay} videos/day` };
+  if (videosLeft === 0) {
+    return { allowed: false, videosLeft, costLeft, reason: `Limit: ${ADMIN_LIMITS.maxPerDay} videos/day` };
   }
 
-  if (dayCost >= ADMIN_LIMITS.maxCostPerDay) {
-    return { allowed: false, reason: `Limit: $${ADMIN_LIMITS.maxCostPerDay}/day` };
+  if (costLeft <= 0) {
+    return { allowed: false, videosLeft, costLeft, reason: `Limit: $${ADMIN_LIMITS.maxCostPerDay}/day` };
   }
 
-  return { allowed: true };
+  return { allowed: true, videosLeft, costLeft };
+}
+
+// NEW: Check if admin can test with detailed reason (for test button)
+export function canAdminTest(email: string, recentTests: AdminTestRecord[]): { allowed: boolean; reason?: string } {
+  const quota = adminTestQuota(email, recentTests);
+  return quota.allowed ? { allowed: true } : { allowed: false, reason: quota.reason ?? "Daily limit reached" };
 }
 
 // Helper for UI - Get admin display info
