@@ -2,16 +2,16 @@ import { Check, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DURATION_OFFERS, FAL_LISTED_COST, durationProfit, type VideoDuration } from "@/lib/video-duration";
 
-export function DurationSelector({ duration, onChange }: { duration: VideoDuration; onChange: (value: VideoDuration) => void }) {
+export function DurationSelector({ duration, onChange, inverse = false }: { duration: VideoDuration; onChange: (value: VideoDuration) => void; inverse?: boolean }) {
   const offer = DURATION_OFFERS[duration];
   return (
-    <div className="mt-6 text-foreground">
-      <h2 className="mb-3 text-xl font-bold text-christmas-green">Pili-a ang haba sa video</h2>
+    <div className={`mt-6 ${inverse ? "text-night-foreground" : "text-foreground"}`}>
+      <h2 className={`mb-3 text-xl font-bold ${inverse ? "text-gold" : "text-christmas-green"}`}>Pili-a ang haba sa video</h2>
       <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Video duration">
         {([5, 10] as const).map((value) => {
           const item = DURATION_OFFERS[value];
           return (
-            <Button key={value} variant="ghost" type="button" aria-label={`${value} seconds`} aria-pressed={duration === value} onClick={() => onChange(value)} className={`flex h-auto min-w-0 flex-col items-stretch gap-0 whitespace-normal rounded-lg border-2 bg-card p-4 text-left hover:bg-card ${duration === value ? "border-gold shadow-glow" : "border-input"}`}>
+            <Button key={value} variant="ghost" type="button" aria-label={`${value} seconds`} aria-pressed={duration === value} onClick={() => onChange(value)} className={`flex h-auto min-w-0 flex-col items-stretch gap-0 whitespace-normal rounded-lg border-2 bg-card p-4 text-left text-card-foreground hover:bg-card ${duration === value ? "border-gold shadow-glow" : "border-input"}`}>
               <span className="flex items-center justify-between gap-2">
                 <span className={`rounded-full px-2 py-1 text-xs font-bold ${value === 5 ? "bg-primary text-primary-foreground" : "bg-gold text-gold-foreground"}`}>{item.badge}</span>
                 {duration === value ? <Check className="text-primary" aria-hidden="true" /> : <Circle className="text-muted-foreground" aria-hidden="true" />}

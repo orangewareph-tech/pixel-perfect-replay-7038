@@ -53,11 +53,23 @@ function Create() {
     if (!videoUrl || saving) return;
     setSaving(true);
     try {
-      const { dataUrl } = await download({ data: { videoUrl } });
+      const chunks: Uint8Array<ArrayBuffer>[] = [];
+      let offset = 0;
+      while (true) {
+        const result = await download({ data: { videoUrl, offset } });
+        const bytes = Uint8Array.from(atob(result.base64), (character) => character.charCodeAt(0));
+        chunks.push(bytes);
+        offset = result.nextOffset;
+        if (offset >= result.total) break;
+      }
+      const objectUrl = URL.createObjectURL(new Blob(chunks, { type: "video/mp4" }));
       const a = document.createElement("a");
-      a.href = dataUrl;
+      a.href = objectUrl;
       a.download = "magicph-christmas.mp4";
+      document.body.appendChild(a);
       a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
     } catch {
       window.open(videoUrl, "_blank", "noreferrer");
     } finally {

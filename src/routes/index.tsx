@@ -53,7 +53,7 @@ function Index() {
             <p className="mt-4 text-lg opacity-90">
               Upload lang imong family photo, kami na bahala mo-himo og magical Christmas video in 60 seconds. <b className="text-gold">P149 ra!</b>
             </p>
-            <DurationSelector duration={duration} onChange={setDuration} />
+            <DurationSelector duration={duration} onChange={setDuration} inverse />
             <Button asChild className="mt-6 h-auto w-full whitespace-normal rounded-full bg-gold-grad px-5 py-4 text-base font-extrabold text-gold-foreground shadow-glow">
               <Link to="/create" search={{ duration }}>{durationCheckoutLabel(duration)}</Link>
             </Button>
