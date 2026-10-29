@@ -16,8 +16,8 @@
 - [x] Hide published Lovable badge and verify desktop/mobile public page.
 
 # Christmas magic and music
-- [ ] Add enhanced duration-specific prompts and five saved magical templates.
-- [ ] Add saved music choices, dynamic totals, synchronized preview and volume/loop controls.
-- [ ] Prepare real music-embedded MP4 downloads; do not sell or promise missing licensed songs.
-- [ ] Verify pricing, preferences, mobile layout, generation and music merging.
+- [x] Add enhanced duration-specific prompts and five saved magical templates.
+- [x] Add saved music choices, dynamic totals, synchronized preview and volume/loop controls.
+- [x] Prepare real music-embedded MP4 downloads; do not sell or promise missing licensed songs.
+- [x] Verify pricing, preferences, mobile layout, real 5s Parol generation/save, and music merging with synthetic audio; licensed-song end-to-end awaits files.
 - [ ] Supply licensed Christmas song files — waiting for the owner's audio files.
