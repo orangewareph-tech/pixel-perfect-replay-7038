@@ -2,17 +2,18 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
+import { isAuditAdmin } from "@/lib/audit-permissions";
 
 export const auditAccess = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { data, error } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
-  return { admin: !error && data?.role === "admin" };
+  return { admin: !error && isAuditAdmin(data) };
 });
 
 const requestError = (status: number) => status === 401 ? "FAL_KEY invalid" : status === 403 ? "Access denied: key permissions or balance" : status === 402 ? "Insufficient balance" : status === 404 ? "Model not found" : status === 429 ? "Fal.ai rate limit — try later" : `Fal.ai request failed (HTTP ${status})`;
 
 export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
-  if (!role) throw new Error("Administrator access required");
+  if (!isAuditAdmin(role)) throw new Error("Administrator access required");
   const key = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
   if (!key) return { keyFound: false, connected: false, balance: null as number | null, balanceNote: "FAL_KEY missing - add to Secrets", model: false, lastTest: null, checkedAt: new Date().toISOString() };
   const headers = { Authorization: `Key ${key}` };
@@ -33,7 +34,7 @@ export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware
   .inputValidator((value) => z.object({ duration: videoDurationSchema, imageUrl: z.string().startsWith("data:image/").max(15_000_000) }).parse(value))
   .handler(async ({ context, data }) => {
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
-    if (!role) throw new Error("Administrator access required");
+    if (!isAuditAdmin(role)) throw new Error("Administrator access required");
     const key = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
     if (!key) throw new Error("FAL_KEY missing - add to Secrets");
     const { data: run, error } = await context.supabase.from("fal_test_runs").insert({ user_id: context.userId, duration: data.duration }).select("id").single();
@@ -56,7 +57,7 @@ export const pollFalTest = createServerFn({ method: "POST" }).middleware([requir
   .inputValidator((value) => z.object({ id: z.string().uuid() }).parse(value))
   .handler(async ({ context, data }) => {
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
-    if (!role) throw new Error("Administrator access required");
+    if (!isAuditAdmin(role)) throw new Error("Administrator access required");
     const { data: run } = await context.supabase.from("fal_test_runs").select("*").eq("id", data.id).single();
     if (!run?.request_id) throw new Error("Test request not found");
     if (run.status === "COMPLETED" || run.status === "FAILED") return run;
