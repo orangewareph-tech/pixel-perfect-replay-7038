@@ -17,6 +17,8 @@ describe("Christmas upgrades", () => {
   it("defaults music volume to 70 percent", () => { expect(DEFAULT_MUSIC_VOLUME).toBe(70); expect(mergeAudioArgs(70, true, 5)).toContain("[1:a]volume=0.7,apad[audio]"); });
   it("only loops music when requested", () => { expect(mergeAudioArgs(70, true, 10)).toContain("-stream_loop"); expect(mergeAudioArgs(70, false, 10)).not.toContain("-stream_loop"); });
   it("preserves original audio when present", () => { expect(mergeAudioArgs(70, true, 5, true).join(" ")).toContain("amix=inputs=2"); });
+  it("burns the Merry Christmas greeting into every music download", () => { expect(CHRISTMAS_OVERLAY_TEXT).toBe("Merry Christmas"); const args = mergeAudioArgs(70, true, 5, false, true).join(" "); expect(args).toContain("overlay.png"); expect(args).toContain("overlay=(W-w)/2:H-h-48"); expect(args).toContain("libx264"); expect(args).not.toContain("-c:v copy"); });
+  it("keeps the fast copy path when no overlay is requested", () => { expect(mergeAudioArgs(70, true, 5).join(" ")).toContain("-c:v copy"); });
   it("each selected template changes the actual generation payload", () => { const prompts = TEMPLATES.map((t) => buildVideoInput("photo", t.scene, 5).prompt); expect(new Set(prompts).size).toBe(5); for (const t of TEMPLATES) expect(buildVideoInput("photo", t.scene, 5).prompt).toContain(t.scene); });
   it("requests progressive magic for 10 seconds and protects faces", () => { expect(buildVideoInput("photo", TEMPLATES[0].scene, 10).prompt).toContain("Use the uploaded photo as the starting frame"); expect(buildVideoInput("photo", TEMPLATES[0].scene, 5).negative_prompt).toContain("different faces"); });
 });

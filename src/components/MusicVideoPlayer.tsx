@@ -20,7 +20,10 @@ export function MusicVideoPlayer({ src, music, musicName, volume, loopMusic, rat
     catch { audioRef.current?.pause(); videoRef.current?.pause(); setError("This preview could not play. Try another browser or save the MP4."); }
   }
   return <>
-    <video ref={videoRef} src={src} controls autoPlay loop playsInline onPlay={() => { if (music) { sync(); void audioRef.current?.play().catch(() => setError("Tap Play with sound to enable sound.")); } }} onPause={() => audioRef.current?.pause()} onSeeking={sync} onTimeUpdate={sync} onError={() => { audioRef.current?.pause(); setError("This browser cannot play the preview. Save the MP4 to watch it on your device."); }} onEnded={() => audioRef.current?.pause()} className={`mx-auto mt-4 rounded-3xl bg-night object-cover shadow-glow ${ratio === "9:16" ? "aspect-[9/16] w-full max-w-xs" : "aspect-video w-full"}`} />
+    <div className={`relative mx-auto mt-4 ${ratio === "9:16" ? "aspect-[9/16] w-full max-w-xs" : "aspect-video w-full"}`}>
+      <video ref={videoRef} src={src} controls autoPlay loop playsInline onPlay={() => { if (music) { sync(); void audioRef.current?.play().catch(() => setError("Tap Play with sound to enable sound.")); } }} onPause={() => audioRef.current?.pause()} onSeeking={sync} onTimeUpdate={sync} onError={() => { audioRef.current?.pause(); setError("This browser cannot play the preview. Save the MP4 to watch it on your device."); }} onEnded={() => audioRef.current?.pause()} className="size-full rounded-3xl bg-night object-cover shadow-glow" />
+      <p aria-hidden className="pointer-events-none absolute inset-x-2 bottom-3 text-center font-serif text-lg font-black italic tracking-wide text-amber-200 drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)] sm:text-2xl" style={{ textShadow: "0 0 2px #7a0c0c, 0 2px 6px rgba(0,0,0,0.8)", WebkitTextStroke: "1px #7a0c0c" }}>🎄 {CHRISTMAS_OVERLAY_TEXT} 🎄</p>
+    </div>
     {music && <><audio ref={audioRef} src={music} loop={loopMusic} preload="auto" /><Button variant="outline" onClick={playTogether} className="mt-3"><Play className="size-4" />Play with sound</Button></>}
     {error && <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>}
   </>;
