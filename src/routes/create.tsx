@@ -21,6 +21,8 @@ import { PaymentPanel } from "@/components/PaymentPanel";
 import { listMyPayments } from "@/lib/payments.functions";
 import { paymentChoicesSchema } from "@/lib/payment-rules";
 import { supabase } from "@/integrations/supabase/client";
+import { CreationProgress } from "@/components/CreationProgress";
+import { ArrowLeft, ArrowRight, Upload, Download, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
@@ -36,8 +38,6 @@ export const Route = createFileRoute("/create")({
   }),
   component: Create,
 });
-
-const STEPS = ["Upload", "Template", "Preview", "Payment", "Video"];
 
 function Create() {
   const online = useOnlineStatus();
@@ -64,6 +64,8 @@ function Create() {
   const download = useServerFn(downloadVideo);
   const template = TEMPLATES.find((t) => t.id === tpl) ?? TEMPLATES[0];
   const [saving, setSaving] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
   const [saveError, setSaveError] = useState("");
   const listPayments = useServerFn(listMyPayments);
   const [payments, setPayments] = useState<Awaited<ReturnType<typeof listMyPayments>>["payments"]>([]);
@@ -124,7 +126,7 @@ function Create() {
     if (!musicReady) { setErr("Music is still loading. Please wait and try again."); return; }
     const payment = payments.find((item) => item.id === paymentId && item.status === "approved" && item.duration === duration && item.music === music && item.template === tpl);
     if (!payment) { setErr(`Please pay first — ₱${total} and an approved video credit are required.`); setStep(3); return; }
-    setStep(4); setProgress(3); setGenErr(null); setVideoUrl(null);
+    setStep(4); setProgress(3); setElapsed(0); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
     try {
       const { requestId } = await start({ data: { imageUrl: photo, paymentId: payment.id } });
@@ -137,7 +139,7 @@ function Create() {
           setVideoUrl(s.videoUrl); setProgress(100); return;
         }
       }
-      throw new Error("Taking too long — please try again.");
+      throw new Error("Wala pa mahuman. Tan-awa ang saved request; ayaw pagbayad o generate usab.");
     } catch (e) {
       setGenErr(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -147,28 +149,32 @@ function Create() {
   }
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [step]);
+  useEffect(() => {
+    if (step !== 4 || videoUrl || genErr) return;
+    const timer = setInterval(() => setElapsed((seconds) => seconds + 1), 1000);
+    return () => clearInterval(timer);
+  }, [step, videoUrl, genErr]);
+
+  async function shareVideo(platform: "Facebook" | "TikTok") {
+    if (!videoUrl) return;
+    if (navigator.share) {
+      try { await navigator.share({ title: "MagicPh AI Christmas", url: videoUrl }); }
+      catch (error) { if (!(error instanceof DOMException && error.name === "AbortError")) setSaveError("Dili ma-share karon. I-download ang video ug i-upload sa imong app."); }
+    } else if (platform === "Facebook") window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(videoUrl)}`, "_blank", "noopener,noreferrer");
+    else { await saveVideo(); }
+  }
 
   const shareUrl = typeof window !== "undefined" ? window.location.origin : "https://magicph.ai";
 
   return (
     <div className="min-h-screen">
-      <Header />
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <ol className="mb-8 flex justify-between gap-1">
-          {STEPS.map((s, i) => (
-            <li key={s} className="flex flex-1 flex-col items-center gap-1 text-xs font-bold">
-              <span className={`flex h-8 w-8 items-center justify-center rounded-full ${i <= step ? "bg-festive text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{i + 1}</span>
-              <span className={i <= step ? "text-primary" : "text-muted-foreground"}>{s}</span>
-            </li>
-          ))}
-        </ol>
+      <Header sticky={false} />
+      <CreationProgress step={step} complete={Boolean(videoUrl)} />
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
 
         {step === 0 && (
           <section>
-            <h1 className="text-center text-3xl font-bold text-primary">Upload Your Family Photo</h1>
-            <MagicTemplateSelector value={tpl} onChange={setTpl} />
-            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
-            <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
+            <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">I-upload ang imong family photo</h1>
             <Button
               type="button"
               variant="ghost"
@@ -176,56 +182,63 @@ function Create() {
               onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
               onDragLeave={() => setDrag(false)}
               onDrop={(e) => { e.preventDefault(); setDrag(false); onFile(e.dataTransfer.files[0]); }}
-              className={`mt-6 flex h-auto w-full flex-col items-center whitespace-normal rounded-3xl border-4 border-dashed p-8 text-center transition ${drag ? "border-gold bg-secondary" : "border-border bg-card"}`}
+              aria-label="Upload family photo"
+              className={`mx-auto mt-6 flex min-h-64 h-auto w-full max-w-2xl flex-col items-center justify-center whitespace-normal rounded-lg border-2 border-dashed p-8 text-center transition ${drag ? "border-gold bg-secondary" : "border-gold/60 bg-card"}`}
             >
-              <span className="text-6xl">📸</span>
-              <span className="mt-4 font-display text-xl font-bold">{musicCheckoutLabel(duration, music)}</span>
+              <Upload className="size-12 text-christmas-green" aria-hidden="true" />
+              <span className="mt-4 font-display text-xl font-bold">Pili ug photo o i-drop dinhi</span>
               <span className="mt-1 text-sm text-muted-foreground">JPG or PNG · max 10MB</span>
             </Button>
             <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+            <p className="mt-4 text-center text-sm text-muted-foreground">Mas nindot ang resulta kung klaro ang mga nawong ug hayag ang suga.</p>
+            {photo && <div className="mt-4 text-center"><Button variant="outline" onClick={() => setStep(1)}>Gamita ang kasamtangang photo<ArrowRight /></Button></div>}
             {err && <p className="mt-3 text-center font-bold text-destructive">{err}</p>}
           </section>
         )}
 
         {step === 1 && (
           <section>
-            <h1 className="text-center text-3xl font-bold text-primary">Pinoy Christmas Magic</h1>
-            <MagicTemplateSelector value={tpl} onChange={setTpl} />
-            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
-            <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
+            <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Pili-a ang magic template</h1>
+            <div className="mt-5 grid items-start gap-5 md:grid-cols-2">
+              <MagicTemplateSelector value={tpl} onChange={setTpl} />
+              <figure className="overflow-hidden rounded-lg">
+                <img src={template.img} alt={`${template.name} example`} className="aspect-[4/3] w-full object-cover" />
+                <figcaption className="mt-3 font-display text-lg font-bold text-christmas-green">{template.icon} {template.name}<span className="mt-1 block font-sans text-xs font-normal text-muted-foreground">Pananglitan sa template · dili pa imong final video</span></figcaption>
+              </figure>
+            </div>
             <Nav onBack={() => setStep(0)} onNext={() => setStep(2)} />
           </section>
         )}
 
-        {step === 2 && photo && (
+        {step === 2 && (
           <section>
-            <h1 className="text-center text-3xl font-bold text-primary">Your Preview</h1>
-            <RatioToggle ratio={ratio} setRatio={setRatio} />
-            <div className={`relative mx-auto mt-4 overflow-hidden rounded-3xl bg-night shadow-glow ${ratio === "9:16" ? "aspect-[9/16] max-w-xs" : "aspect-video"}`}>
-              <img src={photo} alt="Your photo" className="animate-kenburns h-full w-full object-cover blur-[1px]" />
-              <div className="absolute inset-0 bg-night/20" />
-              <Snow count={25} />
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-night-foreground opacity-70">
-                <img src={logo} alt="" className="h-16 w-16" />
-                <span className="font-display text-2xl font-bold">MagicPh AI</span>
-                <span className="text-xs">PREVIEW 480p · {template.name}</span>
-              </div>
+            <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Music ug kadugayon</h1>
+            <div className="grid items-start gap-x-6 md:grid-cols-2">
+              <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
+              <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
             </div>
-            {music !== "no-music" && <p className="mt-4 text-center text-sm">🎵 {musicOption(music).name} · {musicReady ? "Ready — music included in final download" : "Loading music…"}</p>}
-            <Nav onBack={() => setStep(1)} onNext={() => setStep(3)} nextLabel="Remove watermark →" />
+            <Nav onBack={() => setStep(1)} onNext={() => { setErr(null); setPaymentOpen(false); setStep(3); }} />
           </section>
         )}
 
         {step === 3 && (
           <section>
-            <h1 className="text-center text-3xl font-bold text-primary">Choose & Pay</h1>
+            <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Kumpirmaha ug bayad</h1>
             {!online && <p role="alert" className="mt-3 text-center text-destructive">Need internet to generate video</p>}
-            <MagicTemplateSelector value={tpl} onChange={setTpl} />
-            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
-            <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
-            {!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in before paying. One approved payment unlocks one video.</p><Button asChild className="mt-4"><Link to="/auth" onClick={() => sessionStorage.setItem("magicph_auth_return", "/create")}>Sign in to pay</Link></Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>}
+            <div className="mt-6 flex flex-col gap-5 rounded-lg border bg-card p-5 text-card-foreground sm:flex-row">
+              {photo && <img src={photo} alt="Imong family photo" className="mx-auto aspect-square w-32 shrink-0 rounded-lg object-cover sm:mx-0" />}
+              <dl className="grid min-w-0 flex-1 grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
+                <dt className="text-muted-foreground">Template</dt><dd className="break-words font-bold">{template.name}</dd>
+                <dt className="text-muted-foreground">Music</dt><dd className="break-words font-bold">{musicOption(music).name}</dd>
+                <dt className="text-muted-foreground">Kadugayon</dt><dd className="font-bold">{duration} segundos</dd>
+                <dt className="border-t pt-3 font-bold">Total</dt><dd aria-live="polite" className="border-t pt-3 font-display text-2xl font-bold text-primary">₱{total}</dd>
+              </dl>
+            </div>
+            <p className="mt-4 text-center text-xs text-muted-foreground">Gipaningkamotan nga mapreserbar ang mga nawong · Gibanabana: {duration === 5 ? "30–60 segundos" : "2–3 minutos"} human ma-approve ang bayad.</p>
+            <Button onClick={() => setPaymentOpen(true)} className="mt-5 h-12 w-full text-base" disabled={!musicReady}>Pay with GCash / Maya · ₱{total}</Button>
+            {paymentOpen && (!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in una sa pagbayad. Usa ka approved payment para sa usa ka video.</p><Button asChild className="mt-4"><Link to="/auth" onClick={() => sessionStorage.setItem("magicph_auth_return", "/create")}>Sign in to pay</Link></Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>)}
             {err && <p role="alert" className="mt-3 text-destructive">{err}</p>}
-            <button onClick={() => setStep(2)} className="mt-4 text-sm font-bold text-primary">← Back</button>
+            <Button variant="ghost" onClick={() => setStep(2)} className="mt-4"><ArrowLeft />Balik</Button>
           </section>
         )}
 
@@ -235,8 +248,9 @@ function Create() {
               <div className="relative overflow-hidden rounded-3xl bg-night-grad p-10 text-night-foreground">
                 <Snow />
                 <img src={logo} alt="" className="animate-twinkle relative mx-auto h-20 w-20" />
-                <h1 className="relative mt-4 text-2xl font-bold">Generating your {duration}-second Christmas magic...</h1>
-                <p className="relative opacity-80">{offer.renderTime}</p>
+                <h1 className="relative mt-4 text-2xl font-bold">Gihimo ang imong Christmas magic...</h1>
+                <p className="relative opacity-80">{offer.renderTime} · {duration} segundos nga video</p>
+                <p className="relative mt-2 text-sm">{elapsed < (duration === 5 ? 60 : 180) ? `Gibanabanang nahabilin: ${Math.max(1, (duration === 5 ? 60 : 180) - elapsed)} segundos` : "Gihimo pa ang video — mahimong mas dugay ang paghulat."}</p>
                 <div className="relative mt-6 h-4 overflow-hidden rounded-full bg-night-foreground/20">
                   <div className="h-full bg-gold-grad transition-all" style={{ width: `${progress}%` }} />
                 </div>
@@ -256,27 +270,30 @@ function Create() {
                 <RatioToggle ratio={ratio} setRatio={setRatio} />
                 <MusicVideoPlayer src={videoUrl} music={track.url} musicName={musicOption(music).name} volume={volume} loopMusic={loopMusic} ratio={ratio} />
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                  <Button onClick={saveVideo} disabled={saving || !musicReady} className="h-auto whitespace-normal rounded-full bg-gold-grad px-6 py-3 font-extrabold text-gold-foreground">{saving ? music === "no-music" ? "Saving…" : "Merging video + music… then downloading!" : music === "no-music" ? "⬇ Save Video" : `⬇ Download with Music — ₱${total}`}</Button>
+                  <Button onClick={saveVideo} disabled={saving || !musicReady} className="h-auto whitespace-normal rounded-full bg-gold-grad px-6 py-3 font-extrabold text-gold-foreground"><Download />{saving ? music === "no-music" ? "Gi-save…" : "Gihiusa ang video ug music…" : "Download Video"}</Button>
+                  <Button variant="outline" onClick={() => void shareVideo("Facebook")}><Share2 />Facebook</Button>
+                  <Button variant="outline" onClick={() => void shareVideo("TikTok")} disabled={saving || !musicReady}><Share2 />TikTok</Button>
                   <a href={`fb-messenger://share/?link=${encodeURIComponent(videoUrl)}`} onClick={(e) => { if (!/Mobi/.test(navigator.userAgent)) { e.preventDefault(); window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(videoUrl)}&redirect_uri=${encodeURIComponent(shareUrl)}`); } }} className="rounded-full bg-festive px-6 py-3 font-bold text-primary-foreground">Share to Messenger</a>
                 </div>
                 {saveError && <p role="alert" className="mt-3 text-sm text-destructive">{saveError}</p>}
                 {music !== "no-music" && <p className="mt-2 text-xs text-muted-foreground">Messenger shares the original video. Save the music MP4 to share it with sound.</p>}
+                <p className="mt-2 text-xs text-muted-foreground">I-upload ang na-download nga video sa TikTok o Facebook para apil ang music.</p>
               </div>
             )}
           </section>
         )}
-        {signedIn && payments.some((payment) => payment.request_id || payment.status === "SUBMITTING") && <section className="mt-8 border-t py-6"><h2 className="text-xl font-bold text-primary">Your saved videos</h2><ul className="mt-3 space-y-3">{payments.filter((payment) => payment.request_id || payment.status === "SUBMITTING").map((payment) => <li key={payment.id} className="flex flex-wrap items-center justify-between gap-3 border-b py-3 text-sm"><span>{payment.duration}s · {payment.status}</span>{payment.request_id && <Button variant="outline" onClick={async () => { if (!payment.request_id) return; try { const result = await check({ data: { requestId: payment.request_id } }); if (result.videoUrl) { setDuration(videoDurationSchema.parse(payment.duration)); setMusic(musicSchema.parse(payment.music)); setTpl(payment.template); setVideoUrl(result.videoUrl); setGenErr(null); setStep(4); } else setErr(`Video status: ${result.status}. Check again shortly.`); await refreshPayments(); } catch (error) { setErr(error instanceof Error ? error.message : "Could not check video"); } }}>Open / check video</Button>}{payment.status === "SUBMITTING" && <span className="text-muted-foreground">Administrator review needed — do not retry</span>}</li>)}</ul></section>}
+        {step === 4 && signedIn && payments.some((payment) => payment.request_id || payment.status === "SUBMITTING") && <section className="mt-8 border-t py-6"><h2 className="text-xl font-bold text-primary">Your saved videos</h2><ul className="mt-3 space-y-3">{payments.filter((payment) => payment.request_id || payment.status === "SUBMITTING").map((payment) => <li key={payment.id} className="flex flex-wrap items-center justify-between gap-3 border-b py-3 text-sm"><span>{payment.duration}s · {payment.status}</span>{payment.request_id && <Button variant="outline" onClick={async () => { if (!payment.request_id) return; try { const result = await check({ data: { requestId: payment.request_id } }); if (result.videoUrl) { setDuration(videoDurationSchema.parse(payment.duration)); setMusic(musicSchema.parse(payment.music)); setTpl(payment.template); setVideoUrl(result.videoUrl); setGenErr(null); setStep(4); } else setErr(`Video status: ${result.status}. Check again shortly.`); await refreshPayments(); } catch (error) { setErr(error instanceof Error ? error.message : "Could not check video"); } }}>Open / check video</Button>}{payment.status === "SUBMITTING" && <span className="text-muted-foreground">Administrator review needed — do not retry</span>}</li>)}</ul></section>}
       </main>
       <Footer />
     </div>
   );
 }
 
-function Nav({ onBack, onNext, nextLabel = "Next →" }: { onBack: () => void; onNext: () => void; nextLabel?: string }) {
+function Nav({ onBack, onNext, nextLabel = "Sunod" }: { onBack: () => void; onNext: () => void; nextLabel?: string }) {
   return (
     <div className="mt-6 flex justify-between">
-      <button onClick={onBack} className="rounded-full px-5 py-3 font-bold text-primary">← Back</button>
-      <button onClick={onNext} className="rounded-full bg-festive px-6 py-3 font-bold text-primary-foreground shadow-festive">{nextLabel}</button>
+      <Button variant="ghost" onClick={onBack}><ArrowLeft />Balik</Button>
+      <Button onClick={onNext}>{nextLabel}<ArrowRight /></Button>
     </div>
   );
 }
@@ -285,9 +302,9 @@ function RatioToggle({ ratio, setRatio }: { ratio: string; setRatio: (r: "9:16" 
   return (
     <div className="mt-4 flex justify-center gap-2">
       {(["9:16", "16:9"] as const).map((r) => (
-        <button key={r} onClick={() => setRatio(r)} className={`rounded-full px-4 py-1 text-sm font-bold ${ratio === r ? "bg-festive text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+        <Button key={r} variant={ratio === r ? "default" : "outline"} size="sm" aria-pressed={ratio === r} onClick={() => setRatio(r)}>
           {r === "9:16" ? "9:16 TikTok/Reels" : "16:9 FB Feed"}
-        </button>
+        </Button>
       ))}
     </div>
   );
