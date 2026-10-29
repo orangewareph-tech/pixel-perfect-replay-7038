@@ -26,8 +26,8 @@ export function DurationSelector({ duration, onChange, inverse = false }: { dura
       </div>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
       <p className="mt-2 text-sm">Total: <b>P{offer.price}</b> · You pay P{offer.price} via GCash · {offer.renderTime}</p>
-      <p className="mt-1 text-xs opacity-80">Planning estimate: ${offer.falCost.toFixed(2)} (P{(offer.falCost * 58).toFixed(2)}) · Estimated profit: P{durationProfit(duration).toFixed(2)}</p>
-      <p className="mt-1 text-xs opacity-80">Fal.ai listed cost: ${FAL_LISTED_COST[duration].toFixed(2)} per video. Planning estimates exclude this actual cost; delivery and file size vary.</p>
+      <p className="mt-1 text-xs opacity-80">Fal.ai cost: ${FAL_LISTED_COST[duration].toFixed(2)} (P{(offer.falCost * 58).toFixed(2)}) · Profit after P2 fee: P{durationProfit(duration).toFixed(2)}</p>
+      <p className="mt-1 text-xs opacity-80">USD conversion: P58. Delivery and file size vary.</p>
     </div>
   );
 }
