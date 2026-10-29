@@ -26,7 +26,7 @@ import { saveCreationDraft, takeCreationDraft } from "@/lib/creation-draft";
 import { ChristmasMessageWriter } from "@/components/ChristmasMessageWriter";
 import { EMPTY_MESSAGE, type MessageDraft } from "@/lib/christmas-message";
 
-export const Route = createFileRoute("/_authenticated/create")({
+export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
   head: () => ({
     meta: [
