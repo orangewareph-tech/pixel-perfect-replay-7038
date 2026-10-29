@@ -1,5 +1,9 @@
 import { expect, it } from "vitest";
-import { canReserveOwnerTest, isOwnerTester } from "@/lib/owner-tests";
+import { ADMIN_LIMITS, adminTestQuota, canReserveOwnerTest, isOwnerTester, type AdminTestRecord } from "@/lib/owner-tests";
+
+const today = new Date().toISOString();
+const record = (over: Partial<AdminTestRecord> = {}): AdminTestRecord =>
+  ({ email: "orangewareph@gmail.com", templateId: "parol", cost: ADMIN_LIMITS.costPer5s, duration: 5, timestamp: today, ...over });
 it("only the named owner with a server role may bypass payment", () => {
   expect(isOwnerTester("orangawareph@gmail.com", { role: "admin" })).toBe(true);
   expect(isOwnerTester("test@gmail.com", { role: "admin" })).toBe(false);
