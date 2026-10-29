@@ -7,7 +7,7 @@ import { Header, Footer } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export const Route = createFileRoute("/auth")({ head: () => ({ meta: [ { title: "Audit Sign In — MagicPh AI" }, { name: "description", content: "Sign in to the protected MagicPh AI Fal.ai audit." }, { property: "og:title", content: "MagicPh AI Audit Sign In" }, { property: "og:description", content: "Protected access to video service checks." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" } ] }), component: Auth });
+export const Route = createFileRoute("/auth")({ head: () => ({ meta: [ { title: "Account Sign In — MagicPh AI" }, { name: "description", content: "Sign in to manage Christmas video payments, credits and saved videos." }, { property: "og:title", content: "MagicPh AI Account Sign In" }, { property: "og:description", content: "Secure account access for video payments and administrator review." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" } ] }), component: Auth });
 function Auth() {
   const navigate = useNavigate();
   const goBack = async () => { const target = sessionStorage.getItem("magicph_auth_return"); sessionStorage.removeItem("magicph_auth_return"); if (target === "/create" || target === "/payment" || target === "/admin") { window.location.assign(target); return; } await navigate({ to: "/create" }); };

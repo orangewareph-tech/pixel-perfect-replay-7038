@@ -1,10 +1,11 @@
 # Secure payment launch
-- [ ] Protect customer generation with authenticated, single-use approved payment credits.
-- [ ] Add manual payment receipt submission and administrator review using the uploaded InstaPay QR.
-- [ ] Add protected administrator dashboard and installed-app status checks.
-- [ ] Connect Paymongo and Stripe — provider setup and approval required; no payment secrets currently configured.
-- [ ] Confirm custom account-based rate limits and daily spending limit before implementation.
-- [ ] Verify unpaid generation is blocked and manual approval grants exactly one video.
+- [x] Protect customer generation with authenticated, single-use approved payment credits; direct unpaid calls reject before Fal submission.
+- [x] Add manual payment receipt submission and administrator review using the uploaded InstaPay QR and confirmed recipient.
+- [x] Add protected administrator dashboard and installed-app status checks.
+- [ ] Connect Paymongo — connection was declined; automatic checkout remains disabled. Stripe excluded by user choice.
+- [x] Enforce confirmed custom account limits: three starts per hour and atomic UTC daily budget reservations, including administrator tests.
+- [x] Run 45 tests and verify unpaid checkout, direct-call rejection and protected-page redirects with no browser errors.
+- [ ] Verify receipt approval, credit consumption and authenticated administrator views end-to-end — requesting user has no matching app account; awaits sign-in or an identified account.
 
 # Full app testing
 - [x] Run all 36 automated tests; verify five templates, eight playable music clips, saved preferences, four prices, mobile layout, signed-out audit redirect, offline checkout recovery, and real 5s/10s video downloads (5s contains audible AAC music).
@@ -12,8 +13,8 @@
 - [ ] Verify installed-app stale-worker upgrade end-to-end — browser harness stalled during worker activation; isolated cleanup tests pass, but a deployed installed-app upgrade remains unverified.
 
 ## Test findings
-- Payments and bundle plans remain demo-only; plan search values do not change delivery or checkout.
-- Customer generation is public without server-side rate/cost limits, allowing unwanted Fal.ai charges; launch requires verified checkout and abuse controls.
+- Manual payments now require account receipt submission and administrator approval. Paymongo remains disconnected; older bundle plans do not change delivery or checkout.
+- Customer generation now requires approved single-use payment credits and atomic account/budget checks. Authenticated paid end-to-end launch verification is still required.
 - Saved files retain the uploaded photo's aspect ratio; display toggles do not reshape the downloaded video.
 - Generation failure handling and download range validation need hardening; this testing request did not change these rules.
 
