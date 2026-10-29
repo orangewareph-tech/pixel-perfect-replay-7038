@@ -1,3 +1,7 @@
+# Full app testing
+- [ ] Run all automated tests and public browser workflows, including music, real video generation/download, and offline recovery.
+- [ ] Verify protected audit with the owner's account — blocked until the owner signs in or identifies a test account.
+
 # Offline recovery
 - [x] Replace the broken navigation worker with a same-path cleanup release, preserving home-screen support.
 - [x] Add non-blocking offline warning, retry, and video-generation guard; verify cache cleanup and online recovery.
