@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { loadMusicFile, musicPath, type MusicId } from "@/lib/christmas-music";
+import { loadMusicFile, musicAssetUrl, type MusicId } from "@/lib/christmas-music";
 import type { VideoDuration } from "@/lib/video-duration";
 
 export function useMusicFile(music: MusicId, duration: VideoDuration) {
-  const path = musicPath(music, duration);
+  const path = musicAssetUrl(music, duration);
   const [result, setResult] = useState<{ path: string | null; blob: Blob | null; url: string | null; status: "checking" | "ready" | "missing" }>({ path: null, blob: null, url: null, status: "ready" });
   useEffect(() => {
     const controller = new AbortController(); let objectUrl: string | null = null;

@@ -26,8 +26,8 @@ export function DurationSelector({ duration, onChange, inverse = false, music = 
         })}
       </div>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
-      <p className="mt-2 text-sm">{music !== "no-music" && !musicReady ? "Total once music is available" : "Total"}: <b>₱{christmasTotal(duration, music)}</b> · {duration}-second video{music !== "no-music" && ` + ${musicOption(music).name}`}</p>
-      {music !== "no-music" && <p className="mt-1 text-xs">{musicReady ? "Mas magical ang video with music!" : "Music unavailable — not ready to purchase."} Estimated delivery {duration === 5 ? "60 sec" : "2–3 mins"} + about 5 sec for music.</p>}
+      <p className="mt-2 text-sm">Total: <b>₱{christmasTotal(duration, music)}</b>{music !== "no-music" && " — With Music!"} · {duration}-second video{music !== "no-music" && ` + ${musicOption(music).name}`}</p>
+      {music !== "no-music" && <p className="mt-1 text-xs">{musicReady ? "Mas magical ang video with music!" : "Loading music — please wait."} Estimated delivery {duration === 5 ? "60 sec" : "2–3 mins"} + about 5 sec for music.</p>}
     </div>
   );
 }
