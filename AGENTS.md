@@ -16,3 +16,6 @@
   is self-hosted on Vercel; Lovable's own publish pipeline is unaffected and still
   builds for its own target.
 
+
+## PWA
+- PWA uses vite-plugin-pwa (generateSW, /sw.js); registration only via src/lib/pwa.ts, which refuses dev and Lovable preview hostnames, because a cached app shell in preview would serve stale code. sw.js outDir is dist/client for Lovable builds and .vercel/output/static for Vercel builds.
