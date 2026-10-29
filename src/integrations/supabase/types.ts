@@ -37,6 +37,7 @@ export type Database = {
       }
       fal_test_runs: {
         Row: {
+          cost_usd: number
           duration: number
           error: string | null
           finished_at: string | null
@@ -44,10 +45,12 @@ export type Database = {
           request_id: string | null
           started_at: string
           status: string
+          template: string
           user_id: string
           video_url: string | null
         }
         Insert: {
+          cost_usd?: number
           duration: number
           error?: string | null
           finished_at?: string | null
@@ -55,10 +58,12 @@ export type Database = {
           request_id?: string | null
           started_at?: string
           status?: string
+          template?: string
           user_id: string
           video_url?: string | null
         }
         Update: {
+          cost_usd?: number
           duration?: number
           error?: string | null
           finished_at?: string | null
@@ -66,6 +71,7 @@ export type Database = {
           request_id?: string | null
           started_at?: string
           status?: string
+          template?: string
           user_id?: string
           video_url?: string | null
         }
@@ -260,6 +266,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      ensure_magicph_owner_role: { Args: never; Returns: boolean }
       review_video_payment: {
         Args: { p_approve: boolean; p_id: string }
         Returns: undefined

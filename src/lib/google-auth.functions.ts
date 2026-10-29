@@ -10,7 +10,8 @@ export const requireGoogleAuth = createMiddleware({ type: "function" })
     return next({ context: { googleUser: data.user } });
   });
 
-export const googleAccount = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(({ context }) => {
+export const googleAccount = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
+  await context.supabase.rpc("ensure_magicph_owner_role");
   const user = context.googleUser;
   return { name: String(user?.user_metadata['full_name'] ?? "Google account"), email: user?.email ?? "", avatar: typeof user?.user_metadata['avatar_url'] === "string" ? user.user_metadata['avatar_url'] : "" };
 });

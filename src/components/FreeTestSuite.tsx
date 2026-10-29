@@ -1,13 +1,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { checkStaticPreviews, runFreeChecks, type FreeCheck } from "@/lib/free-checks";
+import { useServerFn } from "@tanstack/react-start";
+import { freeConnectionCheck } from "@/lib/fal-audit.functions";
+import { readAppCacheStatus } from "@/lib/cache-recovery";
 
 export function FreeTestSuite() {
+  const connection = useServerFn(freeConnectionCheck);
   const [results, setResults] = useState<FreeCheck[]>([]);
   const [busy, setBusy] = useState(false);
   async function run(previewOnly = false) {
     setBusy(true);
-    try { setResults(previewOnly ? [await checkStaticPreviews()] : await runFreeChecks()); }
+    try {
+      const checks = previewOnly ? [await checkStaticPreviews()] : await runFreeChecks();
+      if (!previewOnly) {
+        try { const result = await connection(); checks.push({ name: "Google & video-service connection", status: result.connected ? "PASS" : "SKIP", detail: result.detail }); } catch { checks.push({ name: "Google & video-service connection", status: "SKIP", detail: "Connection could not be verified. No video submitted." }); }
+        const cache = await readAppCacheStatus(); checks.push({ name: "Safe cache recovery", status: cache.supported ? "PASS" : "SKIP", detail: `${cache.items} scoped cache items. No account storage cleared.` });
+      }
+      setResults(checks);
+    }
     finally { setBusy(false); }
   }
   return <section className="border-y py-8">
