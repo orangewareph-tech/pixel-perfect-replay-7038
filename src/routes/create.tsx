@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -17,13 +17,17 @@ import { useChristmasChoices } from "@/hooks/use-christmas-choices";
 import { useMusicFile } from "@/hooks/use-music-file";
 import { canGenerateVideo, useOnlineStatus } from "@/hooks/use-online-status";
 import { christmasTotal, DEFAULT_MUSIC_VOLUME, musicOption, musicSchema, musicCheckoutLabel } from "@/lib/christmas-music";
+import { PaymentPanel } from "@/components/PaymentPanel";
+import { listMyPayments } from "@/lib/payments.functions";
+import { paymentChoicesSchema } from "@/lib/payment-rules";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
   head: () => ({
     meta: [
       { title: "Create Your Christmas Video — MagicPh AI" },
-      { name: "description", content: "Create a Filipino Christmas video with parol glow, snowfall and optional licensed music. Pick 5 or 10 seconds; checkout is currently a demo." },
+      { name: "description", content: "Create a Filipino Christmas video with parol glow, snowfall and original festive music. Pick 5 or 10 seconds; approved payment unlocks one video." },
       { property: "og:title", content: "Create Your Christmas Video — MagicPh AI" },
       { property: "og:description", content: "Turn your family photo into Pinoy Christmas magic with five festive effects and optional music." },
       { property: "og:type", content: "website" },
@@ -61,6 +65,15 @@ function Create() {
   const template = TEMPLATES.find((t) => t.id === tpl) ?? TEMPLATES[0];
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const listPayments = useServerFn(listMyPayments);
+  const [payments, setPayments] = useState<Awaited<ReturnType<typeof listMyPayments>>["payments"]>([]);
+  const [signedIn, setSignedIn] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
+  async function refreshPayments() {
+    try { const result = await listPayments(); setPayments(result.payments); setAccountEmail(result.email); setSignedIn(true); }
+    catch { setSignedIn(false); setPayments([]); }
+  }
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => { if (data.user) void refreshPayments(); }); }, []);
 
   async function saveVideo() {
     if (!videoUrl || saving) return;
@@ -105,14 +118,17 @@ function Create() {
     r.readAsDataURL(f);
   }
 
-  async function generate() {
+  async function generate(paymentId?: string) {
     if (!canGenerateVideo(online)) { setErr("Need internet to generate video"); return; }
     if (!photo) { setErr("Please upload a family photo first."); setStep(0); return; }
     if (!musicReady) { setErr("Music is still loading. Please wait and try again."); return; }
+    const payment = payments.find((item) => item.id === paymentId && item.status === "approved" && item.duration === duration && item.music === music && item.template === tpl);
+    if (!payment) { setErr(`Please pay first — ₱${total} and an approved video credit are required.`); setStep(3); return; }
     setStep(4); setProgress(3); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
     try {
-      const { requestId } = await start({ data: { imageUrl: photo, scene: template.scene, duration } });
+      const { requestId } = await start({ data: { imageUrl: photo, paymentId: payment.id } });
+      await refreshPayments();
       for (let i = 0; i < 90; i++) {
         await new Promise((r) => setTimeout(r, 4000));
         const s = await check({ data: { requestId } });
@@ -126,6 +142,7 @@ function Create() {
       setGenErr(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       clearInterval(timer);
+      await refreshPayments();
     }
   }
 
@@ -206,22 +223,7 @@ function Create() {
             <MagicTemplateSelector value={tpl} onChange={setTpl} />
             <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
             <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {["GCash", "Maya"].map((m) => (
-                <div key={m} className="rounded-2xl bg-card p-4 text-center shadow-festive">
-                  <b>{m} QR</b>
-                  <div className="mx-auto mt-3 grid h-40 w-40 grid-cols-8 gap-0.5 rounded-lg bg-secondary p-2">
-                    {Array.from({ length: 64 }).map((_, i) => (
-                      <span key={i} className={(i * 7 + m.length) % 3 === 0 ? "bg-foreground" : ""} />
-                    ))}
-                  </div>
-                  <p className="mt-2 text-xs text-muted-foreground">Demo QR · total ₱{total}</p>
-                </div>
-              ))}
-            </div>
-            <a href="https://paymongo.com" target="_blank" rel="noreferrer" className="mt-4 block rounded-full bg-festive py-3 text-center font-bold text-primary-foreground">Pay with Card via PayMongo</a>
-            <Button onClick={generate} disabled={!musicReady || !online} className="mt-3 h-auto w-full whitespace-normal rounded-full bg-gold-grad py-3 font-extrabold text-gold-foreground shadow-glow">I've paid ₱{total} — Generate {duration} Sec Magic{music !== "no-music" ? " + Music 🎵" : " ✨"}</Button>
-            <Button variant="ghost" onClick={generate} disabled={!musicReady || !online} className="mt-2 w-full text-sm text-muted-foreground underline">Skip payment (demo)</Button>
+            {!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in before paying. One approved payment unlocks one video.</p><Button asChild className="mt-4"><Link to="/auth" onClick={() => sessionStorage.setItem("magicph_auth_return", "/create")}>Sign in to pay</Link></Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>}
             {err && <p role="alert" className="mt-3 text-destructive">{err}</p>}
             <button onClick={() => setStep(2)} className="mt-4 text-sm font-bold text-primary">← Back</button>
           </section>
@@ -245,7 +247,7 @@ function Create() {
               <div className="rounded-3xl bg-card p-8 shadow-festive">
                 <h1 className="text-2xl font-bold text-primary">Oops, wala nahuman 😢</h1>
                 <p className="mt-2 text-muted-foreground">{genErr}</p>
-                <button onClick={generate} className="mt-4 rounded-full bg-festive px-6 py-3 font-bold text-primary-foreground">Try again</button>
+                <p className="mt-3 text-sm">Your payment and request are saved. Check the existing request before paying or retrying.</p><Button onClick={() => setStep(3)} className="mt-4">View payment status</Button>
               </div>
             )}
             {videoUrl && (
@@ -263,6 +265,7 @@ function Create() {
             )}
           </section>
         )}
+        {signedIn && payments.some((payment) => payment.request_id || payment.status === "SUBMITTING") && <section className="mt-8 border-t py-6"><h2 className="text-xl font-bold text-primary">Your saved videos</h2><ul className="mt-3 space-y-3">{payments.filter((payment) => payment.request_id || payment.status === "SUBMITTING").map((payment) => <li key={payment.id} className="flex flex-wrap items-center justify-between gap-3 border-b py-3 text-sm"><span>{payment.duration}s · {payment.status}</span>{payment.request_id && <Button variant="outline" onClick={async () => { if (!payment.request_id) return; try { const result = await check({ data: { requestId: payment.request_id } }); if (result.videoUrl) { setDuration(videoDurationSchema.parse(payment.duration)); setMusic(musicSchema.parse(payment.music)); setTpl(payment.template); setVideoUrl(result.videoUrl); setGenErr(null); setStep(4); } else setErr(`Video status: ${result.status}. Check again shortly.`); await refreshPayments(); } catch (error) { setErr(error instanceof Error ? error.message : "Could not check video"); } }}>Open / check video</Button>}{payment.status === "SUBMITTING" && <span className="text-muted-foreground">Administrator review needed — do not retry</span>}</li>)}</ul></section>}
       </main>
       <Footer />
     </div>
