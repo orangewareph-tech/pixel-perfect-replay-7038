@@ -11,6 +11,8 @@
 
 ## Rules
 
+- Pass template choices from the home page through the create route's validated search parameters, so uploading a photo preserves the selected template.
+
 - Production builds run outside Lovable must keep emitting Vercel's Build Output
   API (the deploy preset in `vite.config.ts` plus `vercel.json`), because the site
   is self-hosted on Vercel; Lovable's own publish pipeline is unaffected and still
