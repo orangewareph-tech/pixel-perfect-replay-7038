@@ -1,78 +1,131 @@
-# Welcome to your Lovable project
+# MagicPh AI
 
-This project was built with [Lovable](https://lovable.dev).
+A Filipino Christmas photo-to-video app with a guided Cebuano creation flow, festive templates, automatic music, secure manual payment review, and personalized AI greetings.
 
-## Build with Lovable
+## Features
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+- Five templates: **Parol Star Magic**, **Snowfall Magic**, **Fairy Lights Magic**, **Santa Village Magic**, and **Fireplace Noche Buena Magic**.
+- Photo uploads: JPG or PNG, up to 10 MB.
+- **5-second videos for ₱149** or **10-second videos for ₱299**, with Christmas music included and no music surcharge.
+- Five-step flow: upload → template → duration → confirmation/payment → video/download.
+- Optional AI-written Christmas captions based on a recipient’s name, a short greeting, and the selected template. Captions can be edited and copied; they are **not burned into the video**.
+- Account-based receipt submission and administrator approval; one approved payment unlocks one video.
+- One-click MP4 downloads with embedded Christmas audio and sharing actions.
+- Home-screen installation support and non-blocking connection warnings.
+- Protected administrator payment review, video diagnostics, and free media checks.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+Template images and three-second animated previews are generated examples, not customer results or guarantees of the final video.
 
-## Development
+## Technology
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- TanStack Start / TanStack Router, React 19, TypeScript
+- Tailwind CSS v4 and shared UI components
+- Lovable Cloud for accounts, private receipts, and payment records
+- Fal.ai for video generation
+- Lovable AI Gateway through the Vercel AI SDK for personalized captions
+- Single-thread ffmpeg.wasm for browser-side music embedding
+- Vitest for automated tests
+
+## Local development
+
+Use **Node.js 22** (see `.nvmrc`) and Bun. From the project folder:
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun install
+bun run dev
 ```
+
+Open the local address printed by the development server. The Lovable sandbox uses port 8080.
+
+Other commands:
+
+```sh
+bun run test          # Run automated tests
+bun run test:watch    # Watch tests
+bun run lint         # Run ESLint
+bun run build        # Create a production build
+bun run preview      # Preview the production build
+```
+
+The existing tests cover pricing, payment rules, duration selection, music, offline recovery, access rules, routing, and Christmas message validation. Live AI/video calls require configured services; unit tests alone do not verify provider availability or real payment approval.
+
+## Configuration and secrets
+
+Keep secrets in Lovable’s secret settings or the hosting provider’s server environment. Never commit credentials or put private keys in `VITE_*` variables.
+
+| Setting | Purpose |
+| --- | --- |
+| `FAL_KEY` | Server-side video generation credential; `FAL_API_KEY` remains a legacy fallback. |
+| `LOVABLE_API_KEY` | Server-side AI Gateway credential, provisioned through Lovable. |
+| `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` | Generated public connection settings for the Lovable Cloud browser client. |
+| `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` | Server connection settings where required by the generated Cloud integration. |
+
+The generated Cloud server client handles privileged operations. Its managed service credential is **not available for manual export from Lovable Cloud**; do not fabricate a replacement or expose it to browsers. Self-hosting must verify that authenticated and privileged Cloud operations are supported in the target environment. Setting only `FAL_KEY` is not enough for the complete application.
+
+Do not edit generated Cloud clients, auth middleware, connection files, or generated types manually. Apply schema changes using the project’s managed migration workflow.
+
+## Accounts, payments, and safety
+
+Video generation requires a signed-in owner and an atomically claimed, approved payment. Uploading a receipt does not approve a payment. Administrator access is verified server-side through protected role records; new accounts do not automatically receive that role.
+
+Manual GCash/InstaPay receipt review is implemented. **Paymongo is not connected**, and automatic provider checkout remains disabled until configured and verified. Stripe is not part of this project’s payment setup.
+
+Customer generation limits and the shared daily spending guard are enforced server-side. Ambiguous submissions remain saved for reconciliation rather than automatically creating another paid request. Receipts are private owner/administrator records.
+
+Personalized greetings require sign-in, use `openai/gpt-6-astra` through AI Gateway’s Responses API, and keep prompts and keys on the server. AI usage consumes workspace credits. Provider access denials are persisted to prevent repeated blocked calls; restore access before explicitly clearing the server-side denial state and starting a fresh request.
+
+## Music and downloads
+
+All current previews and finished videos use automatic Christmas instrumental music at a default 70% volume. No customer music selector or separate music charge is required. Browser autoplay restrictions may require a sound-enabled play action.
+
+Audio assets are original synthesized festive instrumentals, not recordings or covers of named commercial songs. Do not replace them with commercial recordings without appropriate synchronization rights.
+
+Downloads fetch the video in bounded chunks, then lazy-load ffmpeg.wasm to embed AAC audio into an MP4 while preserving source audio. Allow the merge to finish before closing the page. Sharing the original provider URL does not include the separately added soundtrack; download the merged MP4 and upload it to social apps to share with sound.
+
+Display aspect-ratio controls do not reshape the downloaded source video. Generation times are estimates, and exact face preservation is not guaranteed.
+
+The pinned `@ffmpeg/core` build is GPL-2.0-or-later. Retain its license notice and review applicable redistribution obligations. Source and build instructions: <https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10>.
+
+## PWA and offline recovery
+
+The current release is **manifest-only**, without a new app-shell caching worker. Home-screen icons and a manifest with `start_url: "/"` remain available.
+
+`public/sw.js` is a same-path cleanup release for the previous Workbox worker. It removes only its scoped Workbox caches and `magicph-assets`, recovers tabs, and unregisters itself. Keep it deployed at the same origin so returning installed-app users can receive the recovery; deleting the file is not sufficient. Messaging workers and caches must remain untouched.
+
+Connection detection never replaces the running application. An already-open page remains browsable when disconnected, but new page loads, AI messages, and video generation require internet. Offline recovery includes retry and homepage actions.
 
 ## Deploy to Vercel
 
-This repo builds straight to Vercel's Build Output API (`.vercel/output`) — no
-extra plugins or config to maintain. `vercel.json` keeps the build command
-explicit, and `.nvmrc` pins Node 22 so the deployed function runs on the Node 22
-runtime.
+`vite.config.ts` uses the Vercel deployment preset for builds outside Lovable, emitting the Build Output API into `.vercel/output`. `vercel.json` specifies `npm run build`; `.nvmrc` pins Node 22. Lovable’s own publishing pipeline is unaffected.
 
-1. Push this repository to GitHub and import it into Vercel.
-2. Vercel installs dependencies (Bun is picked up from `bun.lock`) and runs
-   `npm run build`, which produces the serverless function plus static assets.
-3. In **Settings → Environment Variables**, add `FAL_KEY` (the video service
-   key) for the Production environment, then deploy.
-4. Optional, for a one-off deploy straight from your machine:
-   `npm run build && npx vercel deploy --prebuilt`.
+1. Connect the repository to Vercel and select Node.js 22.
+2. Install dependencies using the committed Bun lockfile and keep the configured build command.
+3. Configure required public connection settings and server credentials in the deployment environment. Verify Cloud account, payment, and privileged operations are supported before launch.
+4. Configure authentication’s allowed site/redirect addresses for the deployed origin.
+5. Deploy and test sign-in, receipt submission, approved-credit access, captions, asset playback, and music-embedded downloads.
 
-Deploying from Lovable is unaffected — Lovable's own publish pipeline keeps its
-Cloudflare layout, and the Vercel target only applies to builds run outside it.
+For an optional prebuilt deployment from a configured local environment:
 
-## Built with
+```sh
+bun run build
+bunx vercel deploy --prebuilt
+```
 
-## Offline recovery release
+Keep the `/__l5e/assets-v1/` rewrite in `vercel.json`: imported media pointers and ffmpeg assets depend on this proxy to the published Lovable asset service. Update its destination if that published hostname changes.
 
-Home-screen icons and the manifest remain available. New app-shell caching is
-disabled for this release: `public/sw.js` replaces the previous Workbox worker
-at the same deployed URL, removes only its scoped Workbox caches and
-`magicph-assets`, recovers open tabs, and unregisters itself. Keep this file
-available for returning installed-app users; deleting the old worker is not
-sufficient. Publish/deploy this release to the same origin before installed
-apps can recover. Reopening while online lets the browser check for the update.
-An already-open app stays usable while disconnected, but new page loads and
-video generation require internet. Offline warnings never replace the app.
+## Project map
 
-## Christmas music
+```text
+src/routes/              Pages, guided creation, account and administrator views
+src/components/          Template cards, payments, captions, video player and UI
+src/lib/                 Validation, server functions, media and payment helpers
+src/lib/ai/              Request-scoped AI Gateway helpers
+src/hooks/               Hydration-safe preferences and connection status
+src/assets/              Images and hosted-media asset pointers
+src/test/                Automated tests
+public/                  Manifest, icons, offline page and worker cleanup release
+drizzle/migrations/      Managed database migrations
+supabase/                Existing Cloud migration/configuration files
+```
 
-The five magic templates and four playable music upgrades are available.
-Eight asset-hosted MP3s provide 5/10-second original synthesized festive bell
-instrumentals. These are not recordings or covers of the named songs; the music
-selector discloses this. Music adds ₱20 and previews at 70% volume by default.
-Do not replace tracks with commercial recordings without synchronization rights.
-
-Music downloads lazy-load single-thread ffmpeg.wasm and embed AAC sound in the
-MP4, honoring volume/loop settings and preserving any original audio. Large
-WASM is asset-hosted (not checked into the repository); the Vercel rewrite
-for `/__l5e/assets-v1/` keeps these pointer URLs working outside Lovable.
-If the published Lovable hostname changes, update that rewrite destination.
-
-The pinned `@ffmpeg/core` build is GPL-2.0-or-later. Source and build instructions:
-https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10 . Retain the license notice
-and review applicable redistribution obligations before distributing the core.
-
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+Read `AGENTS.md` before changing architecture and `roadmap.md` for outstanding verification and launch blockers. The README documents implemented behavior; it does not certify every paid or administrator workflow as production-verified.
