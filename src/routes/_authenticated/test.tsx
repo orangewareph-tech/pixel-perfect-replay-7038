@@ -2,19 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { auditAccess, scanFalAi, testFalAiGeneration, pollFalTest } from "@/lib/fal-audit.functions";
+import { auditAccess, scanFalAi } from "@/lib/fal-audit.functions";
 import { Header, Footer } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
-import { DURATION_OFFERS, FAL_LISTED_COST, durationProfit, breakEvenVideos, VIDEO_MODEL, type VideoDuration } from "@/lib/video-duration";
-import sample from "@/assets/hero.jpg";
-import type { Tables } from "@/integrations/supabase/types";
+import { DURATION_OFFERS, FAL_LISTED_COST, durationProfit, breakEvenVideos, VIDEO_MODEL } from "@/lib/video-duration";
 import { christmasTotal, christmasProfit } from "@/lib/christmas-music";
 import { InstalledStatus } from "@/components/InstalledStatus";
 import { CacheRecovery } from "@/components/CacheRecovery";
 import { Link } from "@tanstack/react-router";
 import { FreeTestSuite } from "@/components/FreeTestSuite";
-import { MusicVideoPlayer } from "@/components/MusicVideoPlayer";
-import { musicAssetUrl, AUTOMATIC_MUSIC, DEFAULT_MUSIC_VOLUME } from "@/lib/christmas-music";
 import { OwnerTestPanel } from "@/components/OwnerTestPanel";
 import { MockPaymentFlow } from "@/components/MockPaymentFlow";
 
@@ -33,41 +29,16 @@ export const Route = createFileRoute("/_authenticated/test")({
 function TestPage() {
   const access = useSuspenseQuery(accessOptions).data;
   const initial = Route.useLoaderData().report;
-  const scan = useServerFn(scanFalAi); const start = useServerFn(testFalAiGeneration); const poll = useServerFn(pollFalTest);
+  const scan = useServerFn(scanFalAi);
   const [report, setReport] = useState<Awaited<ReturnType<typeof scanFalAi>> | null>(initial);
-  const [last, setLast] = useState<Tables<"fal_test_runs"> | null>(initial?.lastTest ?? null);
   const [logs, setLogs] = useState<string[]>([]); const [busy, setBusy] = useState(false); const [error, setError] = useState("");
   const addLog = (message: string) => setLogs((old) => [...old, `${new Date().toLocaleTimeString()} · ${message}`]);
   async function refresh() {
     setBusy(true); setError("");
-    try { const result = await scan(); setReport(result); setLast(result.lastTest); addLog("Scan completed — walay generation charge."); }
+    try { const result = await scan(); setReport(result); addLog("Scan completed — walay generation charge."); }
     catch (err) { setError(err instanceof Error ? err.message : "Scan failed"); }
     finally { setBusy(false); }
   }
-  async function follow(id: string) {
-    for (let attempt = 0; attempt < 120; attempt++) {
-      const run = await poll({ data: { id } }); setLast(run);
-      addLog(`Queue ${run.request_id} — ${run.status}`);
-      if (run.status === "FAILED") throw new Error(run.error ?? "Generation failed");
-      if (run.status === "COMPLETED") { addLog("Video ready! Listed charge shown; actual balance deduction unverified."); return; }
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-    }
-    addLog("Still queued. Refresh status instead of creating another paid request.");
-  }
-  async function runTest(duration: VideoDuration) {
-    setBusy(true); setError(""); setLogs([]);
-    try {
-      addLog("Uploading sample Pinoy family photo...");
-      const response = await fetch(sample); const blob = await response.blob();
-      const imageUrl = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Photo unavailable")); reader.onerror = () => reject(new Error("Photo unavailable")); reader.readAsDataURL(blob); });
-      addLog(`Calling Fal.ai — ${duration}s, listed cost $${FAL_LISTED_COST[duration].toFixed(2)}.`);
-      const result = await start({ data: { duration, imageUrl } }); addLog(`Queue ID: ${result.requestId}`);
-      await follow(result.id);
-      const resultReport = await scan(); setReport(resultReport); setLast(resultReport.lastTest);
-    } catch (err) { const message = err instanceof Error ? err.message : "Test failed"; setError(message); addLog(message); }
-    finally { setBusy(false); }
-  }
-  const active = last && ["SUBMITTING", "IN_QUEUE", "IN_PROGRESS"].includes(last.status);
   return <><Header /><main className="mx-auto max-w-5xl px-4 py-10"><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-bold text-christmas-green">MagicPh AI · launch audit</p><h1 className="mt-1 text-3xl font-bold text-primary">Scan & Test Fal.ai</h1></div>{access.admin && <Button onClick={refresh} disabled={busy}>Scan connection</Button>}</div>
     {!access.admin ? <section className="py-12"><h2 className="text-xl font-bold">Administrator access required</h2><p className="mt-3">Naka-sign in ka. An approved administrator role is required before balance checks or paid tests.</p></section> : <>
       <dl className="mt-8 grid gap-6 border-y py-6 sm:grid-cols-3"><div><dt className="text-sm text-muted-foreground">Fal.ai Status</dt><dd className="mt-1 font-bold">{report ? report.connected ? "Connected" : "Not verified / disconnected" : "Not scanned"}</dd></div><div><dt className="text-sm text-muted-foreground">Secret</dt><dd className="mt-1 font-bold">{report ? report.keyFound ? "FAL_KEY found - hidden for security" : "FAL_KEY missing - add to Secrets" : "Not scanned"}</dd></div><div><dt className="text-sm text-muted-foreground">Balance</dt><dd className="mt-1 font-bold">{report?.balance != null ? `$${report.balance.toFixed(2)} = ${Math.floor(report.balance / 0.35)} five-second / ${Math.floor(report.balance / 0.70)} ten-second videos` : "Unavailable / not scanned"}</dd></div></dl>
@@ -80,6 +51,7 @@ function TestPage() {
       <section className="border-t py-6"><h2 className="text-xl font-bold">Launch checklist</h2><ul className="mt-4 space-y-2 text-sm"><li>✓ 5s/10s selection, saved choice, P149/P299, dynamic checkout, correct duration payload.</li><li>✓ Manifest and home-screen support; offline recovery does not register a new app-shell worker.</li><li>Manual payment: uploaded InstaPay QR, receipt submission and administrator approval. Receipt alone does not unlock generation.</li><li>Generation requires authenticated ownership and an approved single-use credit; max 3 per hour and a shared daily spending cap.</li><li>Paymongo is not connected. Automatic payment verification is unavailable.</li><li>Administrator approval requires a protected account role, never a shared password.</li><li>⚠ Fal.ai billing permission is required for live balance. Never infer deductions from a video completing.</li></ul><Button asChild variant="outline" className="mt-4"><Link to="/admin">Review payments & credits</Link></Button></section>
       <section className="border-t py-6"><h2 className="text-xl font-bold">Concurrent capacity · estimates, not a load-test result</h2><p className="mt-3 text-sm">10 × 5s = $3.50 (P203). 100 × 5s = $35 (P2,030). Queue limits and completion time depend on your Fal.ai account; no promised 60–90-second batch delivery.</p><p className="mt-2 text-sm">$50 (P2,900) covers 142 five-second videos at listed cost. Top up according to actual demand; two-week capacity is not verified.</p></section>
     </>}
+    {error && <p role="alert" className="text-destructive">{error}</p>}<ul className="text-sm">{logs.map((log, i) => <li key={i}>{log}</li>)}</ul>
     <OwnerTestPanel /><FreeTestSuite /><MockPaymentFlow />
   </main><Footer /></>;
 }
