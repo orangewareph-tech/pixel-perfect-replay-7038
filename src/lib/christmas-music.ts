@@ -28,9 +28,13 @@ export function musicAssetUrl(id: MusicId, duration: VideoDuration) { return id 
 export function musicCheckoutLabel(duration: VideoDuration, id: MusicId) { return `Upload & Pay ₱${christmasTotal(duration, id)} - ${duration} Sec ${duration === 10 ? "Premium Magic" : "Magic"}${id === "no-music" ? "" : " + Music 🎵"} →`; }
 export function christmasTotal(duration: VideoDuration, _id: MusicId) { return DURATION_OFFERS[duration].price; }
 export function christmasProfit(duration: VideoDuration, id: MusicId) { return Number((christmasTotal(duration, id) - DURATION_OFFERS[duration].falCost * 58 - 2 - (id === "no-music" ? 0 : 5)).toFixed(2)); }
-export function mergeAudioArgs(volume: number, loop: boolean, duration: VideoDuration, hasOriginalAudio = false) {
+export const CHRISTMAS_OVERLAY_TEXT = "Merry Christmas";
+export function mergeAudioArgs(volume: number, loop: boolean, duration: VideoDuration, hasOriginalAudio = false, withOverlay = false) {
   const level = Math.max(0, Math.min(100, volume)) / 100;
-  return ["-i", "video.mp4", ...(loop ? ["-stream_loop", "-1"] : []), "-i", "music.mp3", "-filter_complex", hasOriginalAudio ? `[1:a]volume=${level},apad[music];[0:a:0][music]amix=inputs=2:duration=first:normalize=0[audio]` : `[1:a]volume=${level},apad[audio]`, "-map", "0:v:0", "-map", "[audio]", "-c:v", "copy", "-c:a", "aac", "-t", String(duration), "-movflags", "+faststart", "output.mp4"];
+  const audio = hasOriginalAudio ? `[1:a]volume=${level},apad[music];[0:a:0][music]amix=inputs=2:duration=first:normalize=0[audio]` : `[1:a]volume=${level},apad[audio]`;
+  if (!withOverlay) return ["-i", "video.mp4", ...(loop ? ["-stream_loop", "-1"] : []), "-i", "music.mp3", "-filter_complex", audio, "-map", "0:v:0", "-map", "[audio]", "-c:v", "copy", "-c:a", "aac", "-t", String(duration), "-movflags", "+faststart", "output.mp4"];
+  const video = "[0:v][2:v]overlay=(W-w)/2:H-h-48:alpha=premultiplied,format=yuv420p[v]";
+  return ["-i", "video.mp4", ...(loop ? ["-stream_loop", "-1"] : []), "-i", "music.mp3", "-i", "overlay.png", "-filter_complex", `${video};${audio}`, "-map", "[v]", "-map", "[audio]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-c:a", "aac", "-t", String(duration), "-movflags", "+faststart", "output.mp4"];
 }
 export async function loadMusicFile(path: string, signal?: AbortSignal) {
   const response = await fetch(path, { signal: signal ?? null });
