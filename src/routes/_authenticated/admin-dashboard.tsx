@@ -33,6 +33,7 @@ function AdminDashboard() {
   const [movement, setMovement] = useState<VideoMovement>(DEFAULT_MOVEMENT);
   const [duration, setDuration] = useState<VideoDuration>(5);
   const [busy, setBusy] = useState(false);
+  const [fileName, setFileName] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => setLogs(readLogs()), []);
@@ -83,8 +84,20 @@ function AdminDashboard() {
         </section>
 
         <section className="space-y-5 rounded-xl border bg-card p-5">
-          <input type="file" accept="image/jpeg,image/png,image/webp" aria-label="Upload photo" onChange={(e) => onFile(e.target.files?.[0])} />
-          {photo && <img src={photo} alt="Uploaded test photo" className="h-40 rounded-lg object-cover" />}
+          <div className="rounded-xl bg-secondary/60 p-4">
+            <p className="font-semibold">Upload Photo (for MagicPh video)</p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <input id="admin-photo-upload" type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; setFileName(f?.name ?? ""); void onFile(f); }} />
+              <Button asChild variant="outline"><label htmlFor="admin-photo-upload" className="cursor-pointer">📸 Choose Photo</label></Button>
+              <span className="break-all text-sm text-muted-foreground">{fileName || "No file chosen"}</span>
+            </div>
+            {photo && (
+              <div className="mt-4 flex items-center gap-3">
+                <img src={photo} alt="Uploaded test photo" className="size-32 rounded-lg border object-cover" />
+                <Button variant="ghost" size="sm" onClick={() => { setPhoto(null); setFileName(""); const el = document.getElementById("admin-photo-upload") as HTMLInputElement | null; if (el) el.value = ""; }}>Remove</Button>
+              </div>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2">
             {TEMPLATES.map((t) => <Button key={t.id} variant={template === t.id ? "default" : "outline"} aria-pressed={template === t.id} onClick={() => setTemplate(t.id)}>{t.icon} {t.name}</Button>)}
           </div>
@@ -93,6 +106,7 @@ function AdminDashboard() {
             {([5, 10] as const).map((d) => <Button key={d} variant={duration === d ? "default" : "outline"} aria-pressed={duration === d} onClick={() => setDuration(d)}>{d}s</Button>)}
           </div>
           <Button size="lg" disabled={!photo || busy || !limit.allowed || !status.falKey} onClick={generate}>{busy ? "Generating…" : "Generate FREE Admin Test (Bypass ₱149)"}</Button>
+          {!photo && !busy && <p className="text-sm text-muted-foreground">Please choose a photo first</p>}
           {!limit.allowed && <p className="text-sm text-destructive">{limit.reason}</p>}
           {error && <p className="text-sm text-destructive">{error}</p>}
         </section>
