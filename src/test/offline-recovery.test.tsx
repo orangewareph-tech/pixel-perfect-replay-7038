@@ -67,7 +67,9 @@ describe("Offline recovery", () => {
         },
       });
       let task: Promise<unknown> | undefined;
-      handlers.activate({ waitUntil: (promise) => { task = promise; } });
+      const activate = handlers['activate'];
+      if (!activate) throw new Error("Activation handler missing");
+      activate({ waitUntil: (promise) => { task = promise; } });
       if (fail) await expect(task).rejects.toThrow("cache access failed");
       else {
         await task;
@@ -75,7 +77,7 @@ describe("Offline recovery", () => {
         expect(navigate).toHaveBeenCalledWith(scope);
       }
       expect(unregister).toHaveBeenCalledOnce();
-      expect(handlers.fetch).toBeUndefined();
+      expect(handlers['fetch']).toBeUndefined();
     }
   });
 });

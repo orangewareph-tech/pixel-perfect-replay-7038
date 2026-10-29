@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CreateRouteImport } from './routes/create'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPaymentRouteImport } from './routes/_authenticated/payment'
 import { Route as AuthenticatedTestRouteImport } from './routes/_authenticated/test'
 
@@ -35,6 +36,11 @@ const CreateRoute = CreateRouteImport.update({
   path: '/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPaymentRoute = AuthenticatedPaymentRouteImport.update({
   id: '/payment',
   path: '/payment',
@@ -50,6 +56,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/create': typeof CreateRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/payment': typeof AuthenticatedPaymentRoute
   '/test': typeof AuthenticatedTestRoute
 }
@@ -57,6 +64,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/create': typeof CreateRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/payment': typeof AuthenticatedPaymentRoute
   '/test': typeof AuthenticatedTestRoute
 }
@@ -66,20 +74,22 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/create': typeof CreateRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/payment': typeof AuthenticatedPaymentRoute
   '/_authenticated/test': typeof AuthenticatedTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/create' | '/payment' | '/test'
+  fullPaths: '/' | '/auth' | '/create' | '/admin' | '/payment' | '/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/create' | '/payment' | '/test'
+  to: '/' | '/auth' | '/create' | '/admin' | '/payment' | '/test'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/create'
+    | '/_authenticated/admin'
     | '/_authenticated/payment'
     | '/_authenticated/test'
   fileRoutesById: FileRoutesById
@@ -121,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/payment': {
       id: '/_authenticated/payment'
       path: '/payment'
@@ -139,11 +156,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedPaymentRoute: typeof AuthenticatedPaymentRoute
   AuthenticatedTestRoute: typeof AuthenticatedTestRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPaymentRoute: AuthenticatedPaymentRoute,
   AuthenticatedTestRoute: AuthenticatedTestRoute,
 }
