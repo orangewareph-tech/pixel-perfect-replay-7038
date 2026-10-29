@@ -16,15 +16,16 @@ export function durationProfit(duration: VideoDuration) {
 export function durationCheckoutLabel(duration: VideoDuration) {
   return `Upload & Pay ₱${DURATION_OFFERS[duration].price} - ${duration} Sec ${duration === 10 ? "Premium Magic" : "Magic"} →`;
 }
+export const CHRISTMAS_MUSIC_PROMPT = "Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm.";
 export function buildVideoInput(imageUrl: string, scene: string, duration: VideoDuration, movement: VideoMovement = DEFAULT_MOVEMENT) {
   return {
     image_url: imageUrl,
     prompt: `${duration === 5
       ? "A 5 second cinematic Christmas video in one continuous shot."
-      : "A 10 second cinematic Christmas video in one continuous shot that builds gently from start to finish."} Use the uploaded photo as the starting frame and animate the existing scene; do not replace the people or create a new image. ${scene} ${MOVEMENT_DIRECTIONS[movement]} One primary animation with subtle secondary effects. Steady camera: no forced camera rotation, rapid zooming or camera shake. Natural movement, realistic lighting, smooth animation. Preserve the original people, faces, identity, skin tone, hairstyle, clothing and body proportions. Keep faces unobstructed and the family recognizable. No cuts, no text or logos.`,
+      : "A 10 second cinematic Christmas video in one continuous shot that builds gently from start to finish."} Use the uploaded photo as the starting frame and animate the existing scene; do not replace the people or create a new image. ${scene} ${MOVEMENT_DIRECTIONS[movement]} ${CHRISTMAS_MUSIC_PROMPT} One primary animation with subtle secondary effects. ${movement === "high" || movement === "extreme" ? "Smooth stabilized camera: zoom and orbit allowed, never camera shake." : "Steady camera: no orbiting, rapid zooming or camera shake."} Natural movement, realistic lighting, smooth animation. Preserve the original people, faces, identity, skin tone, hairstyle, clothing and body proportions. Keep faces unobstructed and the family recognizable. No cuts, no text or logos.`,
     duration: String(duration),
     cfg_scale: 0.5,
-    negative_prompt: "blurred faces, face change, different faces, distorted faces, face morphing, body distortion, changed ethnicity, outfit transformation, extra limbs, warped hands, extra foreground people, obscured faces, scary, horror, dark, low quality, blurry, deformed, cartoon, excessive particles, unnatural motion, flickering, strobing lights, abrupt scene changes, hard cuts, camera rotation, rapid zoom, camera shake, text, logo, watermark",
+    negative_prompt: `blurred faces, face change, different faces, distorted faces, face morphing, body distortion, changed ethnicity, outfit transformation, extra limbs, warped hands, extra foreground people, obscured faces, scary, horror, dark, low quality, blurry, deformed, cartoon, excessive particles, unnatural motion, flickering, strobing lights, abrupt scene changes, hard cuts, camera shake, ${movement === "high" || movement === "extreme" ? "" : "camera rotation, orbiting, rapid zoom, "}text, logo, watermark`,
   };
 }
 export const LAUNCH_COST = 3048;

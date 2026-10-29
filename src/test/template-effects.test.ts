@@ -4,7 +4,7 @@ import { buildVideoInput, VIDEO_MODEL } from "@/lib/video-duration";
 
 describe("enhanced Christmas template payloads", () => {
   const requiredEffects = {
-    parol: ["parol", "golden sparkles"],
+    parol: ["parol", "golden star dust"],
     snow: ["snow", "snowflakes"],
     bokeh: ["fairy lights", "heart", "bokeh"],
     globe: ["santa", "elves", "toy train"],
@@ -42,12 +42,14 @@ describe("enhanced Christmas template payloads", () => {
   });
   it("Low movement stays gentle and Extreme adds rapid motion", () => {
     const low = buildVideoInput("photo", TEMPLATES[0].scene, 10, "low");
-    expect(low.prompt).toContain("slow, subtle movement");
+    expect(low.prompt).toContain("gentle slow realistic movement");
     expect(low.prompt).not.toContain("Extreme movement");
     expect(low.negative_prompt).toContain("rapid zoom");
     const ext = buildVideoInput("photo", TEMPLATES[0].scene, 10, "extreme");
     expect(ext.prompt).toContain("Extreme movement");
     expect(ext.negative_prompt).toContain("camera shake");
-    expect(ext.negative_prompt).toContain("rapid zoom");
+    expect(ext.negative_prompt).not.toContain("rapid zoom");
+    expect(buildVideoInput("photo", TEMPLATES[0].scene, 10, "medium").negative_prompt).toContain("orbiting");
+    for (const m of ["low", "medium", "high", "extreme"] as const) expect(buildVideoInput("photo", TEMPLATES[2].scene, 5, m).prompt).toContain("Pasko sa Nayon");
   });
 });
