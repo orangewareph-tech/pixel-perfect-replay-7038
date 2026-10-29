@@ -16,6 +16,9 @@ export default defineConfig({
         registerType: "autoUpdate",
         injectRegister: null,
         filename: "sw.js",
+        // TanStack Start serves statics from dist/client; the plugin otherwise
+        // writes sw.js to the dist root where it is never served.
+        outDir: "dist/client",
         manifest: false, // we serve our own public/manifest.webmanifest
         devOptions: { enabled: false },
         workbox: {
