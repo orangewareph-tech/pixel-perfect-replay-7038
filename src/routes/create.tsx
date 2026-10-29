@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Header, Footer, Snow } from "@/components/SiteChrome";
 import { PLANS, TEMPLATES, isAllowedPhoto } from "@/lib/site";
-import { startVideo, checkVideo } from "@/lib/fal.functions";
+import { startVideo, checkVideo, downloadVideo } from "@/lib/fal.functions";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/create")({
@@ -39,7 +39,25 @@ function Create() {
   const inputRef = useRef<HTMLInputElement>(null);
   const start = useServerFn(startVideo);
   const check = useServerFn(checkVideo);
+  const download = useServerFn(downloadVideo);
   const template = TEMPLATES.find((t) => t.id === tpl)!;
+  const [saving, setSaving] = useState(false);
+
+  async function saveVideo() {
+    if (!videoUrl || saving) return;
+    setSaving(true);
+    try {
+      const { dataUrl } = await download({ data: { videoUrl } });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "magicph-christmas.mp4";
+      a.click();
+    } catch {
+      window.open(videoUrl, "_blank", "noreferrer");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   function onFile(f?: File) {
     if (!f) return;
@@ -200,7 +218,7 @@ function Create() {
                 <RatioToggle ratio={ratio} setRatio={setRatio} />
                 <video src={videoUrl} controls autoPlay loop playsInline className={`mx-auto mt-4 rounded-3xl bg-night object-cover shadow-glow ${ratio === "9:16" ? "aspect-[9/16] max-w-xs" : "aspect-video w-full"}`} />
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                  <a href={videoUrl} download="magicph-christmas.mp4" target="_blank" rel="noreferrer" className="rounded-full bg-gold-grad px-6 py-3 font-extrabold text-gold-foreground">⬇ Download HD</a>
+                  <button onClick={saveVideo} disabled={saving} className="rounded-full bg-gold-grad px-6 py-3 font-extrabold text-gold-foreground disabled:opacity-60">{saving ? "Saving…" : "⬇ Save Video"}</button>
                   <a href={`fb-messenger://share/?link=${encodeURIComponent(videoUrl)}`} onClick={(e) => { if (!/Mobi/.test(navigator.userAgent)) { e.preventDefault(); window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(videoUrl)}&redirect_uri=${encodeURIComponent(shareUrl)}`); } }} className="rounded-full bg-festive px-6 py-3 font-bold text-primary-foreground">Share to Messenger</a>
                 </div>
               </div>
