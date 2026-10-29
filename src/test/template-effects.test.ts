@@ -4,9 +4,9 @@ import { buildVideoInput, VIDEO_MODEL } from "@/lib/video-duration";
 
 describe("enhanced Christmas template payloads", () => {
   const requiredEffects = {
-    parol: ["parol", "star dust", "lens flare"],
+    parol: ["parol", "20 colorful parol", "golden star particles"],
     snow: ["snow", "shoul", "breath vapor"],
-    bokeh: ["fairy lights", "fireflies", "light trails"],
+    bokeh: ["fairy lights", "fireflies", "light trails", "heart-shaped halos"],
     globe: ["santa", "elves", "toy train", "chimney smoke", "sleigh"],
     fire: ["bibingka", "puto bumbong", "fireplace", "flames"],
   };
@@ -21,6 +21,10 @@ describe("enhanced Christmas template payloads", () => {
       }
     });
   }
+  it("keeps every full prompt within the 2500-character model limit", () => {
+    for (const t of TEMPLATES) for (const d of [5, 10] as const) for (const m of ["low", "extreme"] as const)
+      expect(buildVideoInput("photo", t.scene, d, m).prompt.length).toBeLessThanOrEqual(2500);
+  });
   it("uses progressive 10-second pacing and focused 5-second motion", () => {
     expect(buildVideoInput("photo", TEMPLATES[0].scene, 10).prompt).toContain("seconds 3–7");
     expect(buildVideoInput("photo", TEMPLATES[0].scene, 5).prompt).toContain("one clear magical motion");
