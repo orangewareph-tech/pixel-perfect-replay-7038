@@ -1,4 +1,9 @@
 # Video duration selection
+# Offline recovery
+- [ ] Replace the broken navigation worker with a same-path cleanup release, preserving home-screen support.
+- [ ] Add non-blocking offline warning, retry, and video-generation guard; verify cache cleanup and online recovery.
+
+# Video duration selection
 - [x] Add reusable duration offers, saved selection, and pricing estimates.
 - [x] Connect choices through upload, checkout, and Fal.ai requests.
 - [x] Verify both duration flows, persistence, mobile layout, and provider pricing.
