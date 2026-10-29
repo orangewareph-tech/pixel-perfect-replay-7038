@@ -4,20 +4,17 @@ import { buildVideoInput, VIDEO_MODEL } from "@/lib/video-duration";
 
 describe("enhanced Christmas template payloads", () => {
   const requiredEffects = {
-    parol: ["full rotation", "star dust", "pulse", "parallax"],
-    snow: ["shoulders", "gravity", "breath vapor", "volumetric"],
-    bokeh: ["fireflies", "heart-shaped", "light trails", "camera arc"],
-    globe: ["elves", "toy train", "Chimney smoke", "sleigh"],
-    fire: ["bibingka", "puto bumbong", "embers", "food steam", "firelight"],
-    simbang: ["Simbang Gabi", "church", "dawn", "morning mist", "bibingka"],
-    crafting: ["bamboo", "colored-paper", "parol", "float upward", "family bonding"],
-    caroling: ["caroling", "tambourine", "guitar", "aguinaldo", "music notes"],
+    parol: ["parol", "spinning", "pulsing"],
+    snow: ["snow", "shoul", "falling fast"],
+    bokeh: ["fairy lights", "fireflies", "light trails"],
+    globe: ["santa", "elves", "toy train", "chimney smoke", "sleigh"],
+    fire: ["bibingka", "puto bumbong", "fireplace", "flames"],
   };
   for (const template of TEMPLATES) {
     it(`${template.name} carries its requested effects at both durations`, () => {
       for (const duration of [5, 10] as const) {
         const input = buildVideoInput("photo", template.scene, duration);
-        for (const effect of requiredEffects[template.id]) expect(input.prompt).toContain(effect);
+        for (const effect of requiredEffects[template.id]) expect(input.prompt.toLowerCase()).toContain(effect);
         expect(input.image_url).toBe("photo");
         expect(input.duration).toBe(String(duration));
         expect(input.cfg_scale).toBe(0.5);

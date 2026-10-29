@@ -6,9 +6,6 @@ const themes = {
   bokeh: "Fairy Lights Magic: twinkling lights, joy and sparkling memories",
   globe: "Santa Village Magic: Santa's village, gifts and playful Christmas wonder",
   fire: "Fireplace Noche Buena Magic: fireplace warmth, Filipino Noche Buena and togetherness",
-  simbang: "Simbang Gabi Magic: dawn church parols, faith, hope and Filipino Christmas tradition",
-  crafting: "Paskong Pinoy Parol Making: making star lanterns, family bonding and shared light",
-  caroling: "Christmas Caroling Pinoy Aguinaldo: joyful neighborhood caroling, generosity and togetherness",
 };
 export function christmasMessagePrompt(input: MessageInput) {
   return {

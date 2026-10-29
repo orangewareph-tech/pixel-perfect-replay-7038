@@ -95,3 +95,6 @@
 - [x] Prepare real music-embedded MP4 downloads; do not sell or promise missing licensed songs.
 - [x] Verify pricing, preferences, mobile layout, real 5s Parol generation/save, and music merging with synthetic audio; licensed-song end-to-end awaits files.
 - [x] Make music functional with eight original synthesized festive MP3s; verify all clips play at 70%, ready pricing, saved choice, and a real 5s Parol MP4 download containing audible AAC music.
+# Five core templates + movement levels
+- [x] Remove retired template leftovers; align tests to five templates and Extreme-default movement; restore server-role requirement for paid owner bypass.
+- [ ] Visually confirm a paid Extreme render — needs owner Google sign-in or approved payment.
