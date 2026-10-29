@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      christmas_message_access_state: {
+        Row: {
+          id: string
+          message: string
+          status: number
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          message: string
+          status: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          message?: string
+          status?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fal_test_runs: {
         Row: {
           duration: number

@@ -1,7 +1,8 @@
 import type { MusicId } from "@/lib/christmas-music";
 import type { VideoDuration } from "@/lib/video-duration";
+import type { MessageDraft } from "@/lib/christmas-message";
 
-export type CreationDraft = { photo: string; template: string; music: MusicId; duration: VideoDuration; volume: number; loopMusic: boolean };
+export type CreationDraft = { photo: string; template: string; music: MusicId; duration: VideoDuration; volume: number; loopMusic: boolean; christmasMessage?: MessageDraft };
 
 // IndexedDB accommodates a 10 MB photo without putting private photo data in URLs.
 async function draftStore(mode: IDBTransactionMode, action: (store: IDBObjectStore) => IDBRequest) {

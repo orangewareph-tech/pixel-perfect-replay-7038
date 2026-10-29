@@ -23,6 +23,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { CreationProgress } from "@/components/CreationProgress";
 import { ArrowLeft, ArrowRight, Upload, Download, Share2 } from "lucide-react";
 import { saveCreationDraft, takeCreationDraft } from "@/lib/creation-draft";
+import { ChristmasMessageWriter } from "@/components/ChristmasMessageWriter";
+import { EMPTY_MESSAGE, type MessageDraft } from "@/lib/christmas-message";
 
 export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
@@ -45,6 +47,7 @@ function Create() {
   const [duration, setDuration] = useVideoDuration(durationParam);
   const offer = DURATION_OFFERS[duration];
   const [step, setStep] = useState(0);
+  const [christmasMessage, setChristmasMessage] = useState<MessageDraft>(EMPTY_MESSAGE);
   const [photo, setPhoto] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const { template: tpl, chooseTemplate: setTpl, music, chooseMusic: setMusic } = useChristmasChoices(templateParam, musicParam);
@@ -82,13 +85,14 @@ function Create() {
       if (!draft) return;
       setPhoto(draft.photo); setTpl(draft.template); setMusic(AUTOMATIC_MUSIC); setDuration(draft.duration);
       setVolume(DEFAULT_MUSIC_VOLUME); setLoopMusic(true); setPaymentOpen(true); setStep(3);
+      setChristmasMessage(draft.christmasMessage ?? EMPTY_MESSAGE);
     }).catch(() => { /* Upload remains usable if browser storage is unavailable. */ });
   }, []);
 
   async function signInToPay() {
     if (!photo) return;
     try {
-      await saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic });
+      await saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic, christmasMessage });
       sessionStorage.setItem("magicph_auth_return", "/create");
       window.location.assign("/auth");
     } catch { setErr("Dili ma-save ang photo para sa sign-in. Ablihi ang Sign in sa laing tab, dayon balik dinhi."); }
@@ -218,7 +222,7 @@ function Create() {
           <section>
             <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Pili-a ang magic template</h1>
             <div className="mt-5">
-              <MagicTemplateSelector value={tpl} onChange={setTpl} compact />
+              <MagicTemplateSelector value={tpl} onChange={(value) => { setTpl(value); if (value !== tpl) setChristmasMessage((draft) => ({ ...draft, message: "" })); }} compact />
               <figure className="mx-auto mt-6 max-w-lg overflow-hidden rounded-lg">
                 <img src={template.img} alt={`${template.name} example`} className="aspect-[4/3] w-full object-cover" />
                 <figcaption className="mt-3 font-display text-lg font-bold text-christmas-green">{template.icon} {template.name}<span className="mt-1 block font-sans text-xs font-normal text-muted-foreground">Pananglitan sa template · dili pa imong final video</span></figcaption>
@@ -251,6 +255,7 @@ function Create() {
                 <dt className="border-t pt-3 font-bold">Total</dt><dd aria-live="polite" className="border-t pt-3 font-display text-2xl font-bold text-primary">₱{total}</dd>
               </dl>
             </div>
+            <ChristmasMessageWriter value={christmasMessage} onChange={setChristmasMessage} template={tpl} templateName={template.name} signedIn={signedIn} online={online} onSignIn={() => void signInToPay()} />
             <p className="mt-4 text-center text-xs text-muted-foreground">Gipaningkamotan nga mapreserbar ang mga nawong · Gibanabana: {duration === 5 ? "30–60 segundos" : "2–3 minutos"} human ma-approve ang bayad.</p>
             <Button onClick={() => setPaymentOpen(true)} className="mt-5 h-12 w-full text-base" disabled={!musicReady}>Pay with GCash / Maya · ₱{total}</Button>
             {paymentOpen && (!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in una sa pagbayad. Usa ka approved payment para sa usa ka video.</p><Button onClick={() => void signInToPay()} className="mt-4">Sign in to pay</Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>)}
@@ -285,6 +290,7 @@ function Create() {
             {videoUrl && (
               <div>
                 <h1 className="text-3xl font-bold text-primary">Merry Christmas! 🎄</h1>
+                {christmasMessage.message && <p className="mx-auto mt-4 max-w-lg whitespace-pre-wrap break-words text-primary">{christmasMessage.message}</p>}
                 <RatioToggle ratio={ratio} setRatio={setRatio} />
                 <MusicVideoPlayer src={videoUrl} music={track.url} musicName="Christmas soundtrack" volume={volume} loopMusic={loopMusic} ratio={ratio} />
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
