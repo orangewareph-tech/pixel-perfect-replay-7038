@@ -1,0 +1,5 @@
+ffmpeg.wasm core 0.12.10 — GPL-2.0-or-later
+Copyright belongs to the FFmpeg and ffmpeg.wasm contributors.
+Source and build instructions: https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10
+License text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+This core is loaded on demand for browser-based media processing.
