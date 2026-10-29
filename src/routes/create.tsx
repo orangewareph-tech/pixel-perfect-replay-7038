@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Header, Footer, Snow } from "@/components/SiteChrome";
 import { PLANS, TEMPLATES, isAllowedPhoto } from "@/lib/site";
-import { startVideo, checkVideo } from "@/lib/fal.functions";
+import { startVideo, checkVideo, downloadVideo } from "@/lib/fal.functions";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/create")({

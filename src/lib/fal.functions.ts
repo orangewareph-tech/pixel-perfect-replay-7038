@@ -44,3 +44,19 @@ export const checkVideo = createServerFn({ method: "POST" })
     const out = (await r.json()) as { video?: { url: string } };
     return { status: "COMPLETED", videoUrl: out.video?.url ?? null };
   });
+
+// Fetches the finished MP4 server-side and returns it as a data URL so the
+// browser can save it with one click (cross-origin URLs ignore `download`).
+export const downloadVideo = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ videoUrl: z.string().url().max(2000) }).parse(d))
+  .handler(async ({ data }) => {
+    const u = new URL(data.videoUrl);
+    if (u.protocol !== "https:" || !(u.hostname === "fal.media" || u.hostname.endsWith(".fal.media"))) {
+      throw new Error("Unexpected video URL");
+    }
+    const res = await fetch(data.videoUrl);
+    if (!res.ok) throw new Error(`Download error [${res.status}]`);
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength > 60 * 1024 * 1024) throw new Error("Video too large");
+    return { dataUrl: `data:video/mp4;base64,${Buffer.from(buf).toString("base64")}` };
+  });
