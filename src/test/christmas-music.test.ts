@@ -4,7 +4,7 @@ import { TEMPLATES } from "@/lib/site";
 import { buildVideoInput } from "@/lib/video-duration";
 
 describe("Christmas upgrades", () => {
-  it("defaults to Parol and offers all eight Pinoy effects", () => { expect(TEMPLATES.map((t) => t.id)).toEqual(["parol", "snow", "bokeh", "globe", "fire", "simbang", "crafting", "caroling"]); expect(TEMPLATES[0].best).toBe(true); });
+  it("defaults to Parol and offers five Pinoy effects", () => { expect(TEMPLATES.map((t) => t.id)).toEqual(["parol", "snow", "bokeh", "globe", "fire"]); expect(TEMPLATES[0].best).toBe(true); });
   it("keeps a silent 5-second video at ₱149", () => { expect(christmasTotal(5, "no-music")).toBe(149); });
   it("keeps a silent 10-second video at ₱299", () => { expect(christmasTotal(10, "no-music")).toBe(299); });
   it("includes automatic music at ₱149 for five seconds", () => { for (const id of musicSchema.options) expect(christmasTotal(5, id)).toBe(149); });
