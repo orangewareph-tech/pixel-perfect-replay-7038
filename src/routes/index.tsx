@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "MagicPh AI — Family Pic to Christmas Video in 60 seconds" },
-      { name: "description", content: "Create Filipino family Christmas videos with parol glow, snowfall, fairy lights and optional licensed music. 5 seconds from ₱149; 10 seconds from ₱299. Demo checkout." },
+      { name: "description", content: "Create Filipino family Christmas videos with parol glow, snowfall, fairy lights and original festive music. 5 seconds from ₱149; 10 seconds from ₱299. Payment approval required." },
       { property: "og:title", content: "MagicPh AI — Ang Pasko, Magic!" },
       { property: "og:description", content: "Five festive effects, 5- or 10-second family videos and optional Christmas music. Gikan ₱149 ra!" },
       { property: "og:type", content: "website" },
@@ -35,7 +35,7 @@ const REVIEWS = [
 
 const FAQ: [string, string][] = [
   ["Pila ka dugay? (How long?)", "Ang 5-second video: estimated 30–60 seconds. Ang 10-second Premium: estimated 2–3 minutes. Usahay mas dugay kung busy ang queue."],
-  ["Pwede GCash?", "GCash ug Maya ang planned payment options. Demo pa ang checkout karon; wala pa ang verified secure payment."],
+  ["Pwede GCash?", "Pwede GCash through the InstaPay QR. Sign in, send the selected amount and upload your receipt. An administrator must verify the transfer before your video credit is unlocked."],
   ["Same gihapon ang mga nawong?", "Among AI gi-instruct nga ipabilin ang inyong mga nawong. Tan-awa ang result; dili guaranteed nga 100% identical ang output."],
   ["Unsa nga size ang video?", "Makakuha ka og 9:16 para TikTok/Reels ug 16:9 para FB feed."],
 ];
@@ -71,7 +71,7 @@ function Index() {
             <Link to="/create" search={{ duration, template, music, plan: duration === 5 ? "hd" : undefined }} className="mt-4 inline-flex font-bold text-gold underline">
               Upload Family Photo Now →
             </Link>
-            <ul className="mt-4 space-y-2 text-sm opacity-90"><li>✓ Faces preserved with care</li><li>✓ {duration === 5 ? "Estimated 30–60 seconds" : "Estimated 2–3 minutes"}</li><li>✓ TikTok & FB Reels ready</li><li>GCash & Maya · demo checkout; secure payment coming soon</li></ul>
+            <ul className="mt-4 space-y-2 text-sm opacity-90"><li>✓ Faces preserved with care</li><li>✓ {duration === 5 ? "Estimated 30–60 seconds" : "Estimated 2–3 minutes"}</li><li>✓ TikTok & FB Reels ready</li><li>🔒 GCash / InstaPay · verified receipt required · no free generation</li></ul>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <figure className="relative overflow-hidden rounded-3xl border-4 border-night-foreground/20">
