@@ -1,3 +1,6 @@
+# Five templates with movement control
+- [ ] Hide three extra templates; add Low/Medium/High/Extreme movement, default Extreme, shared customer/owner render prompts and draft preservation.
+- [ ] Verify five-template UI, motion payloads, included pricing, and regressions. Paid five-video review must respect three starts/hour and verified owner access.
 # Pinoy-only Christmas templates
 - [x] Add three Pinoy traditions, enhance all eight scenes, connect payment/message/test validation and original sample images; apply payment and owner-reservation validation migration.
 - [x] Verify new-template selection and image previews, 10s confirmation at ₱299 with included music, payment sign-in gate and 82 tests; build OK, no browser errors. No paid render submitted. New templates have image previews only; actual paid quality remains unverified until approved payment/owner access.

@@ -26,6 +26,8 @@ import { saveCreationDraft, takeCreationDraft } from "@/lib/creation-draft";
 import { ChristmasMessageWriter } from "@/components/ChristmasMessageWriter";
 import { EMPTY_MESSAGE, type MessageDraft } from "@/lib/christmas-message";
 import { OwnerTestPanel } from "@/components/OwnerTestPanel";
+import { MovementSelector } from "@/components/MovementSelector";
+import { DEFAULT_MOVEMENT, movementSchema, MOVEMENT_LABELS, type VideoMovement } from "@/lib/video-movement";
 
 export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
@@ -34,7 +36,7 @@ export const Route = createFileRoute("/create")({
       { title: "Create Your Christmas Video — MagicPh AI" },
       { name: "description", content: "Create a Filipino Christmas video with automatic included music. Pick 5 seconds for ₱149 or 10 seconds for ₱299; approved payment unlocks one video." },
       { property: "og:title", content: "Create Your Christmas Video — MagicPh AI" },
-      { property: "og:description", content: "Turn your family photo into Pinoy Christmas magic with eight festive templates and automatic included sound." },
+      { property: "og:description", content: "Five Pinoy Christmas templates with adjustable movement and automatic included sound." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
@@ -49,6 +51,7 @@ function Create() {
   const [duration, setDuration] = useVideoDuration(durationParam);
   const offer = DURATION_OFFERS[duration];
   const [step, setStep] = useState(0);
+  const [movement, setMovement] = useState<VideoMovement>(DEFAULT_MOVEMENT);
   const [christmasMessage, setChristmasMessage] = useState<MessageDraft>(EMPTY_MESSAGE);
   const [photo, setPhoto] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -88,18 +91,19 @@ function Create() {
       setPhoto(draft.photo); setTpl(draft.template); setMusic(AUTOMATIC_MUSIC); setDuration(draft.duration);
       setVolume(DEFAULT_MUSIC_VOLUME); setLoopMusic(true); setPaymentOpen(false); setStep(draft.step ?? 3);
       setChristmasMessage(draft.christmasMessage ?? EMPTY_MESSAGE);
+      setMovement(movementSchema.catch(DEFAULT_MOVEMENT).parse(draft.movement));
     }).catch(() => { /* Upload remains usable if browser storage is unavailable. */ });
   }, []);
   useEffect(() => {
-    const preserve = (event: Event) => { if (photo) (event as CustomEvent<{ saves: Promise<unknown>[] }>).detail.saves.push(saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic, christmasMessage, step: Math.min(step, 3) })); };
+    const preserve = (event: Event) => { if (photo) (event as CustomEvent<{ saves: Promise<unknown>[] }>).detail.saves.push(saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic, movement, christmasMessage, step: Math.min(step, 3) })); };
     window.addEventListener("magicph-preserve-draft", preserve);
     return () => window.removeEventListener("magicph-preserve-draft", preserve);
-  }, [photo, tpl, music, duration, volume, loopMusic, christmasMessage, step]);
+  }, [photo, tpl, music, duration, volume, loopMusic, movement, christmasMessage, step]);
 
   async function signInToPay() {
     if (!photo) return;
     try {
-      await saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic, christmasMessage });
+      await saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic, movement, christmasMessage });
       sessionStorage.setItem("magicph_auth_return", "/create");
       window.location.assign("/auth");
     } catch { setErr("Dili ma-save ang photo para sa sign-in. Ablihi ang Sign in sa laing tab, dayon balik dinhi."); }
@@ -157,7 +161,7 @@ function Create() {
     setHistoryOnly(false); setStep(4); setProgress(3); setElapsed(0); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
     try {
-      const { requestId } = await start({ data: { imageUrl: photo, paymentId: payment.id } });
+      const { requestId } = await start({ data: { imageUrl: photo, paymentId: payment.id, movement } });
       await refreshPayments();
       for (let i = 0; i < 90; i++) {
         await new Promise((r) => setTimeout(r, 4000));
@@ -230,6 +234,7 @@ function Create() {
             <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Pili-a ang magic template</h1>
             <div className="mt-5">
               <MagicTemplateSelector value={tpl} onChange={(value) => { setTpl(value); if (value !== tpl) setChristmasMessage((draft) => ({ ...draft, message: "" })); }} compact />
+              <MovementSelector value={movement} onChange={setMovement} />
               <figure className="mx-auto mt-6 max-w-lg overflow-hidden rounded-lg">
                 <img src={template.img} alt={`${template.name} example`} className="aspect-[4/3] w-full object-cover" />
                 <figcaption className="mt-3 font-display text-lg font-bold text-christmas-green">{template.icon} {template.name}<span className="mt-1 block font-sans text-xs font-normal text-muted-foreground">Pananglitan sa template · dili pa imong final video</span></figcaption>
@@ -257,13 +262,14 @@ function Create() {
               {photo && <img src={photo} alt="Imong family photo" className="mx-auto aspect-square w-32 shrink-0 rounded-lg object-cover sm:mx-0" />}
               <dl className="grid min-w-0 flex-1 grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
                 <dt className="text-muted-foreground">Template</dt><dd className="break-words font-bold">{template.name}</dd>
+                <dt className="text-muted-foreground">Movement</dt><dd className="font-bold">{MOVEMENT_LABELS[movement]}</dd>
                 <dt className="text-muted-foreground">Music</dt><dd className="break-words font-bold">Automatic Christmas soundtrack · included</dd>
                 <dt className="text-muted-foreground">Kadugayon</dt><dd className="font-bold">{duration} segundos</dd>
                 <dt className="border-t pt-3 font-bold">Total</dt><dd aria-live="polite" className="border-t pt-3 font-display text-2xl font-bold text-primary">₱{total}</dd>
               </dl>
             </div>
             <ChristmasMessageWriter value={christmasMessage} onChange={setChristmasMessage} template={tpl} templateName={template.name} signedIn={signedIn} online={online} onSignIn={() => void signInToPay()} />
-            <OwnerTestPanel photo={photo} template={tpl} duration={duration} onVideo={(url) => { setStep(4); setGenErr(null); setVideoUrl(url); setProgress(100); }} />
+            <OwnerTestPanel photo={photo} template={tpl} duration={duration} movement={movement} onVideo={(url) => { setStep(4); setGenErr(null); setVideoUrl(url); setProgress(100); }} />
             <p className="mt-4 text-center text-xs text-muted-foreground">Gipaningkamotan nga mapreserbar ang mga nawong · Gibanabana: {duration === 5 ? "30–60 segundos" : "2–3 minutos"} human ma-approve ang bayad.</p>
             <Button onClick={() => setPaymentOpen(true)} className="mt-5 h-12 w-full text-base" disabled={!musicReady}>Pay with GCash / Maya · ₱{total}</Button>
             {paymentOpen && (!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in una sa pagbayad. Usa ka approved payment para sa usa ka video.</p><Button onClick={() => void signInToPay()} className="mt-4">Sign in to pay</Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>)}

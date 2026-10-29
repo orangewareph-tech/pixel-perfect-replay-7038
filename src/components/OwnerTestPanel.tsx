@@ -7,12 +7,15 @@ import { FAL_LISTED_COST, type VideoDuration } from "@/lib/video-duration";
 import sample from "@/assets/hero.jpg";
 import { TEMPLATES } from "@/lib/site";
 import { templateSchema } from "@/lib/template-ids";
+import { MovementSelector } from "@/components/MovementSelector";
+import { DEFAULT_MOVEMENT, type VideoMovement } from "@/lib/video-movement";
 
-export function OwnerTestPanel({ photo, template = "parol", duration = 5, onStart, onVideo, onError }: { photo?: string | null; template?: string; duration?: VideoDuration; onStart?: () => void; onVideo?: (url: string) => void; onError?: (message: string) => void }) {
+export function OwnerTestPanel({ photo, template = "parol", duration = 5, movement = DEFAULT_MOVEMENT, onStart, onVideo, onError }: { photo?: string | null; template?: string; duration?: VideoDuration; movement?: VideoMovement; onStart?: () => void; onVideo?: (url: string) => void; onError?: (message: string) => void }) {
   const reportFn = useServerFn(ownerTestReport); const start = useServerFn(testFalAiGeneration); const poll = useServerFn(pollFalTest);
   const [report, setReport] = useState<Awaited<ReturnType<typeof ownerTestReport>> | null>(null);
   const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const [customerView, setCustomerView] = useState(false);
   const [testTemplate, setTestTemplate] = useState(template);
+  const [testMovement, setTestMovement] = useState<VideoMovement>(DEFAULT_MOVEMENT);
   async function refresh() { setReport(await reportFn()); }
   useEffect(() => { void refresh().catch(() => {}); }, []);
   async function follow(id: string) {
@@ -31,7 +34,7 @@ export function OwnerTestPanel({ photo, template = "parol", duration = 5, onStar
       let imageUrl = photo;
       if (!imageUrl) { const blob = await (await fetch(sample)).blob(); imageUrl = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Photo unavailable")); reader.onerror = () => reject(new Error("Photo unavailable")); reader.readAsDataURL(blob); }); }
       onStart?.();
-      const result = await start({ data: { duration: d, template: templateSchema.parse(photo ? template : testTemplate), imageUrl } }); await follow(result.id);
+      const result = await start({ data: { duration: d, template: templateSchema.parse(photo ? template : testTemplate), movement: photo ? movement : testMovement, imageUrl } }); await follow(result.id);
     } catch (e) { const message = e instanceof Error ? e.message : "Test failed"; setError(message); onError?.(message); }
     finally { setBusy(false); await refresh().catch(() => {}); }
   }
@@ -41,6 +44,7 @@ export function OwnerTestPanel({ photo, template = "parol", duration = 5, onStar
     {customerView ? <p className="mt-4">Customer view · approved payment required: ₱149 / 5s or ₱299 / 10s.</p> : <>
       <p className="mt-3 text-sm">Customer payment bypass only · real Fal.ai charges apply. Maximum 3 videos/hour and $10/account/day, within the shared budget.</p>
       {!photo && <label className="mt-3 block text-sm">Test template<select aria-label="Owner test template" className="ml-2 max-w-full rounded-md border border-input bg-background p-2 text-foreground" value={testTemplate} onChange={(e) => setTestTemplate(e.target.value)}>{TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>}
+      {!photo && <MovementSelector value={testMovement} onChange={setTestMovement} />}
       <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3"><div><dt>This hour · all starts</dt><dd className="font-bold">{report.hour}/3</dd></div><div><dt>Today · UTC reserved</dt><dd className="font-bold">${report.accountSpent.toFixed(2)} / $10</dd></div><div><dt>All recorded tests</dt><dd className="font-bold">{report.runs.length} · ${report.totalSpent.toFixed(2)}</dd></div></dl><p className="mt-2 text-sm text-muted-foreground">Account allowance remaining: ${Math.max(0, 10 - report.accountSpent).toFixed(2)}. Not your Fal.ai credit balance.</p>
       <div className="mt-4 flex flex-wrap gap-3">{(photo ? [duration] : [5, 10] as const).map((d) => <Button key={d} className="h-auto whitespace-normal bg-gold text-gold-foreground" disabled={busy || Boolean(active) || report.hour >= 3 || report.accountSpent + FAL_LISTED_COST[d] > 10} onClick={() => void run(d)}><FlaskConical />Generate {d}s FREE (Admin) · costs ${FAL_LISTED_COST[d].toFixed(2)}</Button>)}{!photo && <Button variant="outline" disabled title="Five starts exceed the hourly limit">All 5 templates · $1.75 · exceeds 3/hour</Button>}
       <Button variant="outline" disabled={busy} onClick={() => void refresh()}>Refresh usage</Button>{active?.request_id && <Button disabled={busy} variant="outline" onClick={async () => { setBusy(true); try { await follow(active.id); } catch (e) { setError(String(e)); } finally { setBusy(false); } }}>Resume active test</Button>}</div>

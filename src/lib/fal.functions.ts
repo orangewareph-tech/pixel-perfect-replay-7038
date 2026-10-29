@@ -3,6 +3,7 @@ import { z } from "zod";
 import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
 import { requireGoogleAuth } from "@/lib/google-auth.functions";
 import { TEMPLATES } from "@/lib/site";
+import { movementSchema, DEFAULT_MOVEMENT } from "@/lib/video-movement";
 
 function key() {
   const k = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
@@ -13,7 +14,7 @@ function key() {
 export const startVideo = createServerFn({ method: "POST" })
   .middleware([requireGoogleAuth])
   .inputValidator((d) =>
-    z.object({ paymentId: z.string().uuid(), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(d),
+    z.object({ paymentId: z.string().uuid(), movement: movementSchema.default(DEFAULT_MOVEMENT), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const apiKey = key();
@@ -29,7 +30,7 @@ export const startVideo = createServerFn({ method: "POST" })
     const res = await fetch(`https://queue.fal.run/${VIDEO_MODEL}`, {
       method: "POST",
       headers: { Authorization: `Key ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(buildVideoInput(data.imageUrl, template.scene, duration)),
+      body: JSON.stringify(buildVideoInput(data.imageUrl, template.scene, duration, data.movement)),
       signal: AbortSignal.timeout(30000),
     });
     if (!res.ok) {

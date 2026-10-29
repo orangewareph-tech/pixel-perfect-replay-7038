@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_MOVEMENT, MOVEMENT_DIRECTIONS, type VideoMovement } from "./video-movement";
 
 export const videoDurationSchema = z.union([z.literal(5), z.literal(10)]);
 export type VideoDuration = z.infer<typeof videoDurationSchema>;
@@ -15,15 +16,15 @@ export function durationProfit(duration: VideoDuration) {
 export function durationCheckoutLabel(duration: VideoDuration) {
   return `Upload & Pay ₱${DURATION_OFFERS[duration].price} - ${duration} Sec ${duration === 10 ? "Premium Magic" : "Magic"} →`;
 }
-export function buildVideoInput(imageUrl: string, scene: string, duration: VideoDuration) {
+export function buildVideoInput(imageUrl: string, scene: string, duration: VideoDuration, movement: VideoMovement = DEFAULT_MOVEMENT) {
   return {
     image_url: imageUrl,
     prompt: `${duration === 5
-      ? "A 5 second cinematic Christmas portrait in one continuous shot. Establish the selected effect immediately, emphasize one clear magical motion with supporting light and particles, then settle into a warm portrait ending. Keep secondary background actions subtle rather than crowding the short scene."
-      : "A 10 second progressive cinematic Christmas story in one continuous shot: starts with the original family photo. During seconds 0–3 the selected setting gradually lights up; during seconds 3–7 its main magical motion unfolds and secondary background details become visible; during seconds 7–10 the glow builds gently and settles into a warm portrait ending."} Featured effect: ${scene}. Apply only this selected template's effects. Smooth controlled camera motion, cinematic lighting, detailed realistic textures and natural subtle family movement. Preserve the original people, faces, identity, skin tone, expressions and clothing, no face change, no face distortion. Keep faces unobstructed and the family recognizable. No cuts, no additional foreground people, no captions or logos.`,
+      ? "A 5 second cinematic Christmas portrait in one continuous shot. Establish the selected effect immediately, emphasize one clear magical motion with supporting light and particles, and keep effects moving through the ending."
+      : "A 10 second progressive cinematic Christmas story in one continuous shot: starts with the original family photo. During seconds 0–3 the selected setting lights up with motion immediately; during seconds 3–7 its main magical motion builds and secondary background details animate; during seconds 7–10 the glow intensifies while effects continue moving through the ending."} Featured effect: ${scene}. ${MOVEMENT_DIRECTIONS[movement]} The movement level controls speed and density of every scene action; Low and Medium slow the effects, High and Extreme accelerate them. Use only the camera move specified by the movement level. Apply only this selected template's effects. Cinematic lighting, detailed realistic textures and natural subtle family movement. Preserve the original people, faces, identity, skin tone, expressions and clothing, no face change, no face distortion. Keep faces unobstructed and the family recognizable. No cuts, no additional foreground people, no captions or logos.`,
     duration: String(duration),
     cfg_scale: 0.5,
-    negative_prompt: "blurred faces, face change, different faces, distorted faces, scary, horror, dark, low quality, blurry, deformed, changed ethnicity, cartoon, extra foreground people, obscured faces, face morphing, outfit transformation, extra limbs, warped hands, camera shake, rapid spinning camera, hard cuts, text, watermark",
+    negative_prompt: `blurred faces, face change, different faces, distorted faces, scary, horror, dark, low quality, blurry, deformed, changed ethnicity, cartoon, extra foreground people, obscured faces, face morphing, outfit transformation, extra limbs, warped hands, camera shake, rapid spinning camera, strobing lights, hard cuts, text, watermark${movement === "high" || movement === "extreme" ? ", static effects, frozen particles, motionless background, no movement" : ""}`,
   };
 }
 export const LAUNCH_COST = 3048;
