@@ -1,3 +1,9 @@
+# Automatic included sound and free checks
+- [ ] Remove customer music choices; automatically play sound with previews and embed sound in saved videos at ₱149/₱299.
+- [ ] Align secure account payment pricing without changing existing payment records.
+- [ ] Add honest administrator free media, payment/security and installed-app checks; never submit paid jobs.
+- [ ] Test pricing, audible previews, muxed downloads and free-check network behavior.
+
 # Template images
 - [x] Generate five distinct Christmas sample images, optimize WebP/JPEG, and add badges, selection checks and three-second animated sample dialogs without invented review counts.
 - [x] Verify all five three-second previews play, selections survive Back, images load at 200px, and phone/tablet/desktop have no overflow; 20 relevant tests pass and no browser errors.
