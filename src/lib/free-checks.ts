@@ -12,6 +12,8 @@ export function checkPaymentRules(): boolean {
 export async function checkStaticPreviews(): Promise<FreeCheck> {
   try {
     for (const t of TEMPLATES) {
+      const url = TEMPLATE_WEBM[t.id];
+      if (!url) continue;
       await new Promise<void>((resolve, reject) => {
         const video = document.createElement("video");
         const timeout = window.setTimeout(() => finish(new Error(`${t.name}: preview timed out`)), 20000);
@@ -19,17 +21,17 @@ export async function checkStaticPreviews(): Promise<FreeCheck> {
         video.preload = "metadata";
         video.onloadedmetadata = () => finish(Math.abs(video.duration - 3) < 0.2 && video.videoWidth > 0 ? undefined : new Error(`${t.name}: expected a three-second clip`));
         video.onerror = () => finish(new Error(`${t.name}: sample could not load`));
-        video.src = TEMPLATE_WEBM[t.id];
+        video.src = url;
       });
     }
-    return { name: "Three-second previews", status: "PASS", detail: "Five static three-second clips loaded. No generation endpoint used; no Fal.ai generation charge." };
+    return { name: "Three-second previews", status: "PASS", detail: "Five original animated samples loaded; three new templates have sample images only. No generation endpoint used; no Fal.ai generation charge." };
   } catch (e) { return { name: "Three-second previews", status: "FAIL", detail: e instanceof Error ? e.message : "Preview unavailable" }; }
 }
 export async function runFreeChecks(): Promise<FreeCheck[]> {
   const results: FreeCheck[] = [await checkStaticPreviews()];
   try {
     await Promise.all(TEMPLATES.map((t) => new Promise<void>((resolve, reject) => { const img = new Image(); img.onload = () => img.naturalWidth > 0 ? resolve() : reject(new Error("Empty image")); img.onerror = () => reject(new Error(`${t.name} image unavailable`)); img.src = TEMPLATE_MEDIA[t.id].webp; })));
-    results.push({ name: "Template images", status: "PASS", detail: "Five static images loaded. No image generation on viewing." });
+    results.push({ name: "Template images", status: "PASS", detail: "Eight Pinoy sample images loaded. No image generation on viewing." });
   } catch (e) { results.push({ name: "Template images", status: "FAIL", detail: String(e) }); }
   try {
     for (const d of [5, 10] as const) { const url = musicAssetUrl(AUTOMATIC_MUSIC, d); if (!url) throw new Error("Missing soundtrack"); await loadMusicFile(url); }

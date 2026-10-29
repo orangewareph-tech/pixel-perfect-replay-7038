@@ -9,6 +9,9 @@ describe("enhanced Christmas template payloads", () => {
     bokeh: ["fireflies", "heart-shaped", "light trails", "camera arc"],
     globe: ["elves", "toy train", "Chimney smoke", "sleigh"],
     fire: ["bibingka", "puto bumbong", "embers", "food steam", "firelight"],
+    simbang: ["Simbang Gabi", "church", "dawn", "morning mist", "bibingka"],
+    crafting: ["bamboo", "colored-paper", "parol", "float upward", "family bonding"],
+    caroling: ["caroling", "tambourine", "guitar", "aguinaldo", "music notes"],
   };
   for (const template of TEMPLATES) {
     it(`${template.name} carries its requested effects at both durations`, () => {

@@ -50,7 +50,7 @@ export function Footer() {
             <img src={logo} alt="" width={44} height={44} loading="lazy" className="h-11 w-11" />
             <span className="font-display text-2xl font-bold">MagicPh <span className="text-gold">AI</span></span>
           </div>
-          <p className="mt-3 text-sm opacity-80">Ang Pasko, Magic! Family Pic to Christmas Video in 60 seconds.</p>
+          <p className="mt-3 text-sm opacity-80">🇵🇭 Ang Pasko, Magic! Paskong Pinoy, para sa inyong pamilya.</p>
         </div>
         <div className="space-y-1 text-sm">
           <h4 className="mb-2 font-display text-lg text-gold">Contact</h4>

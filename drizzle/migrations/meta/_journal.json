@@ -36,6 +36,13 @@
       "when": 1793263691328,
       "tag": "0004_owner_test_reservations",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793271785383,
+      "tag": "0005_pinoy_template_choices",
+      "breakpoints": true
     }
   ]
 }

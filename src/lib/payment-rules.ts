@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { videoDurationSchema, type VideoDuration } from "@/lib/video-duration";
 import { musicSchema } from "@/lib/christmas-music";
+import { templateSchema } from "@/lib/template-ids";
 
-export const paymentChoicesSchema = z.object({ duration: videoDurationSchema, music: musicSchema, template: z.enum(["parol", "snow", "bokeh", "globe", "fire"]) });
+export const paymentChoicesSchema = z.object({ duration: videoDurationSchema, music: musicSchema, template: templateSchema });
 export type PaymentChoices = z.infer<typeof paymentChoicesSchema>;
 export const DAILY_SPEND_LIMIT = 10;
 export const HOURLY_GENERATION_LIMIT = 3;

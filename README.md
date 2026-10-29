@@ -4,7 +4,7 @@ A Filipino Christmas photo-to-video app with a guided Cebuano creation flow, fes
 
 ## Features
 
-- Five templates: **Parol Star Magic**, **Snowfall Magic**, **Fairy Lights Magic**, **Santa Village Magic**, and **Fireplace Noche Buena Magic**.
+- Eight Pinoy-only templates: **Parol Star Magic**, **Snowfall Magic**, **Fairy Lights Magic**, **Santa Village Magic**, **Fireplace Noche Buena Magic**, **Simbang Gabi Magic**, **Paskong Pinoy Parol Making**, and **Christmas Caroling Pinoy Aguinaldo**. No US brand, templates or customer dollar prices.
 - Photo uploads: JPG or PNG, up to 10 MB.
 - **5-second videos for ₱149** or **10-second videos for ₱299**, with Christmas music included and no music surcharge.
 - Five-step flow: upload → template → duration → confirmation/payment → video/download.
@@ -14,7 +14,7 @@ A Filipino Christmas photo-to-video app with a guided Cebuano creation flow, fes
 - Home-screen installation support and non-blocking connection warnings.
 - Protected administrator payment review, video diagnostics, and free media checks.
 
-Template images and three-second animated previews are generated examples, not customer results or guarantees of the final video.
+All eight template images are generated examples, not customer results. The five original templates retain their older three-second animated samples; the three new templates have image previews only. Updated final-render effects are not demonstrated by those older clips.
 
 ## Technology
 
@@ -66,7 +66,7 @@ Do not edit generated Cloud clients, auth middleware, connection files, or gener
 
 ## Accounts, payments, and safety
 
-Google is the only sign-in method. The app uses Google's existing name, email and avatar, without extra profile storage or duplicate token keys. Creation, account, video history and private server operations require a verified Google identity. Cache reset preserves the managed session; sign-out saves unfinished photos and greetings in a one-time local draft. Google OAuth and installed-app persistence still require verification with a real Google account on the deployed site.
+Google is the only sign-in method. The app uses Google's existing name, email and avatar, without extra profile storage or duplicate token keys. Visitors can upload and choose a template and duration before signing in; payment, account, video history and private server operations require a verified Google identity. Cache reset preserves the managed session; sign-out saves unfinished photos and greetings in a one-time local draft. Google OAuth and installed-app persistence still require verification with a real Google account on the deployed site.
 
 Video generation requires a signed-in owner and an atomically claimed, approved payment. Uploading a receipt does not approve a payment. Administrator access is verified server-side through protected role records; new accounts do not automatically receive that role.
 

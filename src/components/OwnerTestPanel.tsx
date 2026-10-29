@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FAL_LISTED_COST, type VideoDuration } from "@/lib/video-duration";
 import sample from "@/assets/hero.jpg";
 import { TEMPLATES } from "@/lib/site";
+import { templateSchema } from "@/lib/template-ids";
 
 export function OwnerTestPanel({ photo, template = "parol", duration = 5, onStart, onVideo, onError }: { photo?: string | null; template?: string; duration?: VideoDuration; onStart?: () => void; onVideo?: (url: string) => void; onError?: (message: string) => void }) {
   const reportFn = useServerFn(ownerTestReport); const start = useServerFn(testFalAiGeneration); const poll = useServerFn(pollFalTest);
@@ -30,7 +31,7 @@ export function OwnerTestPanel({ photo, template = "parol", duration = 5, onStar
       let imageUrl = photo;
       if (!imageUrl) { const blob = await (await fetch(sample)).blob(); imageUrl = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Photo unavailable")); reader.onerror = () => reject(new Error("Photo unavailable")); reader.readAsDataURL(blob); }); }
       onStart?.();
-      const result = await start({ data: { duration: d, template: (photo ? template : testTemplate) as "parol" | "snow" | "bokeh" | "globe" | "fire", imageUrl } }); await follow(result.id);
+      const result = await start({ data: { duration: d, template: templateSchema.parse(photo ? template : testTemplate), imageUrl } }); await follow(result.id);
     } catch (e) { const message = e instanceof Error ? e.message : "Test failed"; setError(message); onError?.(message); }
     finally { setBusy(false); await refresh().catch(() => {}); }
   }

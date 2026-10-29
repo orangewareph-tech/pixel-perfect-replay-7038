@@ -7,5 +7,5 @@ describe("automatic included sound and free audit", () => {
   it("includes sound in ₱149 five-second price", () => expect(christmasTotal(5, AUTOMATIC_MUSIC)).toBe(149));
   it("includes sound in ₱299 ten-second price", () => expect(christmasTotal(10, AUTOMATIC_MUSIC)).toBe(299));
   it("checks unused credits and spending caps", () => expect(checkPaymentRules()).toBe(true));
-  it("all five previews are static assets, not generation endpoints", () => { expect(Object.keys(TEMPLATE_WEBM)).toHaveLength(5); for (const url of Object.values(TEMPLATE_WEBM)) expect(url).toMatch(/^\/__l5e\/assets-v1\/[^/]+\/[^/]+\.webm$/); });
+  it("keeps five original clips and does not mislabel new images as videos", () => { expect(Object.keys(TEMPLATE_WEBM)).toHaveLength(8); const clips = Object.values(TEMPLATE_WEBM).filter(Boolean); expect(clips).toHaveLength(5); for (const url of clips) expect(url).toMatch(/^\/__l5e\/assets-v1\/[^/]+\/[^/]+\.webm$/); expect(TEMPLATE_WEBM.simbang).toBeNull(); expect(TEMPLATE_WEBM.crafting).toBeNull(); expect(TEMPLATE_WEBM.caroling).toBeNull(); });
 });
