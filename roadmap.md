@@ -1,6 +1,13 @@
 # Full app testing
-- [ ] Run all automated tests and public browser workflows, including music, real video generation/download, and offline recovery.
+- [x] Run all 36 automated tests; verify five templates, eight playable music clips, saved preferences, four prices, mobile layout, signed-out audit redirect, offline checkout recovery, and real 5s/10s video downloads (5s contains audible AAC music).
 - [ ] Verify protected audit with the owner's account — blocked until the owner signs in or identifies a test account.
+- [ ] Verify installed-app stale-worker upgrade end-to-end — browser harness stalled during worker activation; isolated cleanup tests pass, but a deployed installed-app upgrade remains unverified.
+
+## Test findings
+- Payments and bundle plans remain demo-only; plan search values do not change delivery or checkout.
+- Customer generation is public without server-side rate/cost limits, allowing unwanted Fal.ai charges; launch requires verified checkout and abuse controls.
+- Saved files retain the uploaded photo's aspect ratio; display toggles do not reshape the downloaded video.
+- Generation failure handling and download range validation need hardening; this testing request did not change these rules.
 
 # Offline recovery
 - [x] Replace the broken navigation worker with a same-path cleanup release, preserving home-screen support.
