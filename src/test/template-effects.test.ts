@@ -48,6 +48,8 @@ describe("enhanced Christmas template payloads", () => {
     const ext = buildVideoInput("photo", TEMPLATES[0].scene, 10, "extreme");
     expect(ext.prompt).toContain("Extreme movement");
     expect(ext.negative_prompt).toContain("camera shake");
-    expect(ext.negative_prompt).toContain("rapid zoom");
+    expect(ext.negative_prompt).not.toContain("rapid zoom");
+    expect(buildVideoInput("photo", TEMPLATES[0].scene, 10, "medium").negative_prompt).toContain("orbiting");
+    for (const m of ["low", "medium", "high", "extreme"] as const) expect(buildVideoInput("photo", TEMPLATES[2].scene, 5, m).prompt).toContain("Pasko sa Nayon");
   });
 });
