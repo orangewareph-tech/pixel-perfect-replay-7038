@@ -1,8 +1,9 @@
 import { Check, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DURATION_OFFERS, type VideoDuration } from "@/lib/video-duration";
+import { christmasTotal, musicOption, type MusicId } from "@/lib/christmas-music";
 
-export function DurationSelector({ duration, onChange, inverse = false }: { duration: VideoDuration; onChange: (value: VideoDuration) => void; inverse?: boolean }) {
+export function DurationSelector({ duration, onChange, inverse = false, music = "no-music", musicReady = true }: { duration: VideoDuration; onChange: (value: VideoDuration) => void; inverse?: boolean; music?: MusicId; musicReady?: boolean }) {
   const offer = DURATION_OFFERS[duration];
   return (
     <div className={`mt-6 ${inverse ? "text-night-foreground" : "text-foreground"}`}>
@@ -25,7 +26,8 @@ export function DurationSelector({ duration, onChange, inverse = false }: { dura
         })}
       </div>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
-      <p className="mt-2 text-sm">Total: <b>₱{offer.price}</b> · {duration}-second video · {offer.renderTime}</p>
+      <p className="mt-2 text-sm">{music !== "no-music" && !musicReady ? "Total once music is available" : "Total"}: <b>₱{christmasTotal(duration, music)}</b> · {duration}-second video{music !== "no-music" && ` + ${musicOption(music).name}`}</p>
+      {music !== "no-music" && <p className="mt-1 text-xs">{musicReady ? "Mas magical ang video with music!" : "Music unavailable — not ready to purchase."} Estimated delivery {duration === 5 ? "60 sec" : "2–3 mins"} + about 5 sec for music.</p>}
     </div>
   );
 }
