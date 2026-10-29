@@ -34,7 +34,7 @@ export const Route = createFileRoute("/create")({
       { title: "Create Your Christmas Video — MagicPh AI" },
       { name: "description", content: "Create a Filipino Christmas video with automatic included music. Pick 5 seconds for ₱149 or 10 seconds for ₱299; approved payment unlocks one video." },
       { property: "og:title", content: "Create Your Christmas Video — MagicPh AI" },
-      { property: "og:description", content: "Turn your family photo into Pinoy Christmas magic with five festive effects and automatic included sound." },
+      { property: "og:description", content: "Turn your family photo into Pinoy Christmas magic with eight festive templates and automatic included sound." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },

@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { canClaimPayment, withinDailyBudget, withinHourlyLimit, installedDisplay } from "@/lib/payment-rules";
+import { canClaimPayment, withinDailyBudget, withinHourlyLimit, installedDisplay, paymentChoicesSchema } from "@/lib/payment-rules";
 import { christmasTotal } from "@/lib/christmas-music";
 
 describe("paid video rules", () => {
+  for (const template of ["simbang", "crafting", "caroling"]) it(`accepts ${template} for both paid duration offers`, () => {
+    for (const duration of [5, 10]) expect(paymentChoicesSchema.parse({ template, duration, music: "pasko-sa-nayon" }).template).toBe(template);
+    expect(paymentChoicesSchema.safeParse({ template: "MagicFam", duration: 5, music: "pasko-sa-nayon" }).success).toBe(false);
+  });
   it("grants generation only to approved unused credits", () => {
     expect(canClaimPayment("approved")).toBe(true);
     for (const status of ["pending", "rejected", "SUBMITTING", "IN_QUEUE", "COMPLETED", "FAILED"]) expect(canClaimPayment(status)).toBe(false);

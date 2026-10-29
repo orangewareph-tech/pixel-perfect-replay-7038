@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header, Footer, Snow } from "@/components/SiteChrome";
-import { PLANS, TEMPLATES, TEMPLATE_MEDIA } from "@/lib/site";
+import { TEMPLATES, TEMPLATE_MEDIA } from "@/lib/site";
 import hero from "@/assets/hero.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DurationSelector } from "@/components/DurationSelector";
@@ -14,22 +14,16 @@ import { musicCheckoutLabel } from "@/lib/christmas-music";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MagicPh AI — Family Pic to Christmas Video in 60 seconds" },
+      { title: "MagicPh AI — Paskong Pinoy Family Videos" },
       { name: "description", content: "Create Filipino family Christmas videos with parol glow, snowfall and automatic included Christmas music. 5 seconds ₱149; 10 seconds ₱299. Payment approval required." },
       { property: "og:title", content: "MagicPh AI — Ang Pasko, Magic!" },
-      { property: "og:description", content: "Five festive effects and automatic included Christmas music. 5 seconds ₱149; 10 seconds ₱299." },
+      { property: "og:description", content: "Eight Pinoy Christmas templates with automatic included music. 5 seconds ₱149; 10 seconds ₱299." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
 });
-
-const REVIEWS = [
-  { name: "Joy D., Cebu", text: "Grabe ka nindot! Ang among family pic nahimong Christmas video. Nihilak akong Lola!" },
-  { name: "Mark R., Davao", text: "Wala gyud nausab ang mga nawong. Gi-post nako sa FB, daghan kaayo likes!" },
-  { name: "Ana L., Manila", text: "Super bilis, wala pang 1 minute. GCash pa, sobrang dali. Sulit ang P149!" },
-];
 
 const FAQ: [string, string][] = [
   ["Pila ka dugay? (How long?)", "Ang 5-second video: estimated 30–60 seconds. Ang 10-second Premium: estimated 2–3 minutes. Usahay mas dugay kung busy ang queue."],
@@ -50,7 +44,7 @@ function Index() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
           <div>
             <span className="inline-block rounded-full bg-gold-grad px-3 py-1 text-xs font-extrabold text-gold-foreground">
-              ⭐ Ang Pasko, Magic!
+              🇵🇭 Ang Pasko, Magic!
             </span>
             <h1 className="mt-4 text-4xl font-bold leading-tight md:text-6xl">
               Himoa Imong Family Pic nga <span className="text-gold">Christmas Magic!</span> 🎄
@@ -83,11 +77,11 @@ function Index() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">5 Magical Templates</h2>
-        <div className="mt-8 flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-5">
+        <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">🇵🇭 8 Pinoy Magic Templates</h2>
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {TEMPLATES.map((t) => (
-            <Link key={t.id} to="/create" search={{ template: t.id, duration, music }} aria-label={`Choose ${t.name}`} className="w-44 shrink-0 snap-start overflow-hidden rounded-2xl bg-card shadow-festive transition hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold md:w-auto">
-              <div className="relative h-[200px] overflow-hidden"><picture><source srcSet={TEMPLATE_MEDIA[t.id].webp} type="image/webp" /><img src={t.img} alt={TEMPLATE_MEDIA[t.id].alt} width={900} height={600} loading="lazy" className="h-full w-full object-cover" /></picture><span className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-bold text-primary-foreground">{TEMPLATE_MEDIA[t.id].badge}</span></div>
+            <Link key={t.id} to="/create" search={{ template: t.id, duration, music }} aria-label={`Choose ${t.name}`} className="min-w-0 overflow-hidden rounded-lg bg-card shadow-festive transition hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold">
+              <div className="relative h-[200px] overflow-hidden"><picture>{TEMPLATE_MEDIA[t.id].webp !== t.img && <source srcSet={TEMPLATE_MEDIA[t.id].webp} type="image/webp" />}<img src={t.img} alt={TEMPLATE_MEDIA[t.id].alt} width={992} height={672} loading="lazy" className="h-full w-full object-cover" /></picture><span className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-bold text-primary-foreground">{TEMPLATE_MEDIA[t.id].badge}</span></div>
               <div className="p-3">
                 <h3 className="font-bold">{t.name}</h3>
                 <p className="text-xs text-muted-foreground">{t.desc}</p>
@@ -101,35 +95,22 @@ function Index() {
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">Simple Pricing</h2>
           <p className="mt-2 text-center text-muted-foreground">5 segundos · ₱149 &nbsp; / &nbsp; 10 segundos Premium · ₱299</p>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {PLANS.map((p) => {
-              const best = "best" in p;
+          <div className="mx-auto mt-10 grid max-w-2xl gap-5 sm:grid-cols-2">
+            {([{ id: "hd", price: 149, name: "5 segundos", detail: "Automatic Christmas music · included", duration: 5 }, { id: "premium", price: 299, name: "10 segundos Premium", detail: "Automatic Christmas music · included", duration: 10 }] as const).map((p) => {
+              const best = p.duration === 5;
               return (
                 <div key={p.id} className={`relative rounded-3xl bg-card p-6 shadow-festive ${best ? "border-4 border-gold lg:scale-105" : "border border-border"}`}>
                   {best && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold-grad px-3 py-1 text-xs font-extrabold text-gold-foreground">⭐ BEST SELLER</span>}
                   <h3 className="text-xl font-bold">{p.name}</h3>
                   <p className="mt-2 font-display text-4xl font-bold text-primary">₱{p.price}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{p.detail}</p>
-                  <Button asChild className={`mt-6 h-auto w-full rounded-full py-3 font-bold ${best ? "bg-festive text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}><Link to="/create" search={{ plan: p.id, duration: 5 }}>
+                  <Button asChild className={`mt-6 h-auto w-full rounded-full py-3 font-bold ${best ? "bg-festive text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}><Link to="/create" search={{ duration: p.duration, template }}>
                     Choose
                   </Link></Button>
                 </div>
               );
             })}
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">2,000+ Happy Pinoy Families ❤️</h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {REVIEWS.map((r) => (
-            <blockquote key={r.name} className="flex flex-col rounded-2xl border border-border/60 bg-card p-7 shadow-festive">
-              <div className="text-gold">★★★★★</div>
-              <p className="mb-6 mt-4 flex-1 leading-relaxed">“{r.text}”</p>
-              <footer className="border-t border-border/60 pt-4 text-sm font-bold text-muted-foreground">— {r.name}</footer>
-            </blockquote>
-          ))}
         </div>
       </section>
 
