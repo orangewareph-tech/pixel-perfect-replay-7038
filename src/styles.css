@@ -102,3 +102,7 @@
 @utility animate-snow { animation: snow-fall linear infinite; }
 @utility animate-kenburns { animation: ken-burns 6s ease-in-out infinite alternate; }
 @utility animate-twinkle { animation: twinkle 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-snow, .animate-kenburns, .animate-twinkle { animation: none; }
+}

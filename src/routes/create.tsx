@@ -16,13 +16,14 @@ import { MusicVideoPlayer } from "@/components/MusicVideoPlayer";
 import { useChristmasChoices } from "@/hooks/use-christmas-choices";
 import { useMusicFile } from "@/hooks/use-music-file";
 import { canGenerateVideo, useOnlineStatus } from "@/hooks/use-online-status";
-import { christmasTotal, DEFAULT_MUSIC_VOLUME, musicOption, musicSchema, musicCheckoutLabel } from "@/lib/christmas-music";
+import { christmasTotal, DEFAULT_MUSIC_VOLUME, musicOption, musicSchema } from "@/lib/christmas-music";
 import { PaymentPanel } from "@/components/PaymentPanel";
 import { listMyPayments } from "@/lib/payments.functions";
 import { paymentChoicesSchema } from "@/lib/payment-rules";
 import { supabase } from "@/integrations/supabase/client";
 import { CreationProgress } from "@/components/CreationProgress";
 import { ArrowLeft, ArrowRight, Upload, Download, Share2 } from "lucide-react";
+import { saveCreationDraft, takeCreationDraft } from "@/lib/creation-draft";
 
 export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
@@ -66,6 +67,7 @@ function Create() {
   const [saving, setSaving] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [historyOnly, setHistoryOnly] = useState(false);
   const [saveError, setSaveError] = useState("");
   const listPayments = useServerFn(listMyPayments);
   const [payments, setPayments] = useState<Awaited<ReturnType<typeof listMyPayments>>["payments"]>([]);
@@ -76,6 +78,22 @@ function Create() {
     catch { setSignedIn(false); setPayments([]); }
   }
   useEffect(() => { void supabase.auth.getUser().then(({ data }) => { if (data.user) void refreshPayments(); }); }, []);
+  useEffect(() => {
+    void takeCreationDraft().then((draft) => {
+      if (!draft) return;
+      setPhoto(draft.photo); setTpl(draft.template); setMusic(draft.music); setDuration(draft.duration);
+      setVolume(draft.volume); setLoopMusic(draft.loopMusic); setPaymentOpen(true); setStep(3);
+    }).catch(() => { /* Upload remains usable if browser storage is unavailable. */ });
+  }, []);
+
+  async function signInToPay() {
+    if (!photo) return;
+    try {
+      await saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic });
+      sessionStorage.setItem("magicph_auth_return", "/create");
+      window.location.assign("/auth");
+    } catch { setErr("Dili ma-save ang photo para sa sign-in. Ablihi ang Sign in sa laing tab, dayon balik dinhi."); }
+  }
 
   async function saveVideo() {
     if (!videoUrl || saving) return;
@@ -126,7 +144,7 @@ function Create() {
     if (!musicReady) { setErr("Music is still loading. Please wait and try again."); return; }
     const payment = payments.find((item) => item.id === paymentId && item.status === "approved" && item.duration === duration && item.music === music && item.template === tpl);
     if (!payment) { setErr(`Please pay first — ₱${total} and an approved video credit are required.`); setStep(3); return; }
-    setStep(4); setProgress(3); setElapsed(0); setGenErr(null); setVideoUrl(null);
+    setHistoryOnly(false); setStep(4); setProgress(3); setElapsed(0); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
     try {
       const { requestId } = await start({ data: { imageUrl: photo, paymentId: payment.id } });
@@ -150,10 +168,10 @@ function Create() {
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [step]);
   useEffect(() => {
-    if (step !== 4 || videoUrl || genErr) return;
+    if (step !== 4 || videoUrl || genErr || historyOnly) return;
     const timer = setInterval(() => setElapsed((seconds) => seconds + 1), 1000);
     return () => clearInterval(timer);
-  }, [step, videoUrl, genErr]);
+  }, [step, videoUrl, genErr, historyOnly]);
 
   async function shareVideo(platform: "Facebook" | "TikTok") {
     if (!videoUrl) return;
@@ -192,6 +210,7 @@ function Create() {
             <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
             <p className="mt-4 text-center text-sm text-muted-foreground">Mas nindot ang resulta kung klaro ang mga nawong ug hayag ang suga.</p>
             {photo && <div className="mt-4 text-center"><Button variant="outline" onClick={() => setStep(1)}>Gamita ang kasamtangang photo<ArrowRight /></Button></div>}
+            {signedIn && payments.some((payment) => payment.request_id || payment.status === "SUBMITTING") && <div className="mt-4 text-center"><Button variant="link" onClick={() => { setHistoryOnly(true); setStep(4); }}>Tan-awa ang saved videos</Button></div>}
             {err && <p className="mt-3 text-center font-bold text-destructive">{err}</p>}
           </section>
         )}
@@ -236,7 +255,7 @@ function Create() {
             </div>
             <p className="mt-4 text-center text-xs text-muted-foreground">Gipaningkamotan nga mapreserbar ang mga nawong · Gibanabana: {duration === 5 ? "30–60 segundos" : "2–3 minutos"} human ma-approve ang bayad.</p>
             <Button onClick={() => setPaymentOpen(true)} className="mt-5 h-12 w-full text-base" disabled={!musicReady}>Pay with GCash / Maya · ₱{total}</Button>
-            {paymentOpen && (!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in una sa pagbayad. Usa ka approved payment para sa usa ka video.</p><Button asChild className="mt-4"><Link to="/auth" onClick={() => sessionStorage.setItem("magicph_auth_return", "/create")}>Sign in to pay</Link></Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>)}
+            {paymentOpen && (!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in una sa pagbayad. Usa ka approved payment para sa usa ka video.</p><Button onClick={() => void signInToPay()} className="mt-4">Sign in to pay</Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>)}
             {err && <p role="alert" className="mt-3 text-destructive">{err}</p>}
             <Button variant="ghost" onClick={() => setStep(2)} className="mt-4"><ArrowLeft />Balik</Button>
           </section>
@@ -244,7 +263,8 @@ function Create() {
 
         {step === 4 && (
           <section className="text-center">
-            {!videoUrl && !genErr && (
+            {historyOnly && !videoUrl && <><h1 className="text-2xl font-bold text-primary">Imong saved videos</h1><Button variant="ghost" onClick={() => { setHistoryOnly(false); setStep(0); }} className="mt-3"><ArrowLeft />Balik sa upload</Button></>}
+            {!historyOnly && !videoUrl && !genErr && (
               <div className="relative overflow-hidden rounded-3xl bg-night-grad p-10 text-night-foreground">
                 <Snow />
                 <img src={logo} alt="" className="animate-twinkle relative mx-auto h-20 w-20" />

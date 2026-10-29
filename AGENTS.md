@@ -11,6 +11,8 @@
 
 ## Rules
 
+- Keep the creation wizard's choices in the create route and save a one-time IndexedDB draft only across sign-in, so large private photos survive account navigation without entering URLs; progress rendering stays in a shared presentation component.
+
 - Customer videos require authenticated ownership and an atomically claimed approved video_payments row; never trust client credits, approval timers or passwords. Reserve before Fal submission, retain ambiguous failures for reconciliation, and count administrator tests in the shared UTC daily budget so retries cannot create unpaid charges.
 - Payment prices, duration, music and template are stored by validated account operations; only authenticated administrator review may approve manual receipts. Keep provider checkout disabled until its connection and server-side verification are configured.
 - Payment receipts are private account records with owner/admin SELECT only; server-only privileged writes follow verified ownership or role checks, and public pages expose no internal spending values.
