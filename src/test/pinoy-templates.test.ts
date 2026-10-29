@@ -11,7 +11,7 @@ describe("Pinoy-only template integration", () => {
   });
   it("allows new templates in payment and owner-reservation database validation without lifting budgets", () => {
     const sql = readFileSync("drizzle/migrations/0005_pinoy_template_choices.sql", "utf8");
-    const lists = [...sql.matchAll(/(?:CHECK \(template IN|NEW\.template NOT IN) \(([^)]+)\)/g)].map((match) => match[1]);
+    const lists = [...sql.matchAll(/(?:CHECK \(template IN|NEW\.template NOT IN) \(([^)]+)\)/g)].map((match) => match[1] ?? "");
     expect(lists).toHaveLength(2);
     for (const list of lists) expect(list.replaceAll("'", "").split(",")).toEqual(templateSchema.options);
     expect(sql).toContain("hour_count>=3");
