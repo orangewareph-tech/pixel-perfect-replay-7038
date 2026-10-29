@@ -6,6 +6,7 @@ import { useOnlineStatus } from "@/hooks/use-online-status";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { CacheRecovery } from "@/components/CacheRecovery";
 
 export function Header({ sticky = true }: { sticky?: boolean }) {
   const online = useOnlineStatus();
@@ -19,6 +20,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
           <span className="font-display text-xl font-bold text-primary">MagicPh <span className="text-gold">AI</span></span>
         </Link>
         <div className="flex flex-wrap items-center gap-2">
+        <CacheRecovery />
         {signedIn && <Button aria-label="Sign out" title="Sign out" variant="ghost" size="icon" onClick={async () => { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); await navigate({ to: "/auth", replace: true }); }}><LogOut /></Button>}
         <Link to="/create" className="rounded-full bg-festive px-4 py-2 text-sm font-bold text-primary-foreground shadow-festive">
           Upload Photo

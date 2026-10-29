@@ -13,7 +13,7 @@ self.addEventListener("activate", (event) =>
       try {
         const cacheNames = await caches.keys();
         const appCaches = cacheNames.filter(
-          (name) => isWorkboxCacheForThisRegistration(name) || name === "magicph-assets",
+          (name) => isWorkboxCacheForThisRegistration(name) || name === "magicph-assets" || /^magicph-(?:magicph-)?v\d+$/.test(name),
         );
         await Promise.allSettled(appCaches.map((name) => caches.delete(name)));
         await self.clients.claim();
