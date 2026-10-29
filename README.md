@@ -66,6 +66,8 @@ Do not edit generated Cloud clients, auth middleware, connection files, or gener
 
 ## Accounts, payments, and safety
 
+Google is the only sign-in method. The app uses Google's existing name, email and avatar, without extra profile storage or duplicate token keys. Creation, account, video history and private server operations require a verified Google identity. Cache reset preserves the managed session; sign-out saves unfinished photos and greetings in a one-time local draft. Google OAuth and installed-app persistence still require verification with a real Google account on the deployed site.
+
 Video generation requires a signed-in owner and an atomically claimed, approved payment. Uploading a receipt does not approve a payment. Administrator access is verified server-side through protected role records; new accounts do not automatically receive that role.
 
 Manual GCash/InstaPay receipt review is implemented. **Paymongo is not connected**, and automatic provider checkout remains disabled until configured and verified. Stripe is not part of this project’s payment setup.
