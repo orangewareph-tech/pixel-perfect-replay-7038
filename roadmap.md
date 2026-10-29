@@ -1,7 +1,10 @@
+# Pinoy-only Christmas templates
+- [ ] Add three Pinoy traditions, enhance all eight scenes, connect payment/message/test validation and original sample images.
+- [ ] Verify eight-template selection, included ₱149/₱299 pricing and regression tests without paid generation.
 # Enhanced Christmas templates
 - [x] Enrich all five existing template effects and duration pacing without changing identity, prices, payments or soundtrack.
 - [x] Test the shared customer/administrator payload: 37 relevant tests pass; build OK. Visual quality of new paid renders remains unverified without an approved payment or owner access.
-- [ ] Add MagicFam US templates — uploaded brief ends mid-prompt; complete US brief required.
+- [x] Cancel MagicFam US templates — user now explicitly requires Pinoy-only MagicPh AI.
 
 # Owner-only testing
 - [x] Provision only the verified Google owner administrator, enforce atomic three/hour and $10/day test reservations, and preserve customer payment security.
