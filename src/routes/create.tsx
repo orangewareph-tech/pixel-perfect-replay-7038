@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { googleAccount } from "@/lib/google-auth.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -28,9 +27,7 @@ import { ChristmasMessageWriter } from "@/components/ChristmasMessageWriter";
 import { EMPTY_MESSAGE, type MessageDraft } from "@/lib/christmas-message";
 import { OwnerTestPanel } from "@/components/OwnerTestPanel";
 
-export const Route = createFileRoute("/_authenticated/create")({
-  loader: () => googleAccount(),
-  errorComponent: () => <><Header /><main className="mx-auto max-w-md px-4 py-12 text-center"><h1 className="text-2xl font-bold text-primary">Continue with Google</h1><Button asChild className="mt-6"><Link to="/auth">Google sign-in</Link></Button></main><Footer /></>,
+export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
   head: () => ({
     meta: [
