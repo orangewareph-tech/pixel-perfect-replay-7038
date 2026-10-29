@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -219,7 +219,7 @@ function Create() {
           <section>
             <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Pili-a ang magic template</h1>
             <div className="mt-5 grid items-start gap-5 md:grid-cols-2">
-              <MagicTemplateSelector value={tpl} onChange={setTpl} />
+              <MagicTemplateSelector value={tpl} onChange={setTpl} compact />
               <figure className="overflow-hidden rounded-lg">
                 <img src={template.img} alt={`${template.name} example`} className="aspect-[4/3] w-full object-cover" />
                 <figcaption className="mt-3 font-display text-lg font-bold text-christmas-green">{template.icon} {template.name}<span className="mt-1 block font-sans text-xs font-normal text-muted-foreground">Pananglitan sa template · dili pa imong final video</span></figcaption>
@@ -234,7 +234,7 @@ function Create() {
             <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Music ug kadugayon</h1>
             <div className="grid items-start gap-x-6 md:grid-cols-2">
               <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
-              <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
+              <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} compact />
             </div>
             <Nav onBack={() => setStep(1)} onNext={() => { setErr(null); setPaymentOpen(false); setStep(3); }} />
           </section>

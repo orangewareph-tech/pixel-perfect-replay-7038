@@ -1,7 +1,8 @@
 # Guided creation flow
-- [ ] Separate upload, template, music/duration, confirmation/payment and video into five steps with sticky progress and Back actions.
-- [ ] Keep payment security, media controls and download/share features; remove public diagnostics navigation.
-- [ ] Verify step transitions, live totals, retained choices, and desktop/mobile layout.
+- [x] Separate upload, template, music/duration, confirmation/payment and video into five steps with sticky progress and Back actions.
+- [x] Keep payment security, media controls and download/share features; remove public diagnostics navigation.
+- [x] Verify step transitions, live totals, retained choices across Back/sign-in, music playback and desktop/mobile layout; all 45 tests pass.
+- [ ] New paid generation after receipt approval remains unverified — requires an identified signed-in customer and approved payment; no paid test submitted for this presentation redesign.
 
 # Secure payment launch
 - [x] Protect customer generation with authenticated, single-use approved payment credits; direct unpaid calls reject before Fal submission.

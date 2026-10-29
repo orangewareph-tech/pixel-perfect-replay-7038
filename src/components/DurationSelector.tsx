@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DURATION_OFFERS, type VideoDuration } from "@/lib/video-duration";
 import { christmasTotal, musicOption, type MusicId } from "@/lib/christmas-music";
 
-export function DurationSelector({ duration, onChange, inverse = false, music = "no-music", musicReady = true }: { duration: VideoDuration; onChange: (value: VideoDuration) => void; inverse?: boolean; music?: MusicId; musicReady?: boolean }) {
+export function DurationSelector({ duration, onChange, inverse = false, music = "no-music", musicReady = true, compact = false }: { duration: VideoDuration; onChange: (value: VideoDuration) => void; inverse?: boolean; music?: MusicId; musicReady?: boolean; compact?: boolean }) {
   const offer = DURATION_OFFERS[duration];
   return (
     <div className={`mt-6 ${inverse ? "text-night-foreground" : "text-foreground"}`}>
@@ -20,13 +20,13 @@ export function DurationSelector({ duration, onChange, inverse = false, music = 
               <span className="mt-3 font-display text-lg font-bold">{item.title}</span>
               <span className="mt-1 text-xs text-muted-foreground">{item.subtitle}</span>
               <span className="mt-3 flex items-baseline gap-2"><strong className="font-display text-3xl text-primary">₱{item.price}</strong>{"originalPrice" in item && <s className="text-muted-foreground">₱{item.originalPrice}</s>}</span>
-              <span className="mt-3 flex flex-col gap-1 text-xs">{item.details.map((detail) => <span key={detail}>✓ {detail}</span>)}</span>
+              {!compact && <span className="mt-3 flex flex-col gap-1 text-xs">{item.details.map((detail) => <span key={detail}>✓ {detail}</span>)}</span>}
             </Button>
           );
         })}
       </div>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
-      <p className="mt-2 text-sm">Total: <b>₱{christmasTotal(duration, music)}</b>{music !== "no-music" && " — With Music!"} · {duration}-second video{music !== "no-music" && ` + ${musicOption(music).name}`}</p>
+      <p aria-live="polite" className={`mt-2 ${compact ? "font-display text-2xl text-primary" : "text-sm"}`}>Total: <b>₱{christmasTotal(duration, music)}</b>{!compact && <>{music !== "no-music" && " — With Music!"} · {duration}-second video{music !== "no-music" && ` + ${musicOption(music).name}`}</>}</p>
       {music !== "no-music" && <p className="mt-1 text-xs">{musicReady ? "Mas magical ang video with music!" : "Loading music — please wait."} Estimated delivery {duration === 5 ? "60 sec" : "2–3 mins"} + about 5 sec for music.</p>}
     </div>
   );
