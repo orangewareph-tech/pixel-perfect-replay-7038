@@ -1,3 +1,8 @@
+# Google-only sign-in
+- [ ] Enable Google and disable other supported providers; replace sign-in UI and show Google account details.
+- [ ] Require Google for private operations/creation; preserve unfinished work on sign-out and retain sessions during cache reset.
+- [ ] Verify Google-only UI, private access checks, sign-out draft restoration and account persistence where available.
+
 # Safe cache reset
 - [x] Add app-only cache reset in the header and cache status on the test page, preserving private drafts, sessions and unrelated caches.
 - [x] Preserve manifest-only home-screen support and same-path automatic stale-worker retirement; do not restore navigation caching.
