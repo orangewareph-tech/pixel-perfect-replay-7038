@@ -4,7 +4,7 @@ import { buildVideoInput, VIDEO_MODEL } from "@/lib/video-duration";
 
 describe("enhanced Christmas template payloads", () => {
   const requiredEffects = {
-    parol: ["parol", "golden sparkles"],
+    parol: ["parol", "golden star dust"],
     snow: ["snow", "snowflakes"],
     bokeh: ["fairy lights", "heart", "bokeh"],
     globe: ["santa", "elves", "toy train"],
