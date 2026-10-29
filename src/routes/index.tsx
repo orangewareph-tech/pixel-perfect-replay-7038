@@ -71,13 +71,13 @@ function Index() {
         <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">5 Magical Templates</h2>
         <div className="mt-8 flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-5">
           {TEMPLATES.map((t) => (
-            <div key={t.id} className="w-44 shrink-0 snap-start overflow-hidden rounded-2xl bg-card shadow-festive md:w-auto">
+            <Link key={t.id} to="/create" search={{ template: t.id }} aria-label={`Choose ${t.name}`} className="w-44 shrink-0 snap-start overflow-hidden rounded-2xl bg-card shadow-festive transition hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold md:w-auto">
               <img src={t.img} alt={t.name} width={768} height={1024} loading="lazy" className="aspect-[3/4] w-full object-cover" />
               <div className="p-3">
                 <h3 className="font-bold">{t.name}</h3>
                 <p className="text-xs text-muted-foreground">{t.desc}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

@@ -6,9 +6,11 @@ import { Header, Footer, Snow } from "@/components/SiteChrome";
 import { PLANS, TEMPLATES, isAllowedPhoto } from "@/lib/site";
 import { startVideo, checkVideo, downloadVideo } from "@/lib/fal.functions";
 import logo from "@/assets/logo.png";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 
 export const Route = createFileRoute("/create")({
-  validateSearch: z.object({ plan: z.string().optional() }),
+  validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional() }),
   head: () => ({
     meta: [
       { title: "Create Your Christmas Video — MagicPh AI" },
@@ -25,11 +27,11 @@ export const Route = createFileRoute("/create")({
 const STEPS = ["Upload", "Template", "Preview", "Payment", "Video"];
 
 function Create() {
-  const { plan: planParam } = Route.useSearch();
+  const { plan: planParam, template: templateParam } = Route.useSearch();
   const [step, setStep] = useState(0);
   const [photo, setPhoto] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [tpl, setTpl] = useState<string>(TEMPLATES[0].id);
+  const [tpl, setTpl] = useState<string>(TEMPLATES.find((t) => t.id === templateParam)?.id ?? TEMPLATES[0].id);
   const [plan, setPlan] = useState<string>(planParam ?? "hd");
   const [ratio, setRatio] = useState<"9:16" | "16:9">("9:16");
   const [progress, setProgress] = useState(0);
@@ -40,7 +42,7 @@ function Create() {
   const start = useServerFn(startVideo);
   const check = useServerFn(checkVideo);
   const download = useServerFn(downloadVideo);
-  const template = TEMPLATES.find((t) => t.id === tpl)!;
+  const template = TEMPLATES.find((t) => t.id === tpl) ?? TEMPLATES[0];
   const [saving, setSaving] = useState(false);
 
   async function saveVideo() {
@@ -69,10 +71,11 @@ function Create() {
   }
 
   async function generate() {
+    if (!photo) { setErr("Please upload a family photo first."); setStep(0); return; }
     setStep(4); setProgress(3); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
     try {
-      const { requestId } = await start({ data: { imageUrl: photo!, scene: template.scene } });
+      const { requestId } = await start({ data: { imageUrl: photo, scene: template.scene } });
       for (let i = 0; i < 90; i++) {
         await new Promise((r) => setTimeout(r, 4000));
         const s = await check({ data: { requestId } });
@@ -131,10 +134,11 @@ function Create() {
             <h1 className="text-center text-3xl font-bold text-primary">Choose a Template</h1>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {TEMPLATES.map((t) => (
-                <button key={t.id} onClick={() => setTpl(t.id)} className={`overflow-hidden rounded-2xl bg-card text-left shadow-festive transition ${tpl === t.id ? "ring-4 ring-gold" : ""}`}>
+                <Button key={t.id} type="button" variant="ghost" aria-label={t.name} aria-pressed={tpl === t.id} onClick={() => setTpl(t.id)} className={`relative block h-auto min-w-0 overflow-hidden whitespace-normal rounded-2xl bg-card p-0 text-left shadow-festive transition ${tpl === t.id ? "ring-4 ring-gold" : ""}`}>
                   <img src={t.img} alt={t.name} width={768} height={1024} loading="lazy" className="aspect-[3/4] w-full object-cover" />
+                  {tpl === t.id && <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-gold text-gold-foreground"><Check aria-hidden="true" /></span>}
                   <div className="p-2"><b className="text-sm">{t.name}</b><p className="text-xs text-muted-foreground">{t.desc}</p></div>
-                </button>
+                </Button>
               ))}
             </div>
             <Nav onBack={() => setStep(0)} onNext={() => setStep(2)} />
