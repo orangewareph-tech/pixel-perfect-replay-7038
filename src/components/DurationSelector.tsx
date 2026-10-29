@@ -1,7 +1,7 @@
 import { Check, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DURATION_OFFERS, type VideoDuration } from "@/lib/video-duration";
-import { christmasTotal, musicOption, type MusicId } from "@/lib/christmas-music";
+import { christmasTotal, type MusicId } from "@/lib/christmas-music";
 
 export function DurationSelector({ duration, onChange, inverse = false, music = "no-music", musicReady = true, compact = false }: { duration: VideoDuration; onChange: (value: VideoDuration) => void; inverse?: boolean; music?: MusicId; musicReady?: boolean; compact?: boolean }) {
   const offer = DURATION_OFFERS[duration];
@@ -26,8 +26,8 @@ export function DurationSelector({ duration, onChange, inverse = false, music = 
         })}
       </div>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
-      <p aria-live="polite" className={`mt-2 ${compact ? "font-display text-2xl text-primary" : "text-sm"}`}>Total: <b>₱{christmasTotal(duration, music)}</b>{!compact && <>{music !== "no-music" && " — With Music!"} · {duration}-second video{music !== "no-music" && ` + ${musicOption(music).name}`}</>}</p>
-      {music !== "no-music" && <p className="mt-1 text-xs">{musicReady ? "Mas magical ang video with music!" : "Loading music — please wait."} Estimated delivery {duration === 5 ? "60 sec" : "2–3 mins"} + about 5 sec for music.</p>}
+      <p aria-live="polite" className={`mt-2 ${compact ? "font-display text-2xl text-primary" : "text-sm"}`}>Total: <b>₱{christmasTotal(duration, music)}</b> · Christmas music included 🎵</p>
+      <p className="mt-1 text-xs">{musicReady ? "Automatic Christmas soundtrack · no extra charge" : "Loading included soundtrack…"}</p>
     </div>
   );
 }

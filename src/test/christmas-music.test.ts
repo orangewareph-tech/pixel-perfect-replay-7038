@@ -7,9 +7,9 @@ describe("Christmas upgrades", () => {
   it("defaults to Parol and offers all five requested effects", () => { expect(TEMPLATES.map((t) => t.id)).toEqual(["parol", "snow", "bokeh", "globe", "fire"]); expect(TEMPLATES[0].best).toBe(true); });
   it("keeps a silent 5-second video at ₱149", () => { expect(christmasTotal(5, "no-music")).toBe(149); });
   it("keeps a silent 10-second video at ₱299", () => { expect(christmasTotal(10, "no-music")).toBe(299); });
-  it("charges ₱169 for every 5-second song upgrade", () => { for (const id of musicSchema.options.filter((v) => v !== "no-music")) expect(christmasTotal(5, id)).toBe(169); });
-  it("charges ₱319 for every 10-second song upgrade", () => { for (const id of musicSchema.options.filter((v) => v !== "no-music")) expect(christmasTotal(10, id)).toBe(319); });
-  it("subtracts the supplied ₱5 license assumption from music profit", () => { expect(christmasProfit(5, "pasko-sa-nayon")).toBe(141.70); expect(christmasProfit(10, "pasko-sa-nayon")).toBe(271.40); });
+  it("includes automatic music at ₱149 for five seconds", () => { for (const id of musicSchema.options) expect(christmasTotal(5, id)).toBe(149); });
+  it("includes automatic music at ₱299 for ten seconds", () => { for (const id of musicSchema.options) expect(christmasTotal(10, id)).toBe(299); });
+  it("subtracts the supplied ₱5 audio budget from included-music profit", () => { expect(christmasProfit(5, "pasko-sa-nayon")).toBe(121.70); expect(christmasProfit(10, "pasko-sa-nayon")).toBe(251.40); });
   it("uses no audio file for No Music", () => { expect(musicPath("no-music", 5)).toBeNull(); });
   it("No Music never loads an audio asset", () => { expect(musicAssetUrl("no-music", 5)).toBeNull(); expect(musicAssetUrl("no-music", 10)).toBeNull(); });
   it("provides a distinct nonempty MP3 asset for each track and duration", () => { const assets = Object.values(MUSIC_ASSETS).flatMap((pair) => [pair[5], pair[10]]); expect(assets.length).toBe(8); expect(new Set(assets.map((a) => a.asset_id)).size).toBe(8); for (const asset of assets) { expect(asset.size).toBeGreaterThan(1000); expect(asset.content_type).toBe("audio/mpeg"); } });

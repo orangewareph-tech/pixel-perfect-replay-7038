@@ -13,7 +13,7 @@ export function PaymentPanel({ choices, onApproved, payments, onRefresh }: { cho
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const total = christmasTotal(choices.duration, choices.music);
-  const matching = payments.filter((payment) => payment.duration === choices.duration && payment.music === choices.music && payment.template === choices.template);
+  const matching = payments.filter((payment) => payment.duration === choices.duration && payment.template === choices.template);
   async function upload(file?: File) {
     if (!file) return;
     if (!["image/jpeg", "image/png"].includes(file.type) || file.size > 2 * 1024 * 1024) { setMessage("Use a JPG or PNG receipt, max 2MB."); return; }

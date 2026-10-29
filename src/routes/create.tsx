@@ -11,12 +11,11 @@ import { DurationSelector } from "@/components/DurationSelector";
 import { useVideoDuration } from "@/hooks/use-video-duration";
 import { DURATION_OFFERS, videoDurationSchema } from "@/lib/video-duration";
 import { MagicTemplateSelector } from "@/components/MagicTemplateSelector";
-import { MusicSelector } from "@/components/MusicSelector";
 import { MusicVideoPlayer } from "@/components/MusicVideoPlayer";
 import { useChristmasChoices } from "@/hooks/use-christmas-choices";
 import { useMusicFile } from "@/hooks/use-music-file";
 import { canGenerateVideo, useOnlineStatus } from "@/hooks/use-online-status";
-import { christmasTotal, DEFAULT_MUSIC_VOLUME, musicOption, musicSchema } from "@/lib/christmas-music";
+import { christmasTotal, DEFAULT_MUSIC_VOLUME, AUTOMATIC_MUSIC, musicSchema } from "@/lib/christmas-music";
 import { PaymentPanel } from "@/components/PaymentPanel";
 import { listMyPayments } from "@/lib/payments.functions";
 import { paymentChoicesSchema } from "@/lib/payment-rules";
@@ -30,9 +29,9 @@ export const Route = createFileRoute("/create")({
   head: () => ({
     meta: [
       { title: "Create Your Christmas Video — MagicPh AI" },
-      { name: "description", content: "Create a Filipino Christmas video with parol glow, snowfall and original festive music. Pick 5 or 10 seconds; approved payment unlocks one video." },
+      { name: "description", content: "Create a Filipino Christmas video with automatic included music. Pick 5 seconds for ₱149 or 10 seconds for ₱299; approved payment unlocks one video." },
       { property: "og:title", content: "Create Your Christmas Video — MagicPh AI" },
-      { property: "og:description", content: "Turn your family photo into Pinoy Christmas magic with five festive effects and optional music." },
+      { property: "og:description", content: "Turn your family photo into Pinoy Christmas magic with five festive effects and automatic included sound." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -81,8 +80,8 @@ function Create() {
   useEffect(() => {
     void takeCreationDraft().then((draft) => {
       if (!draft) return;
-      setPhoto(draft.photo); setTpl(draft.template); setMusic(draft.music); setDuration(draft.duration);
-      setVolume(draft.volume); setLoopMusic(draft.loopMusic); setPaymentOpen(true); setStep(3);
+      setPhoto(draft.photo); setTpl(draft.template); setMusic(AUTOMATIC_MUSIC); setDuration(draft.duration);
+      setVolume(DEFAULT_MUSIC_VOLUME); setLoopMusic(true); setPaymentOpen(true); setStep(3);
     }).catch(() => { /* Upload remains usable if browser storage is unavailable. */ });
   }, []);
 
@@ -109,7 +108,7 @@ function Create() {
         if (offset >= result.total) break;
       }
       let output = new Blob(chunks, { type: "video/mp4" });
-      if (music !== "no-music") {
+      {
         if (!track.blob) throw new Error("Music could not load. Reselect your track and try again.");
         const { embedMusic } = await import("@/lib/embed-music");
         output = await embedMusic(output, track.blob, volume, loopMusic, duration);
@@ -117,7 +116,7 @@ function Create() {
       const objectUrl = URL.createObjectURL(output);
       const a = document.createElement("a");
       a.href = objectUrl;
-      a.download = music === "no-music" ? "magicph-christmas.mp4" : "magicph-christmas-with-music.mp4";
+      a.download = "magicph-christmas-with-music.mp4";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -142,7 +141,7 @@ function Create() {
     if (!canGenerateVideo(online)) { setErr("Need internet to generate video"); return; }
     if (!photo) { setErr("Please upload a family photo first."); setStep(0); return; }
     if (!musicReady) { setErr("Music is still loading. Please wait and try again."); return; }
-    const payment = payments.find((item) => item.id === paymentId && item.status === "approved" && item.duration === duration && item.music === music && item.template === tpl);
+    const payment = payments.find((item) => item.id === paymentId && item.status === "approved" && item.duration === duration && item.template === tpl);
     if (!payment) { setErr(`Please pay first — ₱${total} and an approved video credit are required.`); setStep(3); return; }
     setHistoryOnly(false); setStep(4); setProgress(3); setElapsed(0); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
@@ -231,9 +230,8 @@ function Create() {
 
         {step === 2 && (
           <section>
-            <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Music ug kadugayon</h1>
-            <div className="grid items-start gap-x-6 md:grid-cols-2">
-              <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
+            <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Pili-a ang kadugayon</h1>
+            <div className="mx-auto max-w-2xl">
               <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} compact />
             </div>
             <Nav onBack={() => setStep(1)} onNext={() => { setErr(null); setPaymentOpen(false); setStep(3); }} />
@@ -248,7 +246,7 @@ function Create() {
               {photo && <img src={photo} alt="Imong family photo" className="mx-auto aspect-square w-32 shrink-0 rounded-lg object-cover sm:mx-0" />}
               <dl className="grid min-w-0 flex-1 grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
                 <dt className="text-muted-foreground">Template</dt><dd className="break-words font-bold">{template.name}</dd>
-                <dt className="text-muted-foreground">Music</dt><dd className="break-words font-bold">{musicOption(music).name}</dd>
+                <dt className="text-muted-foreground">Music</dt><dd className="break-words font-bold">Automatic Christmas soundtrack · included</dd>
                 <dt className="text-muted-foreground">Kadugayon</dt><dd className="font-bold">{duration} segundos</dd>
                 <dt className="border-t pt-3 font-bold">Total</dt><dd aria-live="polite" className="border-t pt-3 font-display text-2xl font-bold text-primary">₱{total}</dd>
               </dl>
@@ -288,7 +286,7 @@ function Create() {
               <div>
                 <h1 className="text-3xl font-bold text-primary">Merry Christmas! 🎄</h1>
                 <RatioToggle ratio={ratio} setRatio={setRatio} />
-                <MusicVideoPlayer src={videoUrl} music={track.url} musicName={musicOption(music).name} volume={volume} loopMusic={loopMusic} ratio={ratio} />
+                <MusicVideoPlayer src={videoUrl} music={track.url} musicName="Christmas soundtrack" volume={volume} loopMusic={loopMusic} ratio={ratio} />
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                   <Button onClick={saveVideo} disabled={saving || !musicReady} className="h-auto whitespace-normal rounded-full bg-gold-grad px-6 py-3 font-extrabold text-gold-foreground"><Download />{saving ? music === "no-music" ? "Gi-save…" : "Gihiusa ang video ug music…" : "Download Video"}</Button>
                   <Button variant="outline" onClick={() => void shareVideo("Facebook")}><Share2 />Facebook</Button>
