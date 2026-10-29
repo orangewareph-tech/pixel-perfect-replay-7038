@@ -78,7 +78,7 @@ export function adminTestQuota(email: string, recentTests: AdminTestRecord[]): A
 // NEW: Check if admin can test with detailed reason (for test button)
 export function canAdminTest(email: string, recentTests: AdminTestRecord[]): { allowed: boolean; reason?: string } {
   const quota = adminTestQuota(email, recentTests);
-  return { allowed: quota.allowed, reason: quota.reason };
+  return quota.allowed ? { allowed: true } : { allowed: false, reason: quota.reason ?? "Daily limit reached" };
 }
 
 // Helper for UI - Get admin display info
