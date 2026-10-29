@@ -12,6 +12,8 @@ import { christmasTotal, christmasProfit } from "@/lib/christmas-music";
 import { InstalledStatus } from "@/components/InstalledStatus";
 import { Link } from "@tanstack/react-router";
 import { FreeTestSuite } from "@/components/FreeTestSuite";
+import { MusicVideoPlayer } from "@/components/MusicVideoPlayer";
+import { musicAssetUrl, AUTOMATIC_MUSIC, DEFAULT_MUSIC_VOLUME } from "@/lib/christmas-music";
 
 const accessOptions = queryOptions({ queryKey: ["fal-audit-access"], queryFn: () => auditAccess() });
 const scanOptions = queryOptions({ queryKey: ["fal-audit-scan"], queryFn: () => scanFalAi(), staleTime: 0 });
