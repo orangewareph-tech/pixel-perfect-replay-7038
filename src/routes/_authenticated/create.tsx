@@ -26,6 +26,7 @@ import { ArrowLeft, ArrowRight, Upload, Download, Share2 } from "lucide-react";
 import { saveCreationDraft, takeCreationDraft } from "@/lib/creation-draft";
 import { ChristmasMessageWriter } from "@/components/ChristmasMessageWriter";
 import { EMPTY_MESSAGE, type MessageDraft } from "@/lib/christmas-message";
+import { OwnerTestPanel } from "@/components/OwnerTestPanel";
 
 export const Route = createFileRoute("/_authenticated/create")({
   loader: () => googleAccount(),
@@ -265,6 +266,7 @@ function Create() {
               </dl>
             </div>
             <ChristmasMessageWriter value={christmasMessage} onChange={setChristmasMessage} template={tpl} templateName={template.name} signedIn={signedIn} online={online} onSignIn={() => void signInToPay()} />
+            <OwnerTestPanel photo={photo} template={tpl} duration={duration} onVideo={(url) => { setStep(4); setGenErr(null); setVideoUrl(url); setProgress(100); }} />
             <p className="mt-4 text-center text-xs text-muted-foreground">Gipaningkamotan nga mapreserbar ang mga nawong · Gibanabana: {duration === 5 ? "30–60 segundos" : "2–3 minutos"} human ma-approve ang bayad.</p>
             <Button onClick={() => setPaymentOpen(true)} className="mt-5 h-12 w-full text-base" disabled={!musicReady}>Pay with GCash / Maya · ₱{total}</Button>
             {paymentOpen && (!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in una sa pagbayad. Usa ka approved payment para sa usa ka video.</p><Button onClick={() => void signInToPay()} className="mt-4">Sign in to pay</Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>)}

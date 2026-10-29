@@ -25,6 +25,7 @@
 - Public duration selectors show customer pricing only; internal cost/profit calculations belong exclusively in the administrator audit.
 
 - Protect Fal.ai diagnostics and paid test functions with Cloud authentication plus a server-verified user_roles admin row; never grant admin to new signups automatically, and persist test jobs to prevent overlapping paid runs.
+- Provision only the verified Google owner through an authenticated database function; keep owner bypasses on the audit queue, with immutable atomic reservations shared with customer hourly/daily limits. Mock payments never write payment records or submit jobs.
 
 - Keep duration offers and validated Fal.ai payload construction in a shared browser-safe module, so upload, checkout, and server generation agree on the chosen duration; restore the optional local preference only after hydration.
 - Download Fal.ai videos in bounded ranged chunks and assemble a browser Blob, because full base64 MP4 responses exceed server-function serialization limits for longer videos.
