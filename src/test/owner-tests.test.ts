@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 import { ADMIN_LIMITS, adminTestQuota, canReserveOwnerTest, isOwnerTester, type AdminTestRecord } from "@/lib/owner-tests";
+import { TEMPLATES } from "@/lib/site";
 
 const today = new Date().toISOString();
 const record = (over: Partial<AdminTestRecord> = {}): AdminTestRecord =>
