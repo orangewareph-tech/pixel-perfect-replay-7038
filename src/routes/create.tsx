@@ -15,7 +15,7 @@ import { MusicSelector } from "@/components/MusicSelector";
 import { MusicVideoPlayer } from "@/components/MusicVideoPlayer";
 import { useChristmasChoices } from "@/hooks/use-christmas-choices";
 import { useMusicFile } from "@/hooks/use-music-file";
-import { christmasTotal, DEFAULT_MUSIC_VOLUME, musicOption, musicSchema } from "@/lib/christmas-music";
+import { christmasTotal, DEFAULT_MUSIC_VOLUME, musicOption, musicSchema, musicCheckoutLabel } from "@/lib/christmas-music";
 
 export const Route = createFileRoute("/create")({
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
@@ -75,7 +75,7 @@ function Create() {
       }
       let output = new Blob(chunks, { type: "video/mp4" });
       if (music !== "no-music") {
-        if (!track.blob) throw new Error("Licensed song file unavailable. Choose No Music to save the original video.");
+        if (!track.blob) throw new Error("Music could not load. Reselect your track and try again.");
         const { embedMusic } = await import("@/lib/embed-music");
         output = await embedMusic(output, track.blob, volume, loopMusic, duration);
       }
@@ -105,7 +105,7 @@ function Create() {
 
   async function generate() {
     if (!photo) { setErr("Please upload a family photo first."); setStep(0); return; }
-    if (!musicReady) { setErr("Choose No Music — this song file is not available yet."); return; }
+    if (!musicReady) { setErr("Music is still loading. Please wait and try again."); return; }
     setStep(4); setProgress(3); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
     try {
@@ -147,7 +147,7 @@ function Create() {
           <section>
             <h1 className="text-center text-3xl font-bold text-primary">Upload Your Family Photo</h1>
             <MagicTemplateSelector value={tpl} onChange={setTpl} />
-            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} />
+            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
             <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
             <Button
               type="button"
@@ -159,7 +159,7 @@ function Create() {
               className={`mt-6 flex h-auto w-full flex-col items-center whitespace-normal rounded-3xl border-4 border-dashed p-8 text-center transition ${drag ? "border-gold bg-secondary" : "border-border bg-card"}`}
             >
               <span className="text-6xl">📸</span>
-              <span className="mt-4 font-display text-xl font-bold">Upload Photo · ₱{total}{!musicReady ? " once music is available" : ""}</span>
+              <span className="mt-4 font-display text-xl font-bold">{musicCheckoutLabel(duration, music)}</span>
               <span className="mt-1 text-sm text-muted-foreground">JPG or PNG · max 10MB</span>
             </Button>
             <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
@@ -171,7 +171,7 @@ function Create() {
           <section>
             <h1 className="text-center text-3xl font-bold text-primary">Pinoy Christmas Magic</h1>
             <MagicTemplateSelector value={tpl} onChange={setTpl} />
-            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} />
+            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
             <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
             <Nav onBack={() => setStep(0)} onNext={() => setStep(2)} />
           </section>
@@ -191,7 +191,7 @@ function Create() {
                 <span className="text-xs">PREVIEW 480p · {template.name}</span>
               </div>
             </div>
-            {music !== "no-music" && <p className="mt-4 text-center text-sm">🎵 {musicOption(music).name} · {musicReady ? "Music preview available after generation" : "Coming soon — licensed audio needed"}</p>}
+            {music !== "no-music" && <p className="mt-4 text-center text-sm">🎵 {musicOption(music).name} · {musicReady ? "Ready — music included in final download" : "Loading music…"}</p>}
             <Nav onBack={() => setStep(1)} onNext={() => setStep(3)} nextLabel="Remove watermark →" />
           </section>
         )}
@@ -200,7 +200,7 @@ function Create() {
           <section>
             <h1 className="text-center text-3xl font-bold text-primary">Choose & Pay</h1>
             <MagicTemplateSelector value={tpl} onChange={setTpl} />
-            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} />
+            <MusicSelector value={music} onChange={setMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} />
             <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={musicReady} />
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {["GCash", "Maya"].map((m) => (
@@ -216,7 +216,7 @@ function Create() {
               ))}
             </div>
             <a href="https://paymongo.com" target="_blank" rel="noreferrer" className="mt-4 block rounded-full bg-festive py-3 text-center font-bold text-primary-foreground">Pay with Card via PayMongo</a>
-            <Button onClick={generate} disabled={!musicReady} className="mt-3 h-auto w-full whitespace-normal rounded-full bg-gold-grad py-3 font-extrabold text-gold-foreground shadow-glow">I've paid ₱{total} — Generate {duration} Sec Magic ✨</Button>
+            <Button onClick={generate} disabled={!musicReady} className="mt-3 h-auto w-full whitespace-normal rounded-full bg-gold-grad py-3 font-extrabold text-gold-foreground shadow-glow">I've paid ₱{total} — Generate {duration} Sec Magic{music !== "no-music" ? " + Music 🎵" : " ✨"}</Button>
             <Button variant="ghost" onClick={generate} disabled={!musicReady} className="mt-2 w-full text-sm text-muted-foreground underline">Skip payment (demo)</Button>
             {err && <p role="alert" className="mt-3 text-destructive">{err}</p>}
             <button onClick={() => setStep(2)} className="mt-4 text-sm font-bold text-primary">← Back</button>
@@ -250,7 +250,7 @@ function Create() {
                 <RatioToggle ratio={ratio} setRatio={setRatio} />
                 <MusicVideoPlayer src={videoUrl} music={track.url} musicName={musicOption(music).name} volume={volume} loopMusic={loopMusic} ratio={ratio} />
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                  <Button onClick={saveVideo} disabled={saving || !musicReady} className="h-auto whitespace-normal rounded-full bg-gold-grad px-6 py-3 font-extrabold text-gold-foreground">{saving ? music === "no-music" ? "Saving…" : "Adding music & saving…" : music === "no-music" ? "⬇ Save Video" : `⬇ Download with Music — ₱${total}`}</Button>
+                  <Button onClick={saveVideo} disabled={saving || !musicReady} className="h-auto whitespace-normal rounded-full bg-gold-grad px-6 py-3 font-extrabold text-gold-foreground">{saving ? music === "no-music" ? "Saving…" : "Merging video + music… then downloading!" : music === "no-music" ? "⬇ Save Video" : `⬇ Download with Music — ₱${total}`}</Button>
                   <a href={`fb-messenger://share/?link=${encodeURIComponent(videoUrl)}`} onClick={(e) => { if (!/Mobi/.test(navigator.userAgent)) { e.preventDefault(); window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(videoUrl)}&redirect_uri=${encodeURIComponent(shareUrl)}`); } }} className="rounded-full bg-festive px-6 py-3 font-bold text-primary-foreground">Share to Messenger</a>
                 </div>
                 {saveError && <p role="alert" className="mt-3 text-sm text-destructive">{saveError}</p>}

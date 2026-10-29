@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { christmasTotal, christmasProfit, DEFAULT_MUSIC_VOLUME, mergeAudioArgs, musicPath, musicSchema } from "@/lib/christmas-music";
+import { christmasTotal, christmasProfit, DEFAULT_MUSIC_VOLUME, mergeAudioArgs, musicPath, musicSchema, musicAssetUrl, MUSIC_ASSETS } from "@/lib/christmas-music";
 import { TEMPLATES } from "@/lib/site";
 import { buildVideoInput } from "@/lib/video-duration";
 
@@ -11,6 +11,8 @@ describe("Christmas upgrades", () => {
   it("charges ₱319 for every 10-second song upgrade", () => { for (const id of musicSchema.options.filter((v) => v !== "no-music")) expect(christmasTotal(10, id)).toBe(319); });
   it("subtracts the supplied ₱5 license assumption from music profit", () => { expect(christmasProfit(5, "pasko-sa-nayon")).toBe(141.70); expect(christmasProfit(10, "pasko-sa-nayon")).toBe(271.40); });
   it("uses no audio file for No Music", () => { expect(musicPath("no-music", 5)).toBeNull(); });
+  it("No Music never loads an audio asset", () => { expect(musicAssetUrl("no-music", 5)).toBeNull(); expect(musicAssetUrl("no-music", 10)).toBeNull(); });
+  it("provides a distinct nonempty MP3 asset for each track and duration", () => { const assets = Object.values(MUSIC_ASSETS).flatMap((pair) => [pair[5], pair[10]]); expect(assets.length).toBe(8); expect(new Set(assets.map((a) => a.asset_id)).size).toBe(8); for (const asset of assets) { expect(asset.size).toBeGreaterThan(1000); expect(asset.content_type).toBe("audio/mpeg"); } });
   it("uses duration-specific audio files", () => { expect(musicPath("pasko-sa-nayon", 5)).toBe("/music/pasko-sa-nayon-5sec.mp3"); expect(musicPath("pasko-sa-nayon", 10)).toBe("/music/pasko-sa-nayon-10sec.mp3"); });
   it("defaults music volume to 70 percent", () => { expect(DEFAULT_MUSIC_VOLUME).toBe(70); expect(mergeAudioArgs(70, true, 5)).toContain("[1:a]volume=0.7,apad[audio]"); });
   it("only loops music when requested", () => { expect(mergeAudioArgs(70, true, 10)).toContain("-stream_loop"); expect(mergeAudioArgs(70, false, 10)).not.toContain("-stream_loop"); });

@@ -5,14 +5,13 @@ import hero from "@/assets/hero.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DurationSelector } from "@/components/DurationSelector";
 import { useVideoDuration } from "@/hooks/use-video-duration";
-import { durationCheckoutLabel } from "@/lib/video-duration";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { MagicTemplateSelector } from "@/components/MagicTemplateSelector";
 import { MusicSelector } from "@/components/MusicSelector";
 import { useChristmasChoices } from "@/hooks/use-christmas-choices";
 import { useMusicFile } from "@/hooks/use-music-file";
-import { christmasTotal, DEFAULT_MUSIC_VOLUME } from "@/lib/christmas-music";
+import { musicCheckoutLabel, DEFAULT_MUSIC_VOLUME } from "@/lib/christmas-music";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -64,10 +63,10 @@ function Index() {
               Upload lang imong family photo, kami na bahala sa Christmas magic. 5 segundos, estimated 30–60 seconds; Premium 10 segundos, 2–3 minutes. <b className="text-gold">Gikan ₱149 ra!</b>
             </p>
             <MagicTemplateSelector value={template} onChange={chooseTemplate} inverse />
-            <MusicSelector value={music} onChange={chooseMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} inverse />
+            <MusicSelector value={music} onChange={chooseMusic} volume={volume} onVolume={setVolume} loop={loopMusic} onLoop={setLoopMusic} status={track.status} audioUrl={track.url} inverse />
             <DurationSelector duration={duration} onChange={setDuration} music={music} musicReady={track.status === "ready"} inverse />
             <Button asChild className="mt-6 h-auto w-full whitespace-normal rounded-full bg-gold-grad px-5 py-4 text-base font-extrabold text-gold-foreground shadow-glow">
-              <Link to="/create" search={{ duration, template, music, plan: duration === 5 ? "hd" : undefined }}>{music === "no-music" ? durationCheckoutLabel(duration) : `Upload Photo · ₱${christmasTotal(duration, music)} once music is available →`}</Link>
+              <Link to="/create" search={{ duration, template, music, plan: duration === 5 ? "hd" : undefined }}>{musicCheckoutLabel(duration, music)}</Link>
             </Button>
             <Link to="/create" search={{ duration, template, music, plan: duration === 5 ? "hd" : undefined }} className="mt-4 inline-flex font-bold text-gold underline">
               Upload Family Photo Now →
