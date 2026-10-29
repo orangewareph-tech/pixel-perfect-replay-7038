@@ -16,7 +16,16 @@ export function musicOption(id: MusicId) { return MUSIC_OPTIONS.find((item) => i
 export function musicPath(id: MusicId, duration: VideoDuration) { return id === "no-music" ? null : `/music/${id}-${duration}sec.mp3`; }
 export function christmasTotal(duration: VideoDuration, id: MusicId) { return DURATION_OFFERS[duration].price + (id === "no-music" ? 0 : MUSIC_SURCHARGE); }
 export function christmasProfit(duration: VideoDuration, id: MusicId) { return Number((christmasTotal(duration, id) - DURATION_OFFERS[duration].falCost * 58 - 2 - (id === "no-music" ? 0 : 5)).toFixed(2)); }
-export function mergeAudioArgs(volume: number, loop: boolean, duration: VideoDuration) {
+export function mergeAudioArgs(volume: number, loop: boolean, duration: VideoDuration, hasOriginalAudio = false) {
   const level = Math.max(0, Math.min(100, volume)) / 100;
-  return ["-i", "video.mp4", ...(loop ? ["-stream_loop", "-1"] : []), "-i", "music.mp3", "-filter_complex", `[1:a]volume=${level},apad[music];[0:a:0][music]amix=inputs=2:duration=first:normalize=0[audio]`, "-map", "0:v:0", "-map", "[audio]", "-c:v", "copy", "-c:a", "aac", "-t", String(duration), "-movflags", "+faststart", "output.mp4"];
+  return ["-i", "video.mp4", ...(loop ? ["-stream_loop", "-1"] : []), "-i", "music.mp3", "-filter_complex", hasOriginalAudio ? `[1:a]volume=${level},apad[music];[0:a:0][music]amix=inputs=2:duration=first:normalize=0[audio]` : `[1:a]volume=${level},apad[audio]`, "-map", "0:v:0", "-map", "[audio]", "-c:v", "copy", "-c:a", "aac", "-t", String(duration), "-movflags", "+faststart", "output.mp4"];
+}
+export async function loadMusicFile(path: string, signal?: AbortSignal) {
+  const response = await fetch(path, { signal });
+  if (!response.ok || response.headers.get("content-type")?.includes("text/html")) throw new Error("Licensed song file not available yet.");
+  const bytes = await response.arrayBuffer();
+  if (bytes.byteLength < 100) throw new Error("Music file is empty.");
+  const context = new AudioContext();
+  try { await context.decodeAudioData(bytes.slice(0)); } finally { await context.close(); }
+  return new Blob([bytes], { type: "audio/mpeg" });
 }

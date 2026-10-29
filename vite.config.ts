@@ -9,6 +9,7 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   vite: {
+    optimizeDeps: { exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/core"] },
     plugins: [
       // PWA: generates /sw.js (generateSW) on build. Registration is handled
       // solely by src/lib/pwa.ts, which refuses dev/preview contexts.
@@ -27,6 +28,7 @@ export default defineConfig({
         manifest: false, // we serve our own public/manifest.webmanifest
         devOptions: { enabled: false },
         workbox: {
+          globIgnores: ["**/ffmpeg/**", "**/music/**"],
           // SSR app: no static index.html exists, so offline navigations land
           // on the pre-cached offline page instead.
           navigateFallback: "/offline.html",
