@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const DISMISS_KEY = "magicph-install-dismissed";
-const SHOW_DELAY_MS = 10_000;
+const SHOW_DELAY_MS = 45_000;
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -9,7 +10,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 /**
- * "Add to Home Screen" prompt. Shows 10s after load when the browser fires
+ * "Add to Home Screen" prompt. Shows 45s after the browser fires
  * beforeinstallprompt, remembers dismissal in localStorage.
  */
 export function InstallBanner() {
@@ -56,18 +57,18 @@ export function InstallBanner() {
       </p>
       <p className="mt-1 text-xs opacity-80">No need Play Store!</p>
       <div className="mt-3 flex gap-2">
-        <button
+        <Button
           onClick={install}
           className="flex-1 rounded-full bg-gold-grad px-4 py-2 text-sm font-bold text-gold-foreground"
         >
           Add Now
-        </button>
-        <button
+        </Button>
+        <Button variant="ghost"
           onClick={dismiss}
           className="rounded-full border border-night-foreground/30 px-4 py-2 text-sm font-semibold"
         >
           Later
-        </button>
+        </Button>
       </div>
     </div>
   );

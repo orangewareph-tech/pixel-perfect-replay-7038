@@ -1,6 +1,6 @@
 import { Check, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DURATION_OFFERS, FAL_LISTED_COST, durationProfit, type VideoDuration } from "@/lib/video-duration";
+import { DURATION_OFFERS, type VideoDuration } from "@/lib/video-duration";
 
 export function DurationSelector({ duration, onChange, inverse = false }: { duration: VideoDuration; onChange: (value: VideoDuration) => void; inverse?: boolean }) {
   const offer = DURATION_OFFERS[duration];
@@ -18,16 +18,14 @@ export function DurationSelector({ duration, onChange, inverse = false }: { dura
               </span>
               <span className="mt-3 font-display text-lg font-bold">{item.title}</span>
               <span className="mt-1 text-xs text-muted-foreground">{item.subtitle}</span>
-              <span className="mt-3 flex items-baseline gap-2"><strong className="font-display text-3xl text-primary">P{item.price}</strong>{"originalPrice" in item && <s className="text-muted-foreground">P{item.originalPrice}</s>}</span>
+              <span className="mt-3 flex items-baseline gap-2"><strong className="font-display text-3xl text-primary">₱{item.price}</strong>{"originalPrice" in item && <s className="text-muted-foreground">₱{item.originalPrice}</s>}</span>
               <span className="mt-3 flex flex-col gap-1 text-xs">{item.details.map((detail) => <span key={detail}>✓ {detail}</span>)}</span>
             </Button>
           );
         })}
       </div>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
-      <p className="mt-2 text-sm">Total: <b>P{offer.price}</b> · You pay P{offer.price} via GCash · {offer.renderTime}</p>
-      <p className="mt-1 text-xs opacity-80">Fal.ai cost: ${FAL_LISTED_COST[duration].toFixed(2)} (P{(offer.falCost * 58).toFixed(2)}) · Profit after P2 fee: P{durationProfit(duration).toFixed(2)}</p>
-      <p className="mt-1 text-xs opacity-80">USD conversion: P58. Delivery and file size vary.</p>
+      <p className="mt-2 text-sm">Total: <b>₱{offer.price}</b> · {duration}-second video · {offer.renderTime}</p>
     </div>
   );
 }

@@ -29,9 +29,9 @@ const REVIEWS = [
 ];
 
 const FAQ: [string, string][] = [
-  ["Pila ka dugay? (How long?)", "60 seconds lang! Usually 30–60 seconds ang generation."],
-  ["Pwede GCash?", "Oo! GCash, Maya, ug PayMongo (cards) accepted."],
-  ["Same gihapon ang mga nawong?", "Oo, 100%. Among AI gi-instruct nga dili usbon ang mga nawong."],
+  ["Pila ka dugay? (How long?)", "Ang 5-second video: estimated 30–60 seconds. Ang 10-second Premium: estimated 2–3 minutes. Usahay mas dugay kung busy ang queue."],
+  ["Pwede GCash?", "GCash ug Maya ang planned payment options. Demo pa ang checkout karon; wala pa ang verified secure payment."],
+  ["Same gihapon ang mga nawong?", "Among AI gi-instruct nga ipabilin ang inyong mga nawong. Tan-awa ang result; dili guaranteed nga 100% identical ang output."],
   ["Unsa nga size ang video?", "Makakuha ka og 9:16 para TikTok/Reels ug 16:9 para FB feed."],
 ];
 
@@ -51,16 +51,16 @@ function Index() {
               Himoa Imong Family Pic nga <span className="text-gold">Christmas Magic!</span> 🎄
             </h1>
             <p className="mt-4 text-lg opacity-90">
-              Upload lang imong family photo, kami na bahala mo-himo og magical Christmas video in 60 seconds. <b className="text-gold">P149 ra!</b>
+              Upload lang imong family photo, kami na bahala sa Christmas magic. 5 segundos, estimated 30–60 seconds; Premium 10 segundos, 2–3 minutes. <b className="text-gold">Gikan ₱149 ra!</b>
             </p>
             <DurationSelector duration={duration} onChange={setDuration} inverse />
             <Button asChild className="mt-6 h-auto w-full whitespace-normal rounded-full bg-gold-grad px-5 py-4 text-base font-extrabold text-gold-foreground shadow-glow">
-              <Link to="/create" search={{ duration }}>{durationCheckoutLabel(duration)}</Link>
+              <Link to="/create" search={{ duration, plan: duration === 5 ? "hd" : undefined }}>{durationCheckoutLabel(duration)}</Link>
             </Button>
-            <Link to="/create" search={{ duration }} className="mt-4 inline-flex font-bold text-gold underline">
+            <Link to="/create" search={{ duration, plan: duration === 5 ? "hd" : undefined }} className="mt-4 inline-flex font-bold text-gold underline">
               Upload Family Photo Now →
             </Link>
-            <p className="mt-3 text-sm opacity-75">✓ GCash & Maya · ✓ Faces 100% kept · ✓ TikTok & FB ready</p>
+            <ul className="mt-4 space-y-2 text-sm opacity-90"><li>✓ Faces preserved with care</li><li>✓ {duration === 5 ? "Estimated 30–60 seconds" : "Estimated 2–3 minutes"}</li><li>✓ TikTok & FB Reels ready</li><li>GCash & Maya · demo checkout; secure payment coming soon</li></ul>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <figure className="relative overflow-hidden rounded-3xl border-4 border-night-foreground/20">
@@ -94,7 +94,7 @@ function Index() {
       <section className="bg-secondary py-16">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">Simple Pricing</h2>
-          <p className="mt-2 text-center text-muted-foreground">P149 – instant GCash 💸</p>
+          <p className="mt-2 text-center text-muted-foreground">5 segundos · ₱149 &nbsp; / &nbsp; 10 segundos Premium · ₱299</p>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {PLANS.map((p) => {
               const best = "best" in p;
@@ -104,9 +104,9 @@ function Index() {
                   <h3 className="text-xl font-bold">{p.name}</h3>
                   <p className="mt-2 font-display text-4xl font-bold text-primary">₱{p.price}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{p.detail}</p>
-                  <Link to="/create" search={{ plan: p.id, duration }} className={`mt-6 block rounded-full py-3 text-center font-bold ${best ? "bg-festive text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+                  <Button asChild className={`mt-6 h-auto w-full rounded-full py-3 font-bold ${best ? "bg-festive text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}><Link to="/create" search={{ plan: p.id, duration: 5 }}>
                     Choose
-                  </Link>
+                  </Link></Button>
                 </div>
               );
             })}
@@ -116,12 +116,12 @@ function Index() {
 
       <section className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">2,000+ Happy Pinoy Families ❤️</h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
           {REVIEWS.map((r) => (
-            <blockquote key={r.name} className="rounded-3xl bg-card p-6 shadow-festive">
+            <blockquote key={r.name} className="flex flex-col rounded-2xl border border-border/60 bg-card p-7 shadow-festive">
               <div className="text-gold">★★★★★</div>
-              <p className="mt-3">“{r.text}”</p>
-              <footer className="mt-4 text-sm font-bold text-muted-foreground">— {r.name}</footer>
+              <p className="mb-6 mt-4 flex-1 leading-relaxed">“{r.text}”</p>
+              <footer className="border-t border-border/60 pt-4 text-sm font-bold text-muted-foreground">— {r.name}</footer>
             </blockquote>
           ))}
         </div>
@@ -129,7 +129,7 @@ function Index() {
 
       <section className="mx-auto max-w-3xl px-4 pb-20">
         <h2 className="text-center text-3xl font-bold text-primary">FAQ</h2>
-        <Accordion type="single" collapsible className="mt-6 rounded-3xl bg-card px-6 shadow-festive">
+        <Accordion type="single" collapsible defaultValue={FAQ[0]?.[0] ?? ""} className="mt-6 rounded-3xl bg-card px-6 shadow-festive">
           {FAQ.map(([q, a]) => (
             <AccordionItem key={q} value={q}>
               <AccordionTrigger className="text-left font-bold">{q}</AccordionTrigger>

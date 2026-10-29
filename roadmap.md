@@ -11,6 +11,6 @@
 - [ ] Approve the owner's audit account — waiting for the owner to sign in; no existing owner account.
 
 # Public page polish
-- [ ] Remove all public internal cost/profit information and align duration/pricing copy.
-- [ ] Correct plan/duration links, open first FAQ, improve testimonial spacing, delay install prompt.
-- [ ] Hide published Lovable badge and verify desktop/mobile public page.
+- [x] Remove all public internal cost/profit information and align duration/pricing copy.
+- [x] Correct plan/duration links, open first FAQ, improve testimonial spacing, delay install prompt.
+- [x] Hide published Lovable badge and verify desktop/mobile public page.

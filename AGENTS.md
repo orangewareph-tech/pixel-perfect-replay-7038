@@ -11,6 +11,8 @@
 
 ## Rules
 
+- Public duration selectors show customer pricing only; internal cost/profit calculations belong exclusively in the administrator audit.
+
 - Protect Fal.ai diagnostics and paid test functions with Cloud authentication plus a server-verified user_roles admin row; never grant admin to new signups automatically, and persist test jobs to prevent overlapping paid runs.
 
 - Keep duration offers and validated Fal.ai payload construction in a shared browser-safe module, so upload, checkout, and server generation agree on the chosen duration; restore the optional local preference only after hydration.
