@@ -14,7 +14,7 @@ export const TEMPLATES = [
 
 export const PLANS = [
   { id: "preview", price: 99, name: "Preview", detail: "720p with watermark", videos: 1 },
-  { id: "hd", price: 149, name: "HD Magic", detail: "1080p, no watermark, 6–8s", videos: 1, best: true },
+  { id: "hd", price: 149, name: "HD Magic", detail: "1080p, no watermark, 5–6 seconds", videos: 1, best: true },
   { id: "triple", price: 299, name: "Triple Pack", detail: "3 versions, same photo", videos: 3 },
   { id: "family", price: 499, name: "Family Bundle", detail: "5 videos", videos: 5 },
 ] as const;
