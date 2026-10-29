@@ -1,6 +1,6 @@
 # Pinoy-only Christmas templates
-- [ ] Add three Pinoy traditions, enhance all eight scenes, connect payment/message/test validation and original sample images.
-- [ ] Verify eight-template selection, included ₱149/₱299 pricing and regression tests without paid generation.
+- [x] Add three Pinoy traditions, enhance all eight scenes, connect payment/message/test validation and original sample images; apply payment and owner-reservation validation migration.
+- [x] Verify new-template selection and image previews, 10s confirmation at ₱299 with included music, payment sign-in gate and 82 tests; build OK, no browser errors. No paid render submitted. New templates have image previews only; actual paid quality remains unverified until approved payment/owner access.
 # Enhanced Christmas templates
 - [x] Enrich all five existing template effects and duration pacing without changing identity, prices, payments or soundtrack.
 - [x] Test the shared customer/administrator payload: 37 relevant tests pass; build OK. Visual quality of new paid renders remains unverified without an approved payment or owner access.
