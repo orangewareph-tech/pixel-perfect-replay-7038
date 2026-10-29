@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin-dashboard'
 import { Route as AuthenticatedMyVideosRouteImport } from './routes/_authenticated/my-videos'
 import { Route as AuthenticatedPaymentRouteImport } from './routes/_authenticated/payment'
 import { Route as AuthenticatedTestRouteImport } from './routes/_authenticated/test'
@@ -49,6 +50,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/admin-dashboard',
+    path: '/admin-dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyVideosRoute = AuthenticatedMyVideosRouteImport.update({
   id: '/my-videos',
   path: '/my-videos',
@@ -76,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/admin-dashboard': typeof AuthenticatedAdminDashboardRoute
   '/my-videos': typeof AuthenticatedMyVideosRoute
   '/payment': typeof AuthenticatedPaymentRoute
   '/test': typeof AuthenticatedTestRoute
@@ -87,6 +95,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/admin-dashboard': typeof AuthenticatedAdminDashboardRoute
   '/my-videos': typeof AuthenticatedMyVideosRoute
   '/payment': typeof AuthenticatedPaymentRoute
   '/test': typeof AuthenticatedTestRoute
@@ -100,6 +109,7 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin-dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/my-videos': typeof AuthenticatedMyVideosRoute
   '/_authenticated/payment': typeof AuthenticatedPaymentRoute
   '/_authenticated/test': typeof AuthenticatedTestRoute
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/account'
     | '/admin'
+    | '/admin-dashboard'
     | '/my-videos'
     | '/payment'
     | '/test'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/account'
     | '/admin'
+    | '/admin-dashboard'
     | '/my-videos'
     | '/payment'
     | '/test'
@@ -136,6 +148,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/_authenticated/account'
     | '/_authenticated/admin'
+    | '/_authenticated/admin-dashboard'
     | '/_authenticated/my-videos'
     | '/_authenticated/payment'
     | '/_authenticated/test'
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin-dashboard': {
+      id: '/_authenticated/admin-dashboard'
+      path: '/admin-dashboard'
+      fullPath: '/admin-dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-videos': {
       id: '/_authenticated/my-videos'
       path: '/my-videos'
@@ -227,6 +247,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedMyVideosRoute: typeof AuthenticatedMyVideosRoute
   AuthenticatedPaymentRoute: typeof AuthenticatedPaymentRoute
   AuthenticatedTestRoute: typeof AuthenticatedTestRoute
@@ -235,6 +256,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedMyVideosRoute: AuthenticatedMyVideosRoute,
   AuthenticatedPaymentRoute: AuthenticatedPaymentRoute,
   AuthenticatedTestRoute: AuthenticatedTestRoute,
