@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import "@lovable.dev/cloud-auth-js/styles.css";
@@ -11,9 +11,21 @@ export const Route = createFileRoute("/auth")({ head: () => ({ meta: [ { title: 
 function Auth() {
   const navigate = useNavigate();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [signup, setSignup] = useState(false); const [message, setMessage] = useState(""); const [busy, setBusy] = useState(false);
-  async function submit(event: React.FormEvent) {
+  const [recovery, setRecovery] = useState(false);
+  useEffect(() => {
+    const recovering = new URLSearchParams(location.hash.slice(1)).get("type") === "recovery";
+    setRecovery(recovering);
+    if (!recovering) void supabase.auth.getUser().then(({ data }) => { if (data.user) void navigate({ to: "/test" }); });
+  }, [navigate]);
+  async function submit(event: FormEvent) {
     event.preventDefault(); setBusy(true); setMessage("");
     try {
+      if (recovery) {
+        const result = await supabase.auth.updateUser({ password });
+        if (result.error) setMessage(result.error.message);
+        else await navigate({ to: "/test" });
+        return;
+      }
       const result = signup ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${location.origin}/auth` } }) : await supabase.auth.signInWithPassword({ email, password });
       if (result.error) setMessage(result.error.message);
       else if (result.data.session) await navigate({ to: "/test" });

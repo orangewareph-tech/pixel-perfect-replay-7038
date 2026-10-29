@@ -10,17 +10,23 @@ import sample from "@/assets/hero.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
 const accessOptions = queryOptions({ queryKey: ["fal-audit-access"], queryFn: () => auditAccess() });
+const scanOptions = queryOptions({ queryKey: ["fal-audit-scan"], queryFn: () => scanFalAi(), staleTime: 0 });
 export const Route = createFileRoute("/_authenticated/test")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(accessOptions),
+  loader: async ({ context }) => {
+    const access = await context.queryClient.ensureQueryData(accessOptions);
+    const report = access.admin ? await context.queryClient.fetchQuery(scanOptions) : null;
+    return { report };
+  },
   head: () => ({ meta: [{ title: "Fal.ai Audit & Video Tests — MagicPh AI" }, { name: "description", content: "Protected MagicPh AI connectivity, billing and video generation audit." }, { property: "og:title", content: "MagicPh AI Fal.ai Audit" }, { property: "og:description", content: "Video service checks, actual costs and test results." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: TestPage,
 });
 
 function TestPage() {
   const access = useSuspenseQuery(accessOptions).data;
+  const initial = Route.useLoaderData().report;
   const scan = useServerFn(scanFalAi); const start = useServerFn(testFalAiGeneration); const poll = useServerFn(pollFalTest);
-  const [report, setReport] = useState<Awaited<ReturnType<typeof scanFalAi>> | null>(null);
-  const [last, setLast] = useState<Tables<"fal_test_runs"> | null>(null);
+  const [report, setReport] = useState<Awaited<ReturnType<typeof scanFalAi>> | null>(initial);
+  const [last, setLast] = useState<Tables<"fal_test_runs"> | null>(initial?.lastTest ?? null);
   const [logs, setLogs] = useState<string[]>([]); const [busy, setBusy] = useState(false); const [error, setError] = useState("");
   const addLog = (message: string) => setLogs((old) => [...old, `${new Date().toLocaleTimeString()} · ${message}`]);
   async function refresh() {

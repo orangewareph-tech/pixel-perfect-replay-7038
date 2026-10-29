@@ -2,15 +2,13 @@ import { Link } from "@tanstack/react-router";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { Search, LogOut } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
 
 export function Header() {
   const queryClient = useQueryClient(); const navigate = useNavigate();
-  const [signedIn, setSignedIn] = useState(false);
-  useEffect(() => { void supabase.auth.getUser().then(({ data }) => setSignedIn(Boolean(data.user))); }, []);
+  const { data: signedIn = false } = useQuery({ queryKey: ["header-session"], queryFn: async () => Boolean((await supabase.auth.getUser()).data.user), retry: false });
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -19,7 +17,7 @@ export function Header() {
           <span className="font-display text-xl font-bold text-primary">MagicPh <span className="text-gold">AI</span></span>
         </Link>
         <div className="flex flex-wrap items-center gap-2"><Button asChild variant="outline" size="sm"><Link to="/test"><Search aria-hidden="true" />Scan & Test Fal.ai</Link></Button>
-        {signedIn && <Button aria-label="Sign out" title="Sign out" variant="ghost" size="icon" onClick={async () => { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); setSignedIn(false); await navigate({ to: "/auth", replace: true }); }}><LogOut /></Button>}
+        {signedIn && <Button aria-label="Sign out" title="Sign out" variant="ghost" size="icon" onClick={async () => { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); await navigate({ to: "/auth", replace: true }); }}><LogOut /></Button>}
         <Link to="/create" className="rounded-full bg-festive px-4 py-2 text-sm font-bold text-primary-foreground shadow-festive">
           Upload Photo
         </Link>
