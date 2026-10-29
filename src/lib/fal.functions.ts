@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-
-const MODEL = "fal-ai/kling-video/v2.5-turbo/pro/image-to-video";
-const NEGATIVE = "distorted face, blurry, cartoon, changed ethnicity";
+import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
 
 function key() {
   const k = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
@@ -12,14 +10,13 @@ function key() {
 
 export const startVideo = createServerFn({ method: "POST" })
   .inputValidator((d) =>
-    z.object({ imageUrl: z.string().min(10).max(15_000_000), scene: z.string().min(3).max(300) }).parse(d),
+    z.object({ imageUrl: z.string().min(10).max(15_000_000), scene: z.string().min(3).max(300), duration: videoDurationSchema.default(5) }).parse(d),
   )
   .handler(async ({ data }) => {
-    const prompt = `Transform Filipino family photo into ${data.scene} Christmas scene, keep all faces 100% identical no distortion, warm parol lantern glow, snowfall, Noche Buena vibe, 6 second smooth motion, photorealistic`;
-    const res = await fetch(`https://queue.fal.run/${MODEL}`, {
+    const res = await fetch(`https://queue.fal.run/${VIDEO_MODEL}`, {
       method: "POST",
       headers: { Authorization: `Key ${key()}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ image_url: data.imageUrl, prompt, duration: "5", negative_prompt: NEGATIVE }),
+      body: JSON.stringify(buildVideoInput(data.imageUrl, data.scene, data.duration)),
     });
     if (!res.ok) {
       const t = await res.text();
@@ -45,18 +42,22 @@ export const checkVideo = createServerFn({ method: "POST" })
     return { status: "COMPLETED", videoUrl: out.video?.url ?? null };
   });
 
-// Fetches the finished MP4 server-side and returns it as a data URL so the
-// browser can save it with one click (cross-origin URLs ignore `download`).
+// Small ranged chunks avoid RPC output limits for longer MP4s; the browser
+// assembles a local Blob for one-click saving of cross-origin videos.
 export const downloadVideo = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ videoUrl: z.string().url().max(2000) }).parse(d))
+  .inputValidator((d) => z.object({ videoUrl: z.string().url().max(2000), offset: z.number().int().min(0).max(60 * 1024 * 1024).default(0) }).parse(d))
   .handler(async ({ data }) => {
     const u = new URL(data.videoUrl);
     if (u.protocol !== "https:" || !(u.hostname === "fal.media" || u.hostname.endsWith(".fal.media"))) {
       throw new Error("Unexpected video URL");
     }
-    const res = await fetch(data.videoUrl);
+    const chunkSize = 3 * 1024 * 1024;
+    const res = await fetch(data.videoUrl, { headers: { Range: `bytes=${data.offset}-${data.offset + chunkSize - 1}` } });
     if (!res.ok) throw new Error(`Download error [${res.status}]`);
+    const total = res.status === 206 ? Number(res.headers.get("content-range")?.split("/")[1]) : Number(res.headers.get("content-length"));
+    if (!Number.isFinite(total) || total <= 0 || total > 60 * 1024 * 1024) throw new Error("Video too large or missing file size");
     const buf = await res.arrayBuffer();
-    if (buf.byteLength > 60 * 1024 * 1024) throw new Error("Video too large");
-    return { dataUrl: `data:video/mp4;base64,${Buffer.from(buf).toString("base64")}` };
+    const chunk = res.status === 206 ? buf : buf.slice(data.offset, data.offset + chunkSize);
+    if (chunk.byteLength === 0 || chunk.byteLength > chunkSize) throw new Error("Invalid video download chunk");
+    return { base64: Buffer.from(chunk).toString("base64"), nextOffset: data.offset + chunk.byteLength, total };
   });

@@ -11,6 +11,9 @@
 
 ## Rules
 
+- Keep duration offers and validated Fal.ai payload construction in a shared browser-safe module, so upload, checkout, and server generation agree on the chosen duration; restore the optional local preference only after hydration.
+- Download Fal.ai videos in bounded ranged chunks and assemble a browser Blob, because full base64 MP4 responses exceed server-function serialization limits for longer videos.
+
 - Pass template choices from the home page through the create route's validated search parameters, so uploading a photo preserves the selected template.
 
 - Production builds run outside Lovable must keep emitting Vercel's Build Output

@@ -28,6 +28,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-gold: var(--gold);
+  --color-christmas-green: var(--christmas-green);
   --color-gold-foreground: var(--gold-foreground);
   --color-night: var(--night);
   --color-night-foreground: var(--night-foreground);
@@ -46,7 +47,7 @@
   --card-foreground: oklch(0.25 0.05 25);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.25 0.05 25);
-  --primary: oklch(0.53 0.2 25);
+  --primary: #B22222;
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.95 0.03 75);
   --secondary-foreground: oklch(0.3 0.06 30);
@@ -54,7 +55,8 @@
   --muted-foreground: oklch(0.5 0.04 40);
   --accent: oklch(0.76 0.14 75);
   --accent-foreground: oklch(0.25 0.05 40);
-  --gold: oklch(0.76 0.14 75);
+  --gold: #D4AF37;
+  --christmas-green: #165B31;
   --gold-foreground: oklch(0.25 0.05 40);
   --night: oklch(0.22 0.06 20);
   --night-foreground: oklch(0.97 0.02 80);
