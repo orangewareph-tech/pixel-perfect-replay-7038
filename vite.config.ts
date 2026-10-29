@@ -16,9 +16,14 @@ export default defineConfig({
         registerType: "autoUpdate",
         injectRegister: null,
         filename: "sw.js",
-        // TanStack Start serves statics from dist/client; the plugin otherwise
-        // writes sw.js to the dist root where it is never served.
-        outDir: "dist/client",
+        // TanStack Start serves statics from the client build dir, which is
+        // dist/client for the Lovable/Cloudflare target and .vercel/output/static
+        // for self-hosted Vercel builds. The plugin otherwise writes sw.js to
+        // the dist root where it is never served.
+        outDir:
+          process.env["LOVABLE_SANDBOX"] || process.env["DEV_SERVER__PROJECT_PATH"]
+            ? "dist/client"
+            : ".vercel/output/static",
         manifest: false, // we serve our own public/manifest.webmanifest
         devOptions: { enabled: false },
         workbox: {
