@@ -41,8 +41,6 @@ Cloudflare layout, and the Vercel target only applies to builds run outside it.
 
 ## Built with
 
-## Christmas music
-
 ## Offline recovery release
 
 Home-screen icons and the manifest remain available. New app-shell caching is
