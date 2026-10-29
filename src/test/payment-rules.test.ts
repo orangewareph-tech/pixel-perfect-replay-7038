@@ -8,9 +8,9 @@ describe("paid video rules", () => {
     for (const status of ["pending", "rejected", "SUBMITTING", "IN_QUEUE", "COMPLETED", "FAILED"]) expect(canClaimPayment(status)).toBe(false);
   });
   it("charges ₱149 for a five-second video", () => expect(christmasTotal(5, "no-music")).toBe(149));
-  it("charges ₱169 for a five-second music video", () => expect(christmasTotal(5, "pasko-sa-nayon")).toBe(169));
+  it("charges ₱149 for a five-second music video", () => expect(christmasTotal(5, "pasko-sa-nayon")).toBe(149));
   it("charges ₱299 for a ten-second video", () => expect(christmasTotal(10, "no-music")).toBe(299));
-  it("charges ₱319 for a ten-second music video", () => expect(christmasTotal(10, "pasko-sa-nayon")).toBe(319));
+  it("charges ₱299 for a ten-second music video", () => expect(christmasTotal(10, "pasko-sa-nayon")).toBe(299));
   it("blocks a fourth generation within an hour", () => { const now = 10_000_000; expect(withinHourlyLimit([now - 1, now - 2], now)).toBe(true); expect(withinHourlyLimit([now - 1, now - 2, now - 3], now)).toBe(false); expect(withinHourlyLimit([now - 3_600_000, now - 1, now - 2], now)).toBe(true); });
   it("keeps five-second spend within $10 including the next reservation", () => { expect(withinDailyBudget(9.45, 5)).toBe(true); expect(withinDailyBudget(9.8, 5)).toBe(false); });
   it("counts the ten-second cost as $0.70", () => { expect(withinDailyBudget(9.3, 10)).toBe(true); expect(withinDailyBudget(9.65, 10)).toBe(false); });

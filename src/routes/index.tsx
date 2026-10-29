@@ -6,11 +6,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { DurationSelector } from "@/components/DurationSelector";
 import { useVideoDuration } from "@/hooks/use-video-duration";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { MagicTemplateSelector } from "@/components/MagicTemplateSelector";
 import { useChristmasChoices } from "@/hooks/use-christmas-choices";
 import { useMusicFile } from "@/hooks/use-music-file";
-import { musicCheckoutLabel, DEFAULT_MUSIC_VOLUME } from "@/lib/christmas-music";
+import { musicCheckoutLabel } from "@/lib/christmas-music";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,9 +40,7 @@ const FAQ: [string, string][] = [
 
 function Index() {
   const [duration, setDuration] = useVideoDuration();
-  const { template, chooseTemplate, music, chooseMusic } = useChristmasChoices();
-  const [volume, setVolume] = useState(DEFAULT_MUSIC_VOLUME);
-  const [loopMusic, setLoopMusic] = useState(true);
+  const { template, chooseTemplate, music } = useChristmasChoices();
   const track = useMusicFile(music, duration);
   return (
     <div className="min-h-screen">
