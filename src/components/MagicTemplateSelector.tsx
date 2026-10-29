@@ -3,6 +3,7 @@ import { Check, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { TEMPLATES, TEMPLATE_MEDIA } from "@/lib/site";
+import { TEMPLATE_WEBM } from "@/lib/template-preview-formats";
 
 export function MagicTemplateSelector({ value, onChange, inverse = false, compact = false }: { value: string; onChange: (value: string) => void; inverse?: boolean; compact?: boolean }) {
   const [preview, setPreview] = useState<(typeof TEMPLATES)[number] | null>(null);
@@ -25,7 +26,7 @@ export function MagicTemplateSelector({ value, onChange, inverse = false, compac
       <DialogContent className="w-[calc(100%-2rem)] max-w-2xl rounded-lg">
         <DialogTitle>{preview?.name}</DialogTitle>
         <DialogDescription>Animated AI sample · dili pa imong final video</DialogDescription>
-        {preview && <><video key={preview.id} src={TEMPLATE_MEDIA[preview.id].preview} poster={preview.img} aria-label={`${preview.name} sample video`} autoPlay muted playsInline controls preload="metadata" className="aspect-[3/2] w-full rounded-lg bg-night" /><Button onClick={() => { onChange(preview.id); setPreview(null); }}><Check />Pilia kini nga template</Button></>}
+        {preview && <><video key={preview.id} poster={preview.img} aria-label={`${preview.name} sample video`} autoPlay muted playsInline controls preload="metadata" className="aspect-[3/2] w-full rounded-lg bg-night"><source src={TEMPLATE_WEBM[preview.id]} type="video/webm" /><source src={TEMPLATE_MEDIA[preview.id].preview} type="video/mp4" /></video><Button onClick={() => { onChange(preview.id); setPreview(null); }}><Check />Pilia kini nga template</Button></>}
       </DialogContent>
     </Dialog>
     {!compact && <p className={`mt-3 text-xs font-bold ${inverse ? "text-gold" : "text-christmas-green"}`}>✨ More Magical! Snowfall · Sparkles · Parol Glow</p>}
