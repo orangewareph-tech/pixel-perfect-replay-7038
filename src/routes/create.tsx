@@ -3,14 +3,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Header, Footer, Snow } from "@/components/SiteChrome";
-import { PLANS, TEMPLATES, isAllowedPhoto } from "@/lib/site";
+import { TEMPLATES, isAllowedPhoto } from "@/lib/site";
 import { startVideo, checkVideo, downloadVideo } from "@/lib/fal.functions";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { DurationSelector } from "@/components/DurationSelector";
+import { useVideoDuration } from "@/hooks/use-video-duration";
+import { DURATION_OFFERS, durationCheckoutLabel, videoDurationSchema } from "@/lib/video-duration";
 
 export const Route = createFileRoute("/create")({
-  validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional() }),
+  validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
   head: () => ({
     meta: [
       { title: "Create Your Christmas Video — MagicPh AI" },
@@ -27,12 +30,13 @@ export const Route = createFileRoute("/create")({
 const STEPS = ["Upload", "Template", "Preview", "Payment", "Video"];
 
 function Create() {
-  const { plan: planParam, template: templateParam } = Route.useSearch();
+  const { template: templateParam, duration: durationParam } = Route.useSearch();
+  const [duration, setDuration] = useVideoDuration(durationParam);
+  const offer = DURATION_OFFERS[duration];
   const [step, setStep] = useState(0);
   const [photo, setPhoto] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [tpl, setTpl] = useState<string>(TEMPLATES.find((t) => t.id === templateParam)?.id ?? TEMPLATES[0].id);
-  const [plan, setPlan] = useState<string>(planParam ?? "hd");
   const [ratio, setRatio] = useState<"9:16" | "16:9">("9:16");
   const [progress, setProgress] = useState(0);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -75,7 +79,7 @@ function Create() {
     setStep(4); setProgress(3); setGenErr(null); setVideoUrl(null);
     const timer = setInterval(() => setProgress((p) => Math.min(p + 1.5, 95)), 800);
     try {
-      const { requestId } = await start({ data: { imageUrl: photo, scene: template.scene } });
+      const { requestId } = await start({ data: { imageUrl: photo, scene: template.scene, duration } });
       for (let i = 0; i < 90; i++) {
         await new Promise((r) => setTimeout(r, 4000));
         const s = await check({ data: { requestId } });
@@ -112,18 +116,20 @@ function Create() {
         {step === 0 && (
           <section>
             <h1 className="text-center text-3xl font-bold text-primary">Upload Your Family Photo</h1>
-            <button
+            <DurationSelector duration={duration} onChange={setDuration} />
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => inputRef.current?.click()}
               onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
               onDragLeave={() => setDrag(false)}
               onDrop={(e) => { e.preventDefault(); setDrag(false); onFile(e.dataTransfer.files[0]); }}
-              className={`mt-6 flex w-full flex-col items-center rounded-3xl border-4 border-dashed p-12 text-center transition ${drag ? "border-gold bg-secondary" : "border-border bg-card"}`}
+              className={`mt-6 flex h-auto w-full flex-col items-center whitespace-normal rounded-3xl border-4 border-dashed p-8 text-center transition ${drag ? "border-gold bg-secondary" : "border-border bg-card"}`}
             >
               <span className="text-6xl">📸</span>
-              <span className="mt-4 font-display text-xl font-bold">Tap to upload or drag here</span>
+              <span className="mt-4 font-display text-xl font-bold">{durationCheckoutLabel(duration)}</span>
               <span className="mt-1 text-sm text-muted-foreground">JPG or PNG · max 10MB</span>
-            </button>
+            </Button>
             <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
             {err && <p className="mt-3 text-center font-bold text-destructive">{err}</p>}
           </section>
@@ -166,15 +172,7 @@ function Create() {
         {step === 3 && (
           <section>
             <h1 className="text-center text-3xl font-bold text-primary">Choose & Pay</h1>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {PLANS.map((p) => (
-                <button key={p.id} onClick={() => setPlan(p.id)} className={`relative rounded-2xl bg-card p-4 text-left shadow-festive ${plan === p.id ? "ring-4 ring-gold" : ""}`}>
-                  {"best" in p && <span className="absolute right-3 top-3 rounded-full bg-gold-grad px-2 py-0.5 text-[10px] font-extrabold text-gold-foreground">BEST SELLER</span>}
-                  <b>{p.name}</b> <span className="font-display text-2xl font-bold text-primary">₱{p.price}</span>
-                  <p className="text-xs text-muted-foreground">{p.detail}</p>
-                </button>
-              ))}
-            </div>
+            <DurationSelector duration={duration} onChange={setDuration} />
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {["GCash", "Maya"].map((m) => (
                 <div key={m} className="rounded-2xl bg-card p-4 text-center shadow-festive">
@@ -184,12 +182,12 @@ function Create() {
                       <span key={i} className={(i * 7 + m.length) % 3 === 0 ? "bg-foreground" : ""} />
                     ))}
                   </div>
-                  <p className="mt-2 text-xs text-muted-foreground">Scan & pay ₱{PLANS.find((p) => p.id === plan)?.price}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">Scan & pay ₱{offer.price}</p>
                 </div>
               ))}
             </div>
             <a href="https://paymongo.com" target="_blank" rel="noreferrer" className="mt-4 block rounded-full bg-festive py-3 text-center font-bold text-primary-foreground">Pay with Card via PayMongo</a>
-            <button onClick={generate} className="mt-3 w-full rounded-full bg-gold-grad py-3 font-extrabold text-gold-foreground shadow-glow">I've paid — Generate HD Video ✨</button>
+            <Button onClick={generate} className="mt-3 h-auto w-full whitespace-normal rounded-full bg-gold-grad py-3 font-extrabold text-gold-foreground shadow-glow">I've paid P{offer.price} — Generate {duration} Sec Magic ✨</Button>
             <button onClick={generate} className="mt-2 w-full text-sm text-muted-foreground underline">Skip payment (demo)</button>
             <button onClick={() => setStep(2)} className="mt-4 text-sm font-bold text-primary">← Back</button>
           </section>
@@ -201,8 +199,8 @@ function Create() {
               <div className="relative overflow-hidden rounded-3xl bg-night-grad p-10 text-night-foreground">
                 <Snow />
                 <img src={logo} alt="" className="animate-twinkle relative mx-auto h-20 w-20" />
-                <h1 className="relative mt-4 text-2xl font-bold">Generating your Christmas magic...</h1>
-                <p className="relative opacity-80">30–60 seconds</p>
+                <h1 className="relative mt-4 text-2xl font-bold">Generating your {duration}-second Christmas magic...</h1>
+                <p className="relative opacity-80">{offer.renderTime}</p>
                 <div className="relative mt-6 h-4 overflow-hidden rounded-full bg-night-foreground/20">
                   <div className="h-full bg-gold-grad transition-all" style={{ width: `${progress}%` }} />
                 </div>

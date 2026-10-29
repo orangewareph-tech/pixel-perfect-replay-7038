@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-
-const MODEL = "fal-ai/kling-video/v2.5-turbo/pro/image-to-video";
-const NEGATIVE = "distorted face, blurry, cartoon, changed ethnicity";
+import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
 
 function key() {
   const k = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
@@ -12,14 +10,13 @@ function key() {
 
 export const startVideo = createServerFn({ method: "POST" })
   .inputValidator((d) =>
-    z.object({ imageUrl: z.string().min(10).max(15_000_000), scene: z.string().min(3).max(300) }).parse(d),
+    z.object({ imageUrl: z.string().min(10).max(15_000_000), scene: z.string().min(3).max(300), duration: videoDurationSchema.default(5) }).parse(d),
   )
   .handler(async ({ data }) => {
-    const prompt = `Transform Filipino family photo into ${data.scene} Christmas scene, keep all faces 100% identical no distortion, warm parol lantern glow, snowfall, Noche Buena vibe, 6 second smooth motion, photorealistic`;
-    const res = await fetch(`https://queue.fal.run/${MODEL}`, {
+    const res = await fetch(`https://queue.fal.run/${VIDEO_MODEL}`, {
       method: "POST",
       headers: { Authorization: `Key ${key()}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ image_url: data.imageUrl, prompt, duration: "5", negative_prompt: NEGATIVE }),
+      body: JSON.stringify(buildVideoInput(data.imageUrl, data.scene, data.duration)),
     });
     if (!res.ok) {
       const t = await res.text();

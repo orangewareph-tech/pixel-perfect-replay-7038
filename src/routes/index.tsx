@@ -3,6 +3,10 @@ import { Header, Footer, Snow } from "@/components/SiteChrome";
 import { PLANS, TEMPLATES } from "@/lib/site";
 import hero from "@/assets/hero.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { DurationSelector } from "@/components/DurationSelector";
+import { useVideoDuration } from "@/hooks/use-video-duration";
+import { durationCheckoutLabel } from "@/lib/video-duration";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,6 +36,7 @@ const FAQ: [string, string][] = [
 ];
 
 function Index() {
+  const [duration, setDuration] = useVideoDuration();
   return (
     <div className="min-h-screen">
       <Header />
@@ -48,7 +53,11 @@ function Index() {
             <p className="mt-4 text-lg opacity-90">
               Upload lang imong family photo, kami na bahala mo-himo og magical Christmas video in 60 seconds. <b className="text-gold">P149 ra!</b>
             </p>
-            <Link to="/create" className="mt-8 inline-flex rounded-full bg-gold-grad px-7 py-4 text-lg font-extrabold text-gold-foreground shadow-glow transition hover:scale-105">
+            <DurationSelector duration={duration} onChange={setDuration} />
+            <Button asChild className="mt-6 h-auto w-full whitespace-normal rounded-full bg-gold-grad px-5 py-4 text-base font-extrabold text-gold-foreground shadow-glow">
+              <Link to="/create" search={{ duration }}>{durationCheckoutLabel(duration)}</Link>
+            </Button>
+            <Link to="/create" search={{ duration }} className="mt-4 inline-flex font-bold text-gold underline">
               Upload Family Photo Now →
             </Link>
             <p className="mt-3 text-sm opacity-75">✓ GCash & Maya · ✓ Faces 100% kept · ✓ TikTok & FB ready</p>
@@ -71,7 +80,7 @@ function Index() {
         <h2 className="text-center text-3xl font-bold text-primary md:text-4xl">5 Magical Templates</h2>
         <div className="mt-8 flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-5">
           {TEMPLATES.map((t) => (
-            <Link key={t.id} to="/create" search={{ template: t.id }} aria-label={`Choose ${t.name}`} className="w-44 shrink-0 snap-start overflow-hidden rounded-2xl bg-card shadow-festive transition hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold md:w-auto">
+            <Link key={t.id} to="/create" search={{ template: t.id, duration }} aria-label={`Choose ${t.name}`} className="w-44 shrink-0 snap-start overflow-hidden rounded-2xl bg-card shadow-festive transition hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold md:w-auto">
               <img src={t.img} alt={t.name} width={768} height={1024} loading="lazy" className="aspect-[3/4] w-full object-cover" />
               <div className="p-3">
                 <h3 className="font-bold">{t.name}</h3>
@@ -95,7 +104,7 @@ function Index() {
                   <h3 className="text-xl font-bold">{p.name}</h3>
                   <p className="mt-2 font-display text-4xl font-bold text-primary">₱{p.price}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{p.detail}</p>
-                  <Link to="/create" search={{ plan: p.id }} className={`mt-6 block rounded-full py-3 text-center font-bold ${best ? "bg-festive text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+                  <Link to="/create" search={{ plan: p.id, duration }} className={`mt-6 block rounded-full py-3 text-center font-bold ${best ? "bg-festive text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
                     Choose
                   </Link>
                 </div>
