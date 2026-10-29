@@ -20,4 +20,4 @@
 - [x] Add saved music choices, dynamic totals, synchronized preview and volume/loop controls.
 - [x] Prepare real music-embedded MP4 downloads; do not sell or promise missing licensed songs.
 - [x] Verify pricing, preferences, mobile layout, real 5s Parol generation/save, and music merging with synthetic audio; licensed-song end-to-end awaits files.
-- [ ] Supply licensed Christmas song files — waiting for the owner's audio files.
+- [ ] Make music functional now with original synthesized festive MP3s, selector playback, ready pricing and verified music MP4 download.
