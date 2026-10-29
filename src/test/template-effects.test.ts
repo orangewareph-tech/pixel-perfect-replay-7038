@@ -4,8 +4,8 @@ import { buildVideoInput, VIDEO_MODEL } from "@/lib/video-duration";
 
 describe("enhanced Christmas template payloads", () => {
   const requiredEffects = {
-    parol: ["parol", "spinning", "pulsing"],
-    snow: ["snow", "shoul", "falling fast"],
+    parol: ["parol", "star dust", "lens flare"],
+    snow: ["snow", "shoul", "breath vapor"],
     bokeh: ["fairy lights", "fireflies", "light trails"],
     globe: ["santa", "elves", "toy train", "chimney smoke", "sleigh"],
     fire: ["bibingka", "puto bumbong", "fireplace", "flames"],
@@ -32,5 +32,18 @@ describe("enhanced Christmas template payloads", () => {
     expect(input.prompt).not.toContain("lechon");
     expect(input.prompt).not.toContain("Santa hats");
     expect(VIDEO_MODEL).toBe("fal-ai/kling-video/v2.5-turbo/pro/image-to-video");
+  });
+  it("keeps base scenes neutral so the movement slider decides speed", () => {
+    for (const t of TEMPLATES) expect(t.scene).not.toMatch(/EXTREME|RAPIDLY|FAST|shak|ORBIT|360/);
+  });
+  it("Low movement stays gentle and Extreme adds rapid motion", () => {
+    const low = buildVideoInput("photo", TEMPLATES[0].scene, 10, "low");
+    expect(low.prompt).toContain("gentle slow floating");
+    expect(low.prompt).not.toContain("RAPIDLY");
+    expect(low.negative_prompt).toContain("rapid spinning camera");
+    const ext = buildVideoInput("photo", TEMPLATES[0].scene, 10, "extreme");
+    expect(ext.prompt).toContain("RAPIDLY");
+    expect(ext.negative_prompt).toContain("camera shake");
+    expect(ext.negative_prompt).not.toContain("rapid spinning camera");
   });
 });
