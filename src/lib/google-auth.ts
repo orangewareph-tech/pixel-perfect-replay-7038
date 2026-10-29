@@ -6,6 +6,6 @@ export function hasGoogleIdentity(user: Pick<User, "identities" | "app_metadata"
 export function authReturnPath(value: string | null) {
   const allowed = ["/create", "/payment", "/admin", "/test", "/my-videos", "/account"];
   if (!value || value.startsWith("//")) return "/create";
-  const path = value.split("?")[0];
+  const path = value.split("?")[0] ?? "";
   return allowed.includes(path) ? value : "/create";
 }

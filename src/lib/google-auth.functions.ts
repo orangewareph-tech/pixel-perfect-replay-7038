@@ -12,5 +12,5 @@ export const requireGoogleAuth = createMiddleware({ type: "function" })
 
 export const googleAccount = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(({ context }) => {
   const user = context.googleUser;
-  return { name: String(user?.user_metadata.full_name ?? "Google account"), email: user?.email ?? "", avatar: typeof user?.user_metadata.avatar_url === "string" ? user.user_metadata.avatar_url : "" };
+  return { name: String(user?.user_metadata['full_name'] ?? "Google account"), email: user?.email ?? "", avatar: typeof user?.user_metadata['avatar_url'] === "string" ? user.user_metadata['avatar_url'] : "" };
 });
