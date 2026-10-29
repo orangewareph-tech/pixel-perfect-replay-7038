@@ -1,6 +1,6 @@
 # MagicPh AI — Template Prompts
 
-Model: `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` (5s ≈ $0.35, 10s ≈ $0.7).
+Model: `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` (5s ≈ $0.35, 10s ≈ $0.70).
 
 This file is generated from the live code — `src/lib/site.ts`, `src/lib/video-movement.ts` and
 `src/lib/video-duration.ts` — so every string below is exactly what the app sends.
