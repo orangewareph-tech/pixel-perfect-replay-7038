@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
+import { Route as AuthenticatedMyVideosRouteImport } from './routes/_authenticated/my-videos'
 import { Route as AuthenticatedPaymentRouteImport } from './routes/_authenticated/payment'
 import { Route as AuthenticatedTestRouteImport } from './routes/_authenticated/test'
 
@@ -31,6 +33,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -39,6 +46,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 const AuthenticatedCreateRoute = AuthenticatedCreateRouteImport.update({
   id: '/create',
   path: '/create',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyVideosRoute = AuthenticatedMyVideosRouteImport.update({
+  id: '/my-videos',
+  path: '/my-videos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPaymentRoute = AuthenticatedPaymentRouteImport.update({
@@ -55,16 +67,20 @@ const AuthenticatedTestRoute = AuthenticatedTestRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/create': typeof AuthenticatedCreateRoute
+  '/my-videos': typeof AuthenticatedMyVideosRoute
   '/payment': typeof AuthenticatedPaymentRoute
   '/test': typeof AuthenticatedTestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/create': typeof AuthenticatedCreateRoute
+  '/my-videos': typeof AuthenticatedMyVideosRoute
   '/payment': typeof AuthenticatedPaymentRoute
   '/test': typeof AuthenticatedTestRoute
 }
@@ -73,23 +89,43 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
+  '/_authenticated/my-videos': typeof AuthenticatedMyVideosRoute
   '/_authenticated/payment': typeof AuthenticatedPaymentRoute
   '/_authenticated/test': typeof AuthenticatedTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/admin' | '/create' | '/payment' | '/test'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/account'
+    | '/admin'
+    | '/create'
+    | '/my-videos'
+    | '/payment'
+    | '/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin' | '/create' | '/payment' | '/test'
+  to:
+    | '/'
+    | '/auth'
+    | '/account'
+    | '/admin'
+    | '/create'
+    | '/my-videos'
+    | '/payment'
+    | '/test'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/_authenticated/create'
+    | '/_authenticated/my-videos'
     | '/_authenticated/payment'
     | '/_authenticated/test'
   fileRoutesById: FileRoutesById
@@ -123,6 +159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -135,6 +178,13 @@ declare module '@tanstack/react-router' {
       path: '/create'
       fullPath: '/create'
       preLoaderRoute: typeof AuthenticatedCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-videos': {
+      id: '/_authenticated/my-videos'
+      path: '/my-videos'
+      fullPath: '/my-videos'
+      preLoaderRoute: typeof AuthenticatedMyVideosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/payment': {
@@ -155,15 +205,19 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCreateRoute: typeof AuthenticatedCreateRoute
+  AuthenticatedMyVideosRoute: typeof AuthenticatedMyVideosRoute
   AuthenticatedPaymentRoute: typeof AuthenticatedPaymentRoute
   AuthenticatedTestRoute: typeof AuthenticatedTestRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCreateRoute: AuthenticatedCreateRoute,
+  AuthenticatedMyVideosRoute: AuthenticatedMyVideosRoute,
   AuthenticatedPaymentRoute: AuthenticatedPaymentRoute,
   AuthenticatedTestRoute: AuthenticatedTestRoute,
 }
