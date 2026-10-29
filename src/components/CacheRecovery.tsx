@@ -33,6 +33,7 @@ export function CacheRecovery({ statusPanel = false }: { statusPanel?: boolean }
       <dt className="text-muted-foreground">App cache items</dt><dd>{status ? status.supported ? `${status.items} in ${status.caches} caches` : "Unavailable in this browser" : "Checking…"}</dd>
       <dt className="text-muted-foreground">Page loading</dt><dd>Online · no offline page interception</dd>
       <dt className="text-muted-foreground">Old worker</dt><dd>Automatically retired when its update arrives</dd>
+      <dt className="text-muted-foreground">Google sign-in</dt><dd>Preserved by cache reset</dd>
     </dl>
     <Button className="mt-5 h-auto whitespace-normal" variant="outline" onClick={() => void clear()} disabled={busy || status?.supported === false}>{busy ? <Loader2 className="animate-spin" /> : <RefreshCw />}{busy ? "Clearing…" : "Clear Cache - Get Latest Version"}</Button>
     {notice && <div role="status" className="mt-3 text-sm"><p>{notice}</p>{canReload ? <Button className="mt-3" onClick={() => window.location.reload()}><RefreshCw />Reload latest version</Button> : <p className="mt-2 text-muted-foreground">Your photo stays open. Reload only after finishing or saving your video.</p>}</div>}
