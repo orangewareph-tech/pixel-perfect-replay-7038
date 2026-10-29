@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
+import { CHRISTMAS_OVERLAY_TEXT } from "@/lib/christmas-music";
 
 export function MusicVideoPlayer({ src, music, musicName, volume, loopMusic, ratio }: { src: string; music: string | null; musicName: string; volume: number; loopMusic: boolean; ratio: "9:16" | "16:9" }) {
   const videoRef = useRef<HTMLVideoElement>(null);

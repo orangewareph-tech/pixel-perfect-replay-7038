@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { christmasTotal, christmasProfit, DEFAULT_MUSIC_VOLUME, mergeAudioArgs, musicPath, musicSchema, musicAssetUrl, MUSIC_ASSETS } from "@/lib/christmas-music";
+import { christmasTotal, christmasProfit, DEFAULT_MUSIC_VOLUME, mergeAudioArgs, musicPath, musicSchema, musicAssetUrl, MUSIC_ASSETS, CHRISTMAS_OVERLAY_TEXT } from "@/lib/christmas-music";
 import { TEMPLATES } from "@/lib/site";
 import { buildVideoInput } from "@/lib/video-duration";
 
