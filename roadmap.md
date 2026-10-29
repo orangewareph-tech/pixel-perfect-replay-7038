@@ -1,6 +1,6 @@
 # Enhanced Christmas templates
-- [ ] Enrich all five existing template effects and duration pacing without changing identity, prices, payments or soundtrack.
-- [ ] Test the exact payload used by customer and administrator generation.
+- [x] Enrich all five existing template effects and duration pacing without changing identity, prices, payments or soundtrack.
+- [x] Test the shared customer/administrator payload: 37 relevant tests pass; build OK. Visual quality of new paid renders remains unverified without an approved payment or owner access.
 - [ ] Add MagicFam US templates — uploaded brief ends mid-prompt; complete US brief required.
 
 # Owner-only testing
