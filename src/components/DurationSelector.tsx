@@ -1,12 +1,12 @@
 import { Check, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DURATION_OFFERS, durationProfit, type VideoDuration } from "@/lib/video-duration";
+import { DURATION_OFFERS, FAL_LISTED_COST, durationProfit, type VideoDuration } from "@/lib/video-duration";
 
 export function DurationSelector({ duration, onChange }: { duration: VideoDuration; onChange: (value: VideoDuration) => void }) {
   const offer = DURATION_OFFERS[duration];
   return (
     <div className="mt-6 text-foreground">
-      <h2 className="mb-3 text-xl font-bold text-gold">Pili-a ang haba sa video</h2>
+      <h2 className="mb-3 text-xl font-bold text-christmas-green">Pili-a ang haba sa video</h2>
       <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Video duration">
         {([5, 10] as const).map((value) => {
           const item = DURATION_OFFERS[value];
@@ -26,8 +26,8 @@ export function DurationSelector({ duration, onChange }: { duration: VideoDurati
       </div>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
       <p className="mt-2 text-sm">Total: <b>P{offer.price}</b> · You pay P{offer.price} via GCash · {offer.renderTime}</p>
-      <p className="mt-1 text-xs opacity-80">Estimated cost: ${offer.falCost.toFixed(2)} (P{(offer.falCost * 58).toFixed(2)}) · Estimated profit: P{durationProfit(duration).toFixed(2)}</p>
-      <p className="mt-1 text-xs opacity-80">Cost, delivery time, and file size are estimates; actual Fal.ai charges may differ.</p>
+      <p className="mt-1 text-xs opacity-80">Planning estimate: ${offer.falCost.toFixed(2)} (P{(offer.falCost * 58).toFixed(2)}) · Estimated profit: P{durationProfit(duration).toFixed(2)}</p>
+      <p className="mt-1 text-xs opacity-80">Fal.ai listed cost: ${FAL_LISTED_COST[duration].toFixed(2)} per video. Planning estimates exclude this actual cost; delivery and file size vary.</p>
     </div>
   );
 }

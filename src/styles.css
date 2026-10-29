@@ -28,6 +28,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-gold: var(--gold);
+  --color-christmas-green: var(--christmas-green);
   --color-gold-foreground: var(--gold-foreground);
   --color-night: var(--night);
   --color-night-foreground: var(--night-foreground);
@@ -55,6 +56,7 @@
   --accent: oklch(0.76 0.14 75);
   --accent-foreground: oklch(0.25 0.05 40);
   --gold: #D4AF37;
+  --christmas-green: #165B31;
   --gold-foreground: oklch(0.25 0.05 40);
   --night: oklch(0.22 0.06 20);
   --night-foreground: oklch(0.97 0.02 80);
