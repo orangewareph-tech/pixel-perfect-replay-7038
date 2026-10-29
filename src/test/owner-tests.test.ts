@@ -43,12 +43,25 @@ it("blocks the admin batch once the daily video allowance is used", () => {
 });
 
 it("blocks the admin batch once the daily spending cap is reached", () => {
-  const tenSecond = record({ cost: ADMIN_LIMITS.costPer10s, duration: 10 });
-  const quota = adminTestQuota("orangewareph@gmail.com", Array.from({ length: 14 }, () => tenSecond));
+  // Eight renders at $1.25 spend the whole $10 budget while two video slots remain,
+  // so this exercises the money cap on its own rather than the video cap.
+  const pricey = record({ cost: 1.25 });
+  const quota = adminTestQuota("orangewareph@gmail.com", Array.from({ length: 8 }, () => pricey));
   expect(quota.allowed).toBe(false);
+  expect(quota.videosLeft).toBe(2);
   expect(quota.costLeft).toBe(0);
   expect(quota.reason).toBe(`Limit: $${ADMIN_LIMITS.maxCostPerDay}/day`);
 });
+
+it("leaves the admin batch with only what the remaining budget can actually pay for", () => {
+  const nine = record({ cost: 1.0 });
+  const quota = adminTestQuota("orangewareph@gmail.com", Array.from({ length: 9 }, () => nine));
+  expect(quota.allowed).toBe(true);
+  expect(quota.costLeft).toBe(1);
+  const unitCost = ADMIN_LIMITS.costPer10s;
+  expect(Math.min(TEMPLATES.length, quota.videosLeft, Math.floor(quota.costLeft / unitCost))).toBe(1);
+});
+
 
 it("gives non-admins no free renders", () => {
   const quota = adminTestQuota("someone@gmail.com", []);
