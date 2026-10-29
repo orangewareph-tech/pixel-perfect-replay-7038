@@ -98,3 +98,9 @@
 # Five core templates + movement levels
 - [x] Remove retired template leftovers; align tests to five templates and Extreme-default movement; restore server-role requirement for paid owner bypass.
 - [ ] Visually confirm a paid Extreme render — needs owner Google sign-in or approved payment.
+
+# One-click free template comparison
+- [x] Add admin-dashboard "Run all five templates free": one photo, movement and length render all five templates, with a side-by-side comparison grid of each template's newest finished video.
+- [x] Add server-side-free adminTestQuota (videos left / dollars left today) shared by the single and batch actions; 90 tests pass, build OK.
+- [ ] Watch the five free renders in the browser — needs the owner to sign in with Google on /admin-dashboard; no render has been submitted from this change.
+
