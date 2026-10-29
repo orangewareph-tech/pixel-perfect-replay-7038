@@ -68,12 +68,191 @@ export type Database = {
         }
         Relationships: []
       }
+      video_launch_settings: {
+        Row: {
+          daily_limit: number
+          id: boolean
+          phone: string
+          qr_url: string | null
+          recipient: string
+        }
+        Insert: {
+          daily_limit?: number
+          id?: boolean
+          phone?: string
+          qr_url?: string | null
+          recipient?: string
+        }
+        Update: {
+          daily_limit?: number
+          id?: boolean
+          phone?: string
+          qr_url?: string | null
+          recipient?: string
+        }
+        Relationships: []
+      }
+      video_payments: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          cost_usd: number
+          created_at: string
+          currency: string
+          duration: number
+          email: string
+          error: string | null
+          finished_at: string | null
+          id: string
+          music: string
+          provider: string
+          provider_session: string | null
+          receipt: string | null
+          request_id: string | null
+          started_at: string | null
+          status: string
+          template: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          cost_usd?: number
+          created_at?: string
+          currency?: string
+          duration: number
+          email: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          music: string
+          provider?: string
+          provider_session?: string | null
+          receipt?: string | null
+          request_id?: string | null
+          started_at?: string | null
+          status?: string
+          template: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          cost_usd?: number
+          created_at?: string
+          currency?: string
+          duration?: number
+          email?: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          music?: string
+          provider?: string
+          provider_session?: string | null
+          receipt?: string | null
+          request_id?: string | null
+          started_at?: string | null
+          status?: string
+          template?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_video_payment: {
+        Args: { p_id: string }
+        Returns: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          cost_usd: number
+          created_at: string
+          currency: string
+          duration: number
+          email: string
+          error: string | null
+          finished_at: string | null
+          id: string
+          music: string
+          provider: string
+          provider_session: string | null
+          receipt: string | null
+          request_id: string | null
+          started_at: string | null
+          status: string
+          template: string
+          user_id: string
+          video_url: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "video_payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_video_payment: {
+        Args: {
+          p_duration: number
+          p_music: string
+          p_provider: string
+          p_receipt?: string
+          p_template: string
+        }
+        Returns: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          cost_usd: number
+          created_at: string
+          currency: string
+          duration: number
+          email: string
+          error: string | null
+          finished_at: string | null
+          id: string
+          music: string
+          provider: string
+          provider_session: string | null
+          receipt: string | null
+          request_id: string | null
+          started_at: string | null
+          status: string
+          template: string
+          user_id: string
+          video_url: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "video_payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      review_video_payment: {
+        Args: { p_approve: boolean; p_id: string }
+        Returns: undefined
+      }
+      save_video_job: {
+        Args: {
+          p_error?: string
+          p_id: string
+          p_request: string
+          p_status: string
+          p_video?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
