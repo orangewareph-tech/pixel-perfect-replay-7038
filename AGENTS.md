@@ -11,6 +11,8 @@
 
 ## Rules
 
+- Personalized Christmas captions use an authenticated server function and request-scoped AI Gateway Responses helpers; keep prompts/keys server-only, persist provider denials, and retain caption drafts only across sign-in without changing video payment or rendering payloads.
+
 - Keep template images, accessible labels, badges and CDN-hosted sample clips in the shared browser-safe template catalogue; label animated generated samples honestly and keep preview actions separate from selection.
 
 - Keep the creation wizard's choices in the create route and save a one-time IndexedDB draft only across sign-in, so large private photos survive account navigation without entering URLs; progress rendering stays in a shared presentation component.
