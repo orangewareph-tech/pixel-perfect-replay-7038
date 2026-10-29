@@ -39,7 +39,7 @@ export async function runFreeChecks(): Promise<FreeCheck[]> {
   results.push({ name: "Manual payment approval", status: "SKIP", detail: "No receipt submitted or approved. Requires a real identified customer and administrator review." });
   results.push({ name: "Paymongo / Stripe", status: "SKIP", detail: "Paymongo disconnected; Stripe excluded. No checkout or charge attempted." });
   const installed = matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
-  results.push({ name: "PWA / administrator", status: "PASS", detail: `Installed: ${installed ? "Yes" : "No"}. Administrator access was verified before this panel opened; installed upgrade recovery not tested.` });
+  results.push({ name: "PWA detection", status: "PASS", detail: `Installed: ${installed ? "Yes" : "No"}. This checks browser display mode only; administrator authorization and installed upgrade recovery are separate.` });
   results.push({ name: "Paid generation", status: "SKIP", detail: "Deliberately not submitted. Balance deductions and live payment consumption remain unverified." });
   return results;
 }
