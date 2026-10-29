@@ -10,8 +10,11 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { ClientOnly } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { registerAppServiceWorker } from "../lib/pwa";
+import { InstallBanner } from "../components/InstallBanner";
 
 function NotFoundComponent() {
   return (
