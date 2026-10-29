@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header, Footer, Snow } from "@/components/SiteChrome";
-import { PLANS, TEMPLATES } from "@/lib/site";
+import { PLANS, TEMPLATES, TEMPLATE_MEDIA } from "@/lib/site";
 import hero from "@/assets/hero.jpg";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DurationSelector } from "@/components/DurationSelector";
@@ -92,7 +92,7 @@ function Index() {
         <div className="mt-8 flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-5">
           {TEMPLATES.map((t) => (
             <Link key={t.id} to="/create" search={{ template: t.id, duration, music }} aria-label={`Choose ${t.name}`} className="w-44 shrink-0 snap-start overflow-hidden rounded-2xl bg-card shadow-festive transition hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold md:w-auto">
-              <img src={t.img} alt={t.name} width={768} height={1024} loading="lazy" className="aspect-[3/4] w-full object-cover" />
+              <div className="relative h-[200px] overflow-hidden"><picture><source srcSet={TEMPLATE_MEDIA[t.id].webp} type="image/webp" /><img src={t.img} alt={TEMPLATE_MEDIA[t.id].alt} width={900} height={600} loading="lazy" className="h-full w-full object-cover" /></picture><span className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-bold text-primary-foreground">{TEMPLATE_MEDIA[t.id].badge}</span></div>
               <div className="p-3">
                 <h3 className="font-bold">{t.name}</h3>
                 <p className="text-xs text-muted-foreground">{t.desc}</p>

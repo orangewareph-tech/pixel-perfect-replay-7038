@@ -1,3 +1,7 @@
+# Template images
+- [x] Generate five distinct Christmas sample images, optimize WebP/JPEG, and add badges, selection checks and three-second animated sample dialogs without invented review counts.
+- [ ] Verify all images, previews, retained selections and mobile/desktop layouts.
+
 # Guided creation flow
 - [x] Separate upload, template, music/duration, confirmation/payment and video into five steps with sticky progress and Back actions.
 - [x] Keep payment security, media controls and download/share features; remove public diagnostics navigation.

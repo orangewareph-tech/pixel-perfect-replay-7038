@@ -218,9 +218,9 @@ function Create() {
         {step === 1 && (
           <section>
             <h1 className="text-center text-2xl font-bold text-primary sm:text-3xl">Pili-a ang magic template</h1>
-            <div className="mt-5 grid items-start gap-5 md:grid-cols-2">
+            <div className="mt-5">
               <MagicTemplateSelector value={tpl} onChange={setTpl} compact />
-              <figure className="overflow-hidden rounded-lg">
+              <figure className="mx-auto mt-6 max-w-lg overflow-hidden rounded-lg">
                 <img src={template.img} alt={`${template.name} example`} className="aspect-[4/3] w-full object-cover" />
                 <figcaption className="mt-3 font-display text-lg font-bold text-christmas-green">{template.icon} {template.name}<span className="mt-1 block font-sans text-xs font-normal text-muted-foreground">Pananglitan sa template · dili pa imong final video</span></figcaption>
               </figure>
