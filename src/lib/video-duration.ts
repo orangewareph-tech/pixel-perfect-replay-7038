@@ -18,10 +18,12 @@ export function durationCheckoutLabel(duration: VideoDuration) {
 export function buildVideoInput(imageUrl: string, scene: string, duration: VideoDuration) {
   return {
     image_url: imageUrl,
-    prompt: `Transform Filipino family photo into ${scene} Christmas scene, keep all faces identical no distortion, warm parol lantern glow, snowfall, Noche Buena vibe, ${duration} second smooth motion${duration === 10 ? ", extended story with gentle festive dancing" : ""}, photorealistic`,
+    prompt: `${duration === 5
+      ? "Ultra magical Filipino Christmas, Noche Buena, parol star glowing and sparkling, golden fairy lights twinkling, gentle snowfall around family, warm Christmas lights bokeh, fireplace glow, magical sparkles and stars floating around family, Christmas tree lights blinking, magical snow globe effect, warm and cozy Filipino Christmas atmosphere"
+      : "Ultra magical Filipino Christmas extended story, starts with the original family photo then magical transition: parol star lights up and glows, snowfall begins gently, fairy lights around family start twinkling and dancing, golden sparkles float in air, Christmas tree behind family lights up with blinking colors, family gently sways, fireplace flickering warm light, Santa hats appear magically, stars twinkle, Noche Buena table with lechon appears"}. Featured effect: ${scene}. ${duration} second smooth cinematic motion, ultra detailed, ultra realistic, preserve the original people, faces, identity, skin tone, expressions and clothing, no face change, no face distortion. Keep faces unobstructed and the family recognizable.`,
     duration: String(duration),
     cfg_scale: 0.5,
-    negative_prompt: "distorted face, blurry, cartoon, changed ethnicity",
+    negative_prompt: "blurred faces, face change, different faces, distorted faces, scary, horror, dark, low quality, blurry, deformed, changed ethnicity, cartoon, extra people, obscured faces",
   };
 }
 export const LAUNCH_COST = 3048;
