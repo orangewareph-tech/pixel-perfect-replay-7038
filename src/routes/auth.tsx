@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { Header, Footer } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { GoogleMark } from "@/components/GoogleMark";
@@ -43,33 +44,15 @@ function Auth() {
     setBusy(true); 
     setMessage("");
     try {
-      // FIXED: Use Supabase auth directly for Vercel - NOT lovable.auth
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: "offline",
-            prompt: "select_account",
-          },
-        },
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/auth/callback`,
+        extraParams: { prompt: "select_account" },
       });
-      
-      if (error) {
-        setMessage(error.message);
-        console.error("Google sign-in error:", error);
-      } else if (data.url) {
-        // Redirect to Google
-        window.location.href = data.url;
-      } else {
-        // Check if already signed in
-        const { data: userData } = await supabase.auth.getUser(); 
-        if (hasGoogleIdentity(userData.user)) {
-          await goBack(); 
-        } else {
-          setMessage("Google sign-in has not completed. Please try again.");
-        }
-      }
+      if (result.error) { setMessage(result.error.message ?? "Google sign-in could not start."); return; }
+      if (result.redirected) return;
+      const { data: userData } = await supabase.auth.getUser();
+      if (hasGoogleIdentity(userData.user)) await goBack();
+      else setMessage("Google sign-in has not completed. Please try again.");
     } catch (error) { 
       setMessage(error instanceof Error ? error.message : "Google sign-in could not finish.");
       console.error("Google sign-in exception:", error);

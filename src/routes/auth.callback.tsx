@@ -34,8 +34,16 @@ function AuthCallback() {
             sessionStorage.removeItem("magicph_auth_return");
             await navigate({ to: target });
           } else {
-            setMessage("No session found. Redirecting to sign-in...");
-            setTimeout(() => navigate({ to: "/auth" }), 2000);
+            // The managed sign-in may still be saving the session; wait briefly.
+            const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+              if (event === "SIGNED_IN" && session) {
+                sub.subscription.unsubscribe();
+                const target = authReturnPath(sessionStorage.getItem("magicph_auth_return"));
+                sessionStorage.removeItem("magicph_auth_return");
+                void navigate({ to: target });
+              }
+            });
+            setTimeout(() => { sub.subscription.unsubscribe(); setMessage("No session found. Redirecting to sign-in..."); void navigate({ to: "/auth" }); }, 8000);
           }
         }
       } catch (err) {
