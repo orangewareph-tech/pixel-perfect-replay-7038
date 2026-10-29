@@ -5,6 +5,7 @@ import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-d
 import { isAuditAdmin } from "@/lib/audit-permissions";
 import { isOwnerTester } from "@/lib/owner-tests";
 import { templateSchema } from "@/lib/template-ids";
+import { movementSchema, DEFAULT_MOVEMENT } from "@/lib/video-movement";
 
 export const ownerTestReport = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
   await context.supabase.rpc("ensure_magicph_owner_role");
@@ -55,7 +56,7 @@ export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireGo
 });
 
 export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware([requireGoogleAuth])
-  .inputValidator((value) => z.object({ duration: videoDurationSchema, template: templateSchema.default("snow"), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(value))
+  .inputValidator((value) => z.object({ duration: videoDurationSchema, template: templateSchema.default("snow"), movement: movementSchema.default(DEFAULT_MOVEMENT), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(value))
   .handler(async ({ context, data }) => {
     await context.supabase.rpc("ensure_magicph_owner_role");
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
@@ -68,7 +69,7 @@ export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware
       const { TEMPLATES } = await import("@/lib/site");
       const template = TEMPLATES.find((t) => t.id === data.template);
       if (!template) throw new Error("Invalid test template");
-      const result = await fetch(`https://queue.fal.run/${VIDEO_MODEL}`, { method: "POST", headers: { Authorization: `Key ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(buildVideoInput(data.imageUrl, template.scene, data.duration)), signal: AbortSignal.timeout(30000) });
+      const result = await fetch(`https://queue.fal.run/${VIDEO_MODEL}`, { method: "POST", headers: { Authorization: `Key ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(buildVideoInput(data.imageUrl, template.scene, data.duration, data.movement)), signal: AbortSignal.timeout(30000) });
       if (!result.ok) throw new Error(requestError(result.status));
       const output = z.object({ request_id: z.string().min(5).max(100) }).parse(await result.json());
       const saved = await context.supabase.from("fal_test_runs").update({ request_id: output.request_id, status: "IN_QUEUE" }).eq("id", run.id);
