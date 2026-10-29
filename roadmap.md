@@ -1,3 +1,8 @@
+# Owner-only testing
+- [ ] Provision only the verified Google owner administrator, enforce atomic three/hour and $10/day test reservations, and preserve customer payment security.
+- [ ] Add owner badge, creation bypass, test history/budget, customer-view mode, free checks and isolated mock payments.
+- [ ] Verify security/limits, browser flows and a real owner test when the owner account is available.
+
 # Google-only sign-in
 - [x] Configure Google and disable email/Apple/Lovable/Microsoft through managed settings; replace sign-in UI and show Google account details without extra profile/token storage.
 - [x] Require Google for private operations/creation; save unfinished work before sign-out and retain sessions during cache reset.
