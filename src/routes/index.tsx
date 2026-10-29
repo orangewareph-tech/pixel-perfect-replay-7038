@@ -129,7 +129,7 @@ function Index() {
 
       <section className="mx-auto max-w-3xl px-4 pb-20">
         <h2 className="text-center text-3xl font-bold text-primary">FAQ</h2>
-        <Accordion type="single" collapsible defaultValue={FAQ[0]?.[0]} className="mt-6 rounded-3xl bg-card px-6 shadow-festive">
+        <Accordion type="single" collapsible defaultValue={FAQ[0]?.[0] ?? ""} className="mt-6 rounded-3xl bg-card px-6 shadow-festive">
           {FAQ.map(([q, a]) => (
             <AccordionItem key={q} value={q}>
               <AccordionTrigger className="text-left font-bold">{q}</AccordionTrigger>

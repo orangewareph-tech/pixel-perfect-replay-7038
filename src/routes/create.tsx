@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Header, Footer, Snow } from "@/components/SiteChrome";
-import { PLANS, TEMPLATES, isAllowedPhoto } from "@/lib/site";
+import { TEMPLATES, isAllowedPhoto } from "@/lib/site";
 import { startVideo, checkVideo, downloadVideo } from "@/lib/fal.functions";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
@@ -30,10 +30,9 @@ export const Route = createFileRoute("/create")({
 const STEPS = ["Upload", "Template", "Preview", "Payment", "Video"];
 
 function Create() {
-  const { plan: planParam, template: templateParam, duration: durationParam } = Route.useSearch();
+  const { template: templateParam, duration: durationParam } = Route.useSearch();
   const [duration, setDuration] = useVideoDuration(durationParam);
   const offer = DURATION_OFFERS[duration];
-  const selectedPlan = PLANS.find((plan) => plan.id === planParam);
   const [step, setStep] = useState(0);
   const [photo, setPhoto] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -129,7 +128,6 @@ function Create() {
         {step === 0 && (
           <section>
             <h1 className="text-center text-3xl font-bold text-primary">Upload Your Family Photo</h1>
-            {selectedPlan && <p className="mt-3 text-center text-sm font-bold">{selectedPlan.name} · ₱{selectedPlan.price} · {selectedPlan.detail}</p>}
             <DurationSelector duration={duration} onChange={setDuration} />
             <Button
               type="button"
