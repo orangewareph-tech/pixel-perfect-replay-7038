@@ -9,3 +9,8 @@
 - [x] Verify balance availability, parameters, PWA, payment placeholders, and concurrent checks.
 - [x] Run live tests and report verified outcomes and limitations.
 - [ ] Approve the owner's audit account — waiting for the owner to sign in; no existing owner account.
+
+# Public page polish
+- [ ] Remove all public internal cost/profit information and align duration/pricing copy.
+- [ ] Correct plan/duration links, open first FAQ, improve testimonial spacing, delay install prompt.
+- [ ] Hide published Lovable badge and verify desktop/mobile public page.
