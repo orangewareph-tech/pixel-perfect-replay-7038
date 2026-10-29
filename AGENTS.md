@@ -19,6 +19,9 @@
 - Download Fal.ai videos in bounded ranged chunks and assemble a browser Blob, because full base64 MP4 responses exceed server-function serialization limits for longer videos.
 
 - Pass template choices from the home page through the create route's validated search parameters, so uploading a photo preserves the selected template.
+- Keep music choices, pricing and validated per-duration audio paths in a browser-safe module; restore template/music preferences after hydration and let explicit search choices win.
+- Decode real song files before enabling music generation; missing audio must block the music checkout, because filenames are not playable tracks or license evidence.
+- Lazy-load the single-thread ffmpeg browser worker only for music downloads, use asset-hosted WASM, preserve source audio and return an actually muxed MP4; do not change cross-origin isolation headers or pre-cache the large core.
 
 - Production builds run outside Lovable must keep emitting Vercel's Build Output
   API (the deploy preset in `vite.config.ts` plus `vercel.json`), because the site

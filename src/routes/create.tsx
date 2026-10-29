@@ -9,7 +9,7 @@ import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { DurationSelector } from "@/components/DurationSelector";
 import { useVideoDuration } from "@/hooks/use-video-duration";
-import { DURATION_OFFERS, durationCheckoutLabel, videoDurationSchema } from "@/lib/video-duration";
+import { DURATION_OFFERS, videoDurationSchema } from "@/lib/video-duration";
 import { MagicTemplateSelector } from "@/components/MagicTemplateSelector";
 import { MusicSelector } from "@/components/MusicSelector";
 import { MusicVideoPlayer } from "@/components/MusicVideoPlayer";

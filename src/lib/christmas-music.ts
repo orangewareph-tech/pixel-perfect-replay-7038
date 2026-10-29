@@ -21,7 +21,7 @@ export function mergeAudioArgs(volume: number, loop: boolean, duration: VideoDur
   return ["-i", "video.mp4", ...(loop ? ["-stream_loop", "-1"] : []), "-i", "music.mp3", "-filter_complex", hasOriginalAudio ? `[1:a]volume=${level},apad[music];[0:a:0][music]amix=inputs=2:duration=first:normalize=0[audio]` : `[1:a]volume=${level},apad[audio]`, "-map", "0:v:0", "-map", "[audio]", "-c:v", "copy", "-c:a", "aac", "-t", String(duration), "-movflags", "+faststart", "output.mp4"];
 }
 export async function loadMusicFile(path: string, signal?: AbortSignal) {
-  const response = await fetch(path, { signal });
+  const response = await fetch(path, { signal: signal ?? null });
   if (!response.ok || response.headers.get("content-type")?.includes("text/html")) throw new Error("Licensed song file not available yet.");
   const bytes = await response.arrayBuffer();
   if (bytes.byteLength < 100) throw new Error("Music file is empty.");
