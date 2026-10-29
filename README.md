@@ -43,11 +43,11 @@ Cloudflare layout, and the Vercel target only applies to builds run outside it.
 
 ## Christmas music
 
-The five magic templates are available. No copyrighted song files or music
-licenses were supplied: the four song choices show their planned ₱20 upgrade
-and block generation until a real audio file can be decoded. Add commercially
-licensed files following `public/music/README.md`; the filename alone is not
-evidence of synchronization/distribution rights.
+The five magic templates and four playable music upgrades are available.
+Eight asset-hosted MP3s provide 5/10-second original synthesized festive bell
+instrumentals. These are not recordings or covers of the named songs; the music
+selector discloses this. Music adds ₱20 and previews at 70% volume by default.
+Do not replace tracks with commercial recordings without synchronization rights.
 
 Music downloads lazy-load single-thread ffmpeg.wasm and embed AAC sound in the
 MP4, honoring volume/loop settings and preserving any original audio. Large

@@ -20,6 +20,7 @@
 
 - Pass template choices from the home page through the create route's validated search parameters, so uploading a photo preserves the selected template.
 - Keep music choices, pricing and validated per-duration audio paths in a browser-safe module; restore template/music preferences after hydration and let explicit search choices win.
+- Resolve playable music through imported per-duration asset pointers, not the reserved /music file names, so repository binaries and missing local paths cannot block playback.
 - Decode real song files before enabling music generation; missing audio must block the music checkout, because filenames are not playable tracks or license evidence.
 - Lazy-load the single-thread ffmpeg browser worker only for music downloads, use asset-hosted WASM, preserve source audio and return an actually muxed MP4; do not change cross-origin isolation headers or pre-cache the large core.
 - Preserve Vercel's asset-prefix rewrite to the published Lovable asset service, because relative asset pointers require that proxy when self-hosted.
