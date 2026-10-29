@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -13,7 +13,7 @@ import { MockPaymentFlow } from "@/components/MockPaymentFlow";
 import { CacheRecovery } from "@/components/CacheRecovery";
 
 const options = queryOptions({ queryKey: ["admin-payments"], queryFn: () => adminPaymentReport() });
-export const Route = createFileRoute("/_authenticated/admin")({ loader: ({ context }) => context.queryClient.ensureQueryData(options), head: () => ({ meta: [{ title: "Payment Administration — MagicPh AI" }, { name: "description", content: "Protected receipt approval, video credits and generation spending for MagicPh AI administrators." }, { property: "og:title", content: "MagicPh AI Administration" }, { property: "og:description", content: "Review pending payments and monitor account-based video generation." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Admin });
+export const Route = createFileRoute("/_authenticated/admin")({ loader: async ({ context }) => { const report = await context.queryClient.ensureQueryData(options); if (!report.admin) throw redirect({ to: "/" }); return report; }, head: () => ({ meta: [{ title: "Payment Administration — MagicPh AI" }, { name: "description", content: "Protected receipt approval, video credits and generation spending for MagicPh AI administrators." }, { property: "og:title", content: "MagicPh AI Administration" }, { property: "og:description", content: "Review pending payments and monitor account-based video generation." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Admin });
 function Admin() {
   const query = useSuspenseQuery(options); const report = query.data;
   const review = useServerFn(reviewPayment); const saveLimit = useServerFn(updateDailyLimit);
