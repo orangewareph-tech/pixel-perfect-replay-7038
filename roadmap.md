@@ -1,3 +1,9 @@
+# Google-only sign-in
+- [x] Configure Google and disable email/Apple/Lovable/Microsoft through managed settings; replace sign-in UI and show Google account details without extra profile/token storage.
+- [x] Require Google for private operations/creation; save unfinished work before sign-out and retain sessions during cache reset.
+- [x] Verify Google-only phone UI and signed-out redirects on creation/account/videos/test; non-Google managed test account rejected, 60 tests pass.
+- [ ] Verify real Google OAuth, signed-in header, sign-out restoration and installed-app persistence — managed test account has no Google identity; needs real Google sign-in.
+
 # Safe cache reset
 - [x] Add app-only cache reset in the header and cache status on the test page, preserving private drafts, sessions and unrelated caches.
 - [x] Preserve manifest-only home-screen support and same-path automatic stale-worker retirement; do not restore navigation caching.

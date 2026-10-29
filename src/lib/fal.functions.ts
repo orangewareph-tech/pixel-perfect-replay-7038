@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireGoogleAuth } from "@/lib/google-auth.functions";
 import { TEMPLATES } from "@/lib/site";
 
 function key() {
@@ -11,7 +11,7 @@ function key() {
 }
 
 export const startVideo = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireGoogleAuth])
   .inputValidator((d) =>
     z.object({ paymentId: z.string().uuid(), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(d),
   )
@@ -43,7 +43,7 @@ export const startVideo = createServerFn({ method: "POST" })
   });
 
 export const checkVideo = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireGoogleAuth])
   .inputValidator((d) => z.object({ requestId: z.string().min(5).max(100) }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: order } = await context.supabase.from("video_payments").select("id,status,video_url").eq("user_id", context.userId).eq("request_id", data.requestId).maybeSingle();
@@ -69,7 +69,7 @@ export const checkVideo = createServerFn({ method: "POST" })
 // Small ranged chunks avoid RPC output limits for longer MP4s; the browser
 // assembles a local Blob for one-click saving of cross-origin videos.
 export const downloadVideo = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireGoogleAuth])
   .inputValidator((d) => z.object({ videoUrl: z.string().url().max(2000), offset: z.number().int().min(0).max(60 * 1024 * 1024).default(0) }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: order } = await context.supabase.from("video_payments").select("id").eq("user_id", context.userId).eq("video_url", data.videoUrl).eq("status", "COMPLETED").maybeSingle();

@@ -1,17 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireGoogleAuth } from "@/lib/google-auth.functions";
 import { z } from "zod";
 import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
 import { isAuditAdmin } from "@/lib/audit-permissions";
 
-export const auditAccess = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+export const auditAccess = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
   const { data, error } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
   return { admin: !error && isAuditAdmin(data) };
 });
 
 const requestError = (status: number) => status === 401 ? "FAL_KEY invalid" : status === 403 ? "Access denied: key permissions or balance" : status === 402 ? "Insufficient balance" : status === 404 ? "Model not found" : status === 429 ? "Fal.ai rate limit — try later" : `Fal.ai request failed (HTTP ${status})`;
 
-export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
   const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
   if (!isAuditAdmin(role)) throw new Error("Administrator access required");
   const key = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
@@ -30,7 +30,7 @@ export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireSu
   return { keyFound: true, connected: history?.ok ?? false, balance, balanceNote: balance === null ? `Balance unavailable${billing ? ` (HTTP ${billing.status})` : ""}; check Fal.ai dashboard or a key with billing:usage:read permission.` : "Live Fal.ai credits", model: history?.ok ?? false, lastTest: runs.data, checkedAt: new Date().toISOString() };
 });
 
-export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware([requireGoogleAuth])
   .inputValidator((value) => z.object({ duration: videoDurationSchema, imageUrl: z.string().startsWith("data:image/").max(15_000_000) }).parse(value))
   .handler(async ({ context, data }) => {
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
@@ -53,7 +53,7 @@ export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware
     }
   });
 
-export const pollFalTest = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+export const pollFalTest = createServerFn({ method: "POST" }).middleware([requireGoogleAuth])
   .inputValidator((value) => z.object({ id: z.string().uuid() }).parse(value))
   .handler(async ({ context, data }) => {
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();

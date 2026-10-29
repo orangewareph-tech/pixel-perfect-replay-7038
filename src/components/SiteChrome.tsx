@@ -7,11 +7,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CacheRecovery } from "@/components/CacheRecovery";
+import { hasGoogleIdentity } from "@/lib/google-auth";
 
 export function Header({ sticky = true }: { sticky?: boolean }) {
   const online = useOnlineStatus();
   const queryClient = useQueryClient(); const navigate = useNavigate();
-  const { data: signedIn = false } = useQuery({ queryKey: ["header-session"], queryFn: async () => Boolean((await supabase.auth.getUser()).data.user), retry: false });
+  const { data: user } = useQuery({ queryKey: ["header-session"], queryFn: async () => { const { data } = await supabase.auth.getUser(); return hasGoogleIdentity(data.user) ? data.user : null; }, retry: false });
   return (
     <header className={`${sticky ? "sticky top-0" : "relative"} z-40 border-b border-border/60 bg-background/85 backdrop-blur`}>
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -21,7 +22,7 @@ export function Header({ sticky = true }: { sticky?: boolean }) {
         </Link>
         <div className="flex flex-wrap items-center gap-2">
         <CacheRecovery />
-        {signedIn && <Button aria-label="Sign out" title="Sign out" variant="ghost" size="icon" onClick={async () => { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); await navigate({ to: "/auth", replace: true }); }}><LogOut /></Button>}
+        {user && <><Link to="/account" className="flex min-w-0 max-w-56 items-center gap-2" aria-label="Google account">{typeof user.user_metadata['avatar_url'] === "string" && <img src={user.user_metadata['avatar_url']} alt="" referrerPolicy="no-referrer" className="size-8 rounded-full" />}<span className="min-w-0 text-xs"><span className="block truncate font-bold">{user.user_metadata['full_name'] ?? "Google account"}</span><span className="block truncate text-muted-foreground">{user.email}</span></span></Link><Button aria-label="Sign out" title="Sign out" variant="ghost" size="icon" onClick={async () => { const saves: Promise<unknown>[] = []; window.dispatchEvent(new CustomEvent("magicph-preserve-draft", { detail: { saves } })); try { await Promise.all(saves); } catch { window.alert("Your unfinished photo could not be saved. Please finish or download it before signing out."); return; } await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); await navigate({ to: "/auth", replace: true }); }}><LogOut /></Button></>}
         <Link to="/create" className="rounded-full bg-festive px-4 py-2 text-sm font-bold text-primary-foreground shadow-festive">
           Upload Photo
         </Link>

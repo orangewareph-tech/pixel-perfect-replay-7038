@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { googleAccount } from "@/lib/google-auth.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -26,7 +27,9 @@ import { saveCreationDraft, takeCreationDraft } from "@/lib/creation-draft";
 import { ChristmasMessageWriter } from "@/components/ChristmasMessageWriter";
 import { EMPTY_MESSAGE, type MessageDraft } from "@/lib/christmas-message";
 
-export const Route = createFileRoute("/create")({
+export const Route = createFileRoute("/_authenticated/create")({
+  loader: () => googleAccount(),
+  errorComponent: () => <><Header /><main className="mx-auto max-w-md px-4 py-12 text-center"><h1 className="text-2xl font-bold text-primary">Continue with Google</h1><Button asChild className="mt-6"><Link to="/auth">Google sign-in</Link></Button></main><Footer /></>,
   validateSearch: z.object({ plan: z.string().optional(), template: z.string().optional(), music: musicSchema.optional().catch(undefined), duration: z.coerce.number().pipe(videoDurationSchema).optional().catch(undefined) }),
   head: () => ({
     meta: [
@@ -36,6 +39,7 @@ export const Route = createFileRoute("/create")({
       { property: "og:description", content: "Turn your family photo into Pinoy Christmas magic with five festive effects and automatic included sound." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: Create,
@@ -84,10 +88,15 @@ function Create() {
     void takeCreationDraft().then((draft) => {
       if (!draft) return;
       setPhoto(draft.photo); setTpl(draft.template); setMusic(AUTOMATIC_MUSIC); setDuration(draft.duration);
-      setVolume(DEFAULT_MUSIC_VOLUME); setLoopMusic(true); setPaymentOpen(true); setStep(3);
+      setVolume(DEFAULT_MUSIC_VOLUME); setLoopMusic(true); setPaymentOpen(false); setStep(draft.step ?? 3);
       setChristmasMessage(draft.christmasMessage ?? EMPTY_MESSAGE);
     }).catch(() => { /* Upload remains usable if browser storage is unavailable. */ });
   }, []);
+  useEffect(() => {
+    const preserve = (event: Event) => { if (photo) (event as CustomEvent<{ saves: Promise<unknown>[] }>).detail.saves.push(saveCreationDraft({ photo, template: tpl, music, duration, volume, loopMusic, christmasMessage, step: Math.min(step, 3) })); };
+    window.addEventListener("magicph-preserve-draft", preserve);
+    return () => window.removeEventListener("magicph-preserve-draft", preserve);
+  }, [photo, tpl, music, duration, volume, loopMusic, christmasMessage, step]);
 
   async function signInToPay() {
     if (!photo) return;

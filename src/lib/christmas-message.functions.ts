@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest, setResponseHeader, setResponseStatus } from "@tanstack/react-start/server";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireGoogleAuth } from "@/lib/google-auth.functions";
 import { messageInputSchema } from "./christmas-message";
 
 export const writeChristmasMessage = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireGoogleAuth])
   .inputValidator((input: unknown) => messageInputSchema.parse(input))
   .handler(async ({ data }) => {
     setResponseHeader("Cache-Control", "no-store");
