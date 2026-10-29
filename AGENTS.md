@@ -42,5 +42,6 @@
 
 
 ## PWA
+- Manual cache recovery only deletes scoped legacy app caches, never auth storage or private drafts; show a recovery release rather than inventing an active cache version, and defer reload on the creation page to preserve in-progress work.
 - PWA is manifest-only during offline recovery; keep public/sw.js as a same-path kill-switch release to retire the old Workbox navigation fallback, delete only its scoped Workbox caches and magicph-assets, and leave messaging workers/caches alone. Never register a new app-shell worker during this release; src/lib/pwa.ts only updates existing /sw.js registrations so cleanup can activate.
 - Use the hydration-safe shared online-status hook for non-blocking connection warnings and generation guards, never to replace the route or discard in-progress photo choices.

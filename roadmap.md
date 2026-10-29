@@ -1,3 +1,8 @@
+# Safe cache reset
+- [x] Add app-only cache reset in the header and cache status on the test page, preserving private drafts, sessions and unrelated caches.
+- [x] Preserve manifest-only home-screen support and same-path automatic stale-worker retirement; do not restore navigation caching.
+- [x] Test cleanup isolation and failure states; browser reset removes v2/v3 caches while preserving messaging, choices and photo step, with no forced reload or phone overflow.
+
 # Personalized Christmas messages
 - [x] Add recipient and greeting fields with a template-matched AI message, editable result and copy action.
 - [x] Keep private message choices across Back/sign-in and show the message at confirmation and completion without changing paid video rendering.
