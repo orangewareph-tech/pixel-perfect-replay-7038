@@ -4,6 +4,7 @@ import { z } from "zod";
 import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
 import { isAuditAdmin } from "@/lib/audit-permissions";
 import { isOwnerTester } from "@/lib/owner-tests";
+import { templateSchema } from "@/lib/template-ids";
 
 export const ownerTestReport = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
   await context.supabase.rpc("ensure_magicph_owner_role");
@@ -54,7 +55,7 @@ export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireGo
 });
 
 export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware([requireGoogleAuth])
-  .inputValidator((value) => z.object({ duration: videoDurationSchema, template: z.enum(["parol", "snow", "bokeh", "globe", "fire"]).default("snow"), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(value))
+  .inputValidator((value) => z.object({ duration: videoDurationSchema, template: templateSchema.default("snow"), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(value))
   .handler(async ({ context, data }) => {
     await context.supabase.rpc("ensure_magicph_owner_role");
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();

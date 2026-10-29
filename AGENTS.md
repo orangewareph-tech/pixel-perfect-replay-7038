@@ -28,7 +28,7 @@
 - Provision only the verified Google owner through an authenticated database function; keep owner bypasses on the audit queue, with immutable atomic reservations shared with customer hourly/daily limits. Mock payments never write payment records or submit jobs.
 
 - Keep duration offers and validated Fal.ai payload construction in a shared browser-safe module, so upload, checkout, and server generation agree on the chosen duration; restore the optional local preference only after hydration.
-- Keep each template's effects in the shared catalogue and apply duration pacing through buildVideoInput without mixing unrelated scenes, so customer and administrator renders use identical template behavior.
+- Keep each template's effects in the shared catalogue, shared templateSchema validation in captions/payment/owner tests, and duration pacing through buildVideoInput, so all creation paths accept the same choices without mixing scenes. New catalogue choices must also be allowed by payment constraints and owner-reservation validation.
 - Download Fal.ai videos in bounded ranged chunks and assemble a browser Blob, because full base64 MP4 responses exceed server-function serialization limits for longer videos.
 
 - Pass template choices from the home page through the create route's validated search parameters, so uploading a photo preserves the selected template.
