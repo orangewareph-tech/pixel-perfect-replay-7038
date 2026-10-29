@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { TEMPLATES } from "@/lib/site";
-import { musicSchema, type MusicId } from "@/lib/christmas-music";
+import { AUTOMATIC_MUSIC, type MusicId } from "@/lib/christmas-music";
 
 export function useChristmasChoices(initialTemplate?: string, initialMusic?: MusicId) {
   const validTemplate = (value: string | null | undefined) => TEMPLATES.find((t) => t.id === value)?.id;
   const [template, setTemplate] = useState<string>(validTemplate(initialTemplate) ?? "parol");
-  const [music, setMusic] = useState<MusicId>(initialMusic ?? "no-music");
+  const [music, setMusic] = useState<MusicId>(AUTOMATIC_MUSIC);
   useEffect(() => {
     try {
       setTemplate(validTemplate(initialTemplate) ?? validTemplate(localStorage.getItem("magicph_template")) ?? "parol");
-      const parsed = musicSchema.safeParse(initialMusic ?? localStorage.getItem("magicph_music"));
-      setMusic(parsed.success ? parsed.data : "no-music");
+      setMusic(AUTOMATIC_MUSIC);
     } catch { /* Preferences are optional. */ }
   }, [initialTemplate, initialMusic]);
   function chooseTemplate(value: string) { if (!validTemplate(value)) return; setTemplate(value); try { localStorage.setItem("magicph_template", value); } catch { /* Optional. */ } }

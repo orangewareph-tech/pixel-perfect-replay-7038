@@ -11,7 +11,8 @@ import jingle10 from "@/assets/jingle-bells-pinoy-10sec.mp3.asset.json";
 
 export const musicSchema = z.enum(["no-music", "pasko-sa-nayon", "christmas-in-our-hearts", "ang-pasko-ay-sumapit", "jingle-bells-pinoy"]);
 export type MusicId = z.infer<typeof musicSchema>;
-export const MUSIC_SURCHARGE = 20;
+export const MUSIC_SURCHARGE = 0;
+export const AUTOMATIC_MUSIC: MusicId = "pasko-sa-nayon";
 export const DEFAULT_MUSIC_VOLUME = 70;
 export const MUSIC_OPTIONS = [
   { id: "no-music", icon: "🔇", name: "No Music — Video Only", detail: "Original video · no extra charge", best: false },
@@ -25,7 +26,7 @@ export function musicPath(id: MusicId, duration: VideoDuration) { return id === 
 export const MUSIC_ASSETS = { "pasko-sa-nayon": { 5: pasko5, 10: pasko10 }, "christmas-in-our-hearts": { 5: hearts5, 10: hearts10 }, "ang-pasko-ay-sumapit": { 5: sumapit5, 10: sumapit10 }, "jingle-bells-pinoy": { 5: jingle5, 10: jingle10 } };
 export function musicAssetUrl(id: MusicId, duration: VideoDuration) { return id === "no-music" ? null : MUSIC_ASSETS[id][duration].url; }
 export function musicCheckoutLabel(duration: VideoDuration, id: MusicId) { return `Upload & Pay ₱${christmasTotal(duration, id)} - ${duration} Sec ${duration === 10 ? "Premium Magic" : "Magic"}${id === "no-music" ? "" : " + Music 🎵"} →`; }
-export function christmasTotal(duration: VideoDuration, id: MusicId) { return DURATION_OFFERS[duration].price + (id === "no-music" ? 0 : MUSIC_SURCHARGE); }
+export function christmasTotal(duration: VideoDuration, _id: MusicId) { return DURATION_OFFERS[duration].price; }
 export function christmasProfit(duration: VideoDuration, id: MusicId) { return Number((christmasTotal(duration, id) - DURATION_OFFERS[duration].falCost * 58 - 2 - (id === "no-music" ? 0 : 5)).toFixed(2)); }
 export function mergeAudioArgs(volume: number, loop: boolean, duration: VideoDuration, hasOriginalAudio = false) {
   const level = Math.max(0, Math.min(100, volume)) / 100;

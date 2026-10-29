@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 
-const STEPS = ["Upload", "Template", "Music & Duration", "Payment", "Video"];
+const STEPS = ["Upload", "Template", "Duration", "Payment", "Video"];
 
 export function CreationProgress({ step, complete }: { step: number; complete: boolean }) {
   return <nav aria-label="Video creation progress" className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">

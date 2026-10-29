@@ -27,7 +27,7 @@
 - Download Fal.ai videos in bounded ranged chunks and assemble a browser Blob, because full base64 MP4 responses exceed server-function serialization limits for longer videos.
 
 - Pass template choices from the home page through the create route's validated search parameters, so uploading a photo preserves the selected template.
-- Keep music choices, pricing and validated per-duration audio paths in a browser-safe module; restore template/music preferences after hydration and let explicit search choices win.
+- Keep included automatic soundtrack pricing and duration-specific audio in browser-safe shared modules; preserve legacy payment records but never restore old silent preferences for newly rendered downloads.
 - Resolve playable music through imported per-duration asset pointers, not the reserved /music file names, so repository binaries and missing local paths cannot block playback.
 - Decode real song files before enabling music generation; missing audio must block the music checkout, because filenames are not playable tracks or license evidence.
 - Lazy-load the single-thread ffmpeg browser worker only for music downloads, use asset-hosted WASM, preserve source audio and return an actually muxed MP4; do not change cross-origin isolation headers or pre-cache the large core.

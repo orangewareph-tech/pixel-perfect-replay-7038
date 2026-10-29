@@ -7,7 +7,7 @@ import { Header, Footer } from "@/components/SiteChrome";
 
 const options = queryOptions({ queryKey: ["my-payments"], queryFn: () => listMyPayments() });
 export const Route = createFileRoute("/_authenticated/payment")({
-  validateSearch: (input) => paymentChoicesSchema.parse({ duration: Number(input['duration'] ?? 5), music: input['music'] ?? "no-music", template: input['template'] ?? "parol" }),
+  validateSearch: (input) => paymentChoicesSchema.parse({ duration: Number(input['duration'] ?? 5), music: "pasko-sa-nayon", template: input['template'] ?? "parol" }),
   loader: ({ context }) => context.queryClient.ensureQueryData(options),
   head: () => ({ meta: [{ title: "Payment & Video Credits — MagicPh AI" }, { name: "description", content: "Submit your GCash or InstaPay receipt for administrator approval and unlock one Christmas video." }, { property: "og:title", content: "MagicPh AI Payment" }, { property: "og:description", content: "Secure account-based receipt review and video credits." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: PaymentPage,

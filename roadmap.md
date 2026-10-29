@@ -1,3 +1,10 @@
+# Automatic included sound and free checks
+- [x] Remove customer music choices; automatic sound accompanies previews and embeds in saved videos at ₱149/₱299.
+- [x] Align new secure account payment pricing; live function verified, existing payment records unchanged.
+- [x] Add administrator free media/rule/installed-app checks with honest skips for real payment/provider flows; no paid jobs submitted.
+- [x] Verify audible sample, included checkout, actual browser AAC music mux and static free-check execution; 50 tests pass, no browser errors.
+- [ ] Verify free-check panel through administrator UI — signed-in requesting account lacks administrator role; underlying free checks pass directly.
+
 # Template images
 - [x] Generate five distinct Christmas sample images, optimize WebP/JPEG, and add badges, selection checks and three-second animated sample dialogs without invented review counts.
 - [x] Verify all five three-second previews play, selections survive Back, images load at 200px, and phone/tablet/desktop have no overflow; 20 relevant tests pass and no browser errors.
@@ -15,7 +22,7 @@
 - [ ] Connect Paymongo — connection was declined; automatic checkout remains disabled. Stripe excluded by user choice.
 - [x] Enforce confirmed custom account limits: three starts per hour and atomic UTC daily budget reservations, including administrator tests.
 - [x] Run 45 tests and verify unpaid checkout, direct-call rejection and protected-page redirects with no browser errors.
-- [ ] Verify receipt approval, credit consumption and authenticated administrator views end-to-end — requesting user has no matching app account; awaits sign-in or an identified account.
+- [ ] Verify receipt approval, credit consumption and administrator views end-to-end — signed-in requesting account exists but lacks administrator role; no approved customer payment exercised.
 
 # Full app testing
 - [x] Run all 36 automated tests; verify five templates, eight playable music clips, saved preferences, four prices, mobile layout, signed-out audit redirect, offline checkout recovery, and real 5s/10s video downloads (5s contains audible AAC music).
