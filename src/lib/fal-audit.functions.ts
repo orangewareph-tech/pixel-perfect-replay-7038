@@ -3,8 +3,24 @@ import { requireGoogleAuth } from "@/lib/google-auth.functions";
 import { z } from "zod";
 import { buildVideoInput, VIDEO_MODEL, videoDurationSchema } from "@/lib/video-duration";
 import { isAuditAdmin } from "@/lib/audit-permissions";
+import { isOwnerTester } from "@/lib/owner-tests";
+
+export const ownerTestReport = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
+  await context.supabase.rpc("ensure_magicph_owner_role");
+  const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+  const owner = isOwnerTester(context.googleUser?.email, role);
+  if (!owner) return { owner: false, runs: [], hour: 0, today: 0, spent: 0, totalSpent: 0, accountSpent: 0 };
+  const { data: runs, error } = await context.supabase.from("fal_test_runs").select("*").eq("user_id", context.userId).order("started_at", { ascending: false });
+  const now = Date.now(); const midnight = new Date(); midnight.setUTCHours(0, 0, 0, 0);
+  const { data: payments, error: paymentError } = await context.supabase.from("video_payments").select("started_at,cost_usd").eq("user_id", context.userId).gte("started_at", midnight.toISOString());
+  if (error || paymentError) throw new Error("Could not read owner test usage");
+  const history = runs ?? []; const daily = history.filter((run) => Date.parse(run.started_at) >= midnight.getTime());
+  const spent = daily.reduce((sum, run) => sum + Number(run.cost_usd), 0);
+  return { owner, runs: history, hour: history.filter((run) => Date.parse(run.started_at) > now - 3_600_000).length + (payments ?? []).filter((p) => p.started_at && Date.parse(p.started_at) > now - 3_600_000).length, today: daily.length, spent, totalSpent: history.reduce((sum, run) => sum + Number(run.cost_usd), 0), accountSpent: spent + (payments ?? []).reduce((sum, p) => sum + p.cost_usd, 0) };
+});
 
 export const auditAccess = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
+  await context.supabase.rpc("ensure_magicph_owner_role");
   const { data, error } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
   return { admin: !error && isAuditAdmin(data) };
 });
@@ -31,24 +47,29 @@ export const scanFalAi = createServerFn({ method: "GET" }).middleware([requireGo
 });
 
 export const testFalAiGeneration = createServerFn({ method: "POST" }).middleware([requireGoogleAuth])
-  .inputValidator((value) => z.object({ duration: videoDurationSchema, imageUrl: z.string().startsWith("data:image/").max(15_000_000) }).parse(value))
+  .inputValidator((value) => z.object({ duration: videoDurationSchema, template: z.enum(["parol", "snow", "bokeh", "globe", "fire"]).default("snow"), imageUrl: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(15_000_000) }).parse(value))
   .handler(async ({ context, data }) => {
+    await context.supabase.rpc("ensure_magicph_owner_role");
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
-    if (!isAuditAdmin(role)) throw new Error("Administrator access required");
+    if (!isOwnerTester(context.googleUser?.email, role)) throw new Error("Owner administrator access required — customers must pay first");
     const key = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
     if (!key) throw new Error("FAL_KEY missing - add to Secrets");
-    const { data: run, error } = await context.supabase.from("fal_test_runs").insert({ user_id: context.userId, duration: data.duration }).select("id").single();
-    if (error || !run) throw new Error("An active test already exists, or test storage is unavailable. Refresh its status first.");
+    const { data: run, error } = await context.supabase.from("fal_test_runs").insert({ user_id: context.userId, duration: data.duration, template: data.template }).select("id").single();
+    if (error || !run) throw new Error(error?.message ?? "An active test already exists. Refresh its status first.");
     try {
-      const result = await fetch(`https://queue.fal.run/${VIDEO_MODEL}`, { method: "POST", headers: { Authorization: `Key ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(buildVideoInput(data.imageUrl, "Snowfall Magic", data.duration)), signal: AbortSignal.timeout(30000) });
+      const { TEMPLATES } = await import("@/lib/site");
+      const template = TEMPLATES.find((t) => t.id === data.template);
+      if (!template) throw new Error("Invalid test template");
+      const result = await fetch(`https://queue.fal.run/${VIDEO_MODEL}`, { method: "POST", headers: { Authorization: `Key ${key}`, "Content-Type": "application/json" }, body: JSON.stringify(buildVideoInput(data.imageUrl, template.scene, data.duration)), signal: AbortSignal.timeout(30000) });
       if (!result.ok) throw new Error(requestError(result.status));
-      const output = await result.json() as { request_id: string };
+      const output = z.object({ request_id: z.string().min(5).max(100) }).parse(await result.json());
       const saved = await context.supabase.from("fal_test_runs").update({ request_id: output.request_id, status: "IN_QUEUE" }).eq("id", run.id);
       if (saved.error) throw new Error("Video submitted but the test record could not be updated. Check Fal.ai history before retrying.");
       return { id: run.id, requestId: output.request_id };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Fal.ai request failed";
-      await context.supabase.from("fal_test_runs").update({ status: "FAILED", error: message, finished_at: new Date().toISOString() }).eq("id", run.id);
+      // Keep ambiguous submissions active: owner must reconcile before another run.
+      await context.supabase.from("fal_test_runs").update({ error: `${message}; reconcile the reserved request before retrying` }).eq("id", run.id);
       throw new Error(message);
     }
   });
@@ -58,8 +79,8 @@ export const pollFalTest = createServerFn({ method: "POST" }).middleware([requir
   .handler(async ({ context, data }) => {
     const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
     if (!isAuditAdmin(role)) throw new Error("Administrator access required");
-    const { data: run } = await context.supabase.from("fal_test_runs").select("*").eq("id", data.id).single();
-    if (!run?.request_id) throw new Error("Test request not found");
+    const { data: run } = await context.supabase.from("fal_test_runs").select("*").eq("id", data.id).eq("user_id", context.userId).single();
+    if (!run?.request_id) throw new Error("Test request not found; check provider history before retrying");
     if (run.status === "COMPLETED" || run.status === "FAILED") return run;
     const key = process.env["FAL_KEY"] ?? process.env["FAL_API_KEY"];
     if (!key) throw new Error("FAL_KEY missing - add to Secrets");
@@ -73,7 +94,7 @@ export const pollFalTest = createServerFn({ method: "POST" }).middleware([requir
     if (output.status === "COMPLETED") {
       const response = await fetch(base, { headers, signal: AbortSignal.timeout(20000) });
       if (response.ok) { const video = await response.json() as { video?: { url: string } }; videoUrl = video.video?.url ?? null; }
-      if (!videoUrl) error = "Generation completed without a video result";
+      if (!videoUrl || !/^https:\/\/([a-zA-Z0-9-]+\.)*fal\.media\//.test(videoUrl)) { videoUrl = null; error = "Generation completed without a valid video result"; }
     }
     const status = error ? "FAILED" : output.status;
     const { data: updated, error: saveError } = await context.supabase.from("fal_test_runs").update({ status, video_url: videoUrl, error, finished_at: status === "COMPLETED" || status === "FAILED" ? new Date().toISOString() : null }).eq("id", run.id).select("*").single();

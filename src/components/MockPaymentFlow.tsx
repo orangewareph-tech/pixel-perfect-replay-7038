@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import paymentQr from "@/assets/instapay-qr.jpeg.asset.json";
+import paymentQr from "@/assets/payment-qr.jpeg.asset.json";
 
 export function MockPaymentFlow() {
   const [stage, setStage] = useState(0);

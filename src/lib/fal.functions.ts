@@ -73,7 +73,8 @@ export const downloadVideo = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ videoUrl: z.string().url().max(2000), offset: z.number().int().min(0).max(60 * 1024 * 1024).default(0) }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: order } = await context.supabase.from("video_payments").select("id").eq("user_id", context.userId).eq("video_url", data.videoUrl).eq("status", "COMPLETED").maybeSingle();
-    if (!order) throw new Error("Your completed video was not found");
+    const { data: test } = order ? { data: null } : await context.supabase.from("fal_test_runs").select("id").eq("user_id", context.userId).eq("video_url", data.videoUrl).eq("status", "COMPLETED").maybeSingle();
+    if (!order && !test) throw new Error("Your completed video was not found");
     const u = new URL(data.videoUrl);
     if (u.protocol !== "https:" || !(u.hostname === "fal.media" || u.hostname.endsWith(".fal.media"))) {
       throw new Error("Unexpected video URL");

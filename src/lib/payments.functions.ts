@@ -28,6 +28,7 @@ export const reviewPayment = createServerFn({ method: "POST" }).middleware([requ
   });
 
 export const adminPaymentReport = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
+  await context.supabase.rpc("ensure_magicph_owner_role");
   const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
   if (!role) return { admin: false as const, payments: [], spending: 0, total: 0, dailyLimit: 10 };
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
