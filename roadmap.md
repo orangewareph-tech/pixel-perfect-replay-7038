@@ -1,3 +1,8 @@
+# Guided creation flow
+- [ ] Separate upload, template, music/duration, confirmation/payment and video into five steps with sticky progress and Back actions.
+- [ ] Keep payment security, media controls and download/share features; remove public diagnostics navigation.
+- [ ] Verify step transitions, live totals, retained choices, and desktop/mobile layout.
+
 # Secure payment launch
 - [x] Protect customer generation with authenticated, single-use approved payment credits; direct unpaid calls reject before Fal submission.
 - [x] Add manual payment receipt submission and administrator review using the uploaded InstaPay QR and confirmed recipient.
