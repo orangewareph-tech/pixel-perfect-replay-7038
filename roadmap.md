@@ -1,3 +1,8 @@
+# Personalized Christmas messages
+- [ ] Add recipient and greeting fields with a template-matched AI message, editable result and copy action.
+- [ ] Keep private message choices across Back/sign-in and show the message at confirmation and completion without changing paid video rendering.
+- [ ] Verify authenticated AI generation, validation, errors and mobile layout.
+
 # Automatic included sound and free checks
 - [x] Remove customer music choices; automatic sound accompanies previews and embeds in saved videos at ₱149/₱299.
 - [x] Align new secure account payment pricing; live function verified, existing payment records unchanged.
