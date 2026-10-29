@@ -22,6 +22,7 @@
 - Keep music choices, pricing and validated per-duration audio paths in a browser-safe module; restore template/music preferences after hydration and let explicit search choices win.
 - Decode real song files before enabling music generation; missing audio must block the music checkout, because filenames are not playable tracks or license evidence.
 - Lazy-load the single-thread ffmpeg browser worker only for music downloads, use asset-hosted WASM, preserve source audio and return an actually muxed MP4; do not change cross-origin isolation headers or pre-cache the large core.
+- Preserve Vercel's asset-prefix rewrite to the published Lovable asset service, because relative asset pointers require that proxy when self-hosted.
 
 - Production builds run outside Lovable must keep emitting Vercel's Build Output
   API (the deploy preset in `vite.config.ts` plus `vercel.json`), because the site

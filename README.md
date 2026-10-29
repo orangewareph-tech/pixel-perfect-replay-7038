@@ -41,6 +41,24 @@ Cloudflare layout, and the Vercel target only applies to builds run outside it.
 
 ## Built with
 
+## Christmas music
+
+The five magic templates are available. No copyrighted song files or music
+licenses were supplied: the four song choices show their planned ₱20 upgrade
+and block generation until a real audio file can be decoded. Add commercially
+licensed files following `public/music/README.md`; the filename alone is not
+evidence of synchronization/distribution rights.
+
+Music downloads lazy-load single-thread ffmpeg.wasm and embed AAC sound in the
+MP4, honoring volume/loop settings and preserving any original audio. Large
+WASM is asset-hosted (not checked into the repository); the Vercel rewrite
+for `/__l5e/assets-v1/` keeps these pointer URLs working outside Lovable.
+If the published Lovable hostname changes, update that rewrite destination.
+
+The pinned `@ffmpeg/core` build is GPL-2.0-or-later. Source and build instructions:
+https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10 . Retain the license notice
+and review applicable redistribution obligations before distributing the core.
+
 
 - TanStack Start
 - TypeScript
