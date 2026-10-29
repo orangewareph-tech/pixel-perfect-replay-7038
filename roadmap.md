@@ -1,3 +1,8 @@
+# Enhanced Christmas templates
+- [x] Enrich all five existing template effects and duration pacing without changing identity, prices, payments or soundtrack.
+- [x] Test the shared customer/administrator payload: 37 relevant tests pass; build OK. Visual quality of new paid renders remains unverified without an approved payment or owner access.
+- [ ] Add MagicFam US templates — uploaded brief ends mid-prompt; complete US brief required.
+
 # Owner-only testing
 - [x] Provision only the verified Google owner administrator, enforce atomic three/hour and $10/day test reservations, and preserve customer payment security.
 - [x] Add owner badge, creation bypass, test history/budget, customer-view mode, free checks and isolated mock payments; five-at-once action disabled to respect three/hour.
