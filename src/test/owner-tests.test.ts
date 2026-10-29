@@ -22,3 +22,36 @@ it("owner ten-second reservations cost $0.70 and cannot exceed $10/day", () => {
   expect(canReserveOwnerTest([], 9.3, 10, 0)).toBe(true);
   expect(canReserveOwnerTest([], 9.31, 10, 0)).toBe(false);
 });
+
+it("lets a fresh admin start all five templates at once", () => {
+  const quota = adminTestQuota("orangewareph@gmail.com", []);
+  expect(quota).toEqual({ allowed: true, videosLeft: ADMIN_LIMITS.maxPerDay, costLeft: ADMIN_LIMITS.maxCostPerDay });
+});
+
+it("counts only today's admin renders against the daily video allowance", () => {
+  const yesterday = new Date(Date.now() - 2 * 86_400_000).toISOString();
+  const quota = adminTestQuota("orangewareph@gmail.com", [record(), record({ timestamp: yesterday })]);
+  expect(quota.videosLeft).toBe(ADMIN_LIMITS.maxPerDay - 1);
+  expect(quota.costLeft).toBe(Number((ADMIN_LIMITS.maxCostPerDay - ADMIN_LIMITS.costPer5s).toFixed(2)));
+});
+
+it("blocks the admin batch once the daily video allowance is used", () => {
+  const quota = adminTestQuota("orangewareph@gmail.com", Array.from({ length: ADMIN_LIMITS.maxPerDay }, () => record()));
+  expect(quota.allowed).toBe(false);
+  expect(quota.videosLeft).toBe(0);
+  expect(quota.reason).toBe(`Limit: ${ADMIN_LIMITS.maxPerDay} videos/day`);
+});
+
+it("blocks the admin batch once the daily spending cap is reached", () => {
+  const tenSecond = record({ cost: ADMIN_LIMITS.costPer10s, duration: 10 });
+  const quota = adminTestQuota("orangewareph@gmail.com", Array.from({ length: 14 }, () => tenSecond));
+  expect(quota.allowed).toBe(false);
+  expect(quota.costLeft).toBe(0);
+  expect(quota.reason).toBe(`Limit: $${ADMIN_LIMITS.maxCostPerDay}/day`);
+});
+
+it("gives non-admins no free renders", () => {
+  const quota = adminTestQuota("someone@gmail.com", []);
+  expect(quota.allowed).toBe(false);
+  expect(quota.videosLeft).toBe(0);
+});
