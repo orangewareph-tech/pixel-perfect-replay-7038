@@ -5,53 +5,10 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   vite: {
     optimizeDeps: { exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/core"] },
-    plugins: [
-      // PWA: generates /sw.js (generateSW) on build. Registration is handled
-      // solely by src/lib/pwa.ts, which refuses dev/preview contexts.
-      VitePWA({
-        registerType: "autoUpdate",
-        injectRegister: null,
-        filename: "sw.js",
-        // TanStack Start serves statics from the client build dir, which is
-        // dist/client for the Lovable/Cloudflare target and .vercel/output/static
-        // for self-hosted Vercel builds. The plugin otherwise writes sw.js to
-        // the dist root where it is never served.
-        outDir:
-          process.env["LOVABLE_SANDBOX"] || process.env["DEV_SERVER__PROJECT_PATH"]
-            ? "dist/client"
-            : ".vercel/output/static",
-        manifest: false, // we serve our own public/manifest.webmanifest
-        devOptions: { enabled: false },
-        workbox: {
-          globIgnores: ["**/ffmpeg/**", "**/music/**"],
-          // SSR app: no static index.html exists, so offline navigations land
-          // on the pre-cached offline page instead.
-          navigateFallback: "/offline.html",
-          navigateFallbackDenylist: [/^\/~oauth/],
-          runtimeCaching: [
-            {
-              // Fal.ai video queue: never cache, always hit the network.
-              urlPattern: /^https:\/\/queue\.fal\.run\/.*/i,
-              handler: "NetworkOnly",
-            },
-            {
-              // Same-origin hashed build assets are immutable.
-              urlPattern: /\/assets\/.*/i,
-              handler: "CacheFirst",
-              options: {
-                cacheName: "magicph-assets",
-                expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              },
-            },
-          ],
-        },
-      }),
-    ],
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).

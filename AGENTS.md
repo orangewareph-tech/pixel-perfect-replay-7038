@@ -32,4 +32,5 @@
 
 
 ## PWA
-- PWA uses vite-plugin-pwa (generateSW, /sw.js); registration only via src/lib/pwa.ts, which refuses dev and Lovable preview hostnames, because a cached app shell in preview would serve stale code. sw.js outDir is dist/client for Lovable builds and .vercel/output/static for Vercel builds.
+- PWA is manifest-only during offline recovery; keep public/sw.js as a same-path kill-switch release to retire the old Workbox navigation fallback, delete only its scoped Workbox caches and magicph-assets, and leave messaging workers/caches alone. Never register a new app-shell worker during this release; src/lib/pwa.ts only updates existing /sw.js registrations so cleanup can activate.
+- Use the hydration-safe shared online-status hook for non-blocking connection warnings and generation guards, never to replace the route or discard in-progress photo choices.
