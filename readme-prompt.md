@@ -1,140 +1,172 @@
 # MagicPh AI — Template Prompts
 
-Model: `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` (5s ≈ $0.35, 10s ≈ $0.70).
+Model: `fal-ai/kling-video/v2.5-turbo/pro/image-to-video`. Existing 5s/10s offers and provider are unchanged; this is a wording update, not a switch to Omni or forced portrait output.
 
-This file is generated from the live code — `src/lib/site.ts`, `src/lib/video-movement.ts` and
-`src/lib/video-duration.ts` — so every string below is exactly what the app sends.
-
-## Structure
-
-Final prompt = **5s/10s pacing** + **template scene (realistic motion that fits it)** + **movement level** (slider, default
-extreme) + **Christmas music line (always added)** + **camera rule** + **identity rules**. The negative prompt is sent separately.
-
-Scenes carry no speed words at all. Only the movement slider sets speed, so Low really does look
-gentle and Extreme looks highly dynamic but still realistic. Camera shake is always blocked; fast zoom and orbiting
-are only allowed at High/Extreme.
+All templates share the continuous Filipino village story and customer-photo identity safeguards. Template effects remain distinct. One camera glide at every movement level; no cuts, crossfades, vehicles or extra people. Christmas music and the Merry Christmas greeting remain added by the existing preview/download process, not generated lettering. These are model instructions, not guarantees of face preservation or visual quality.
 
 ## Base scenes
 
-
 ### Parol Star Magic (`parol`)
+
 ```text
-20+ colorful Filipino parol star lanterns in red, yellow, blue and green gently floating and swaying naturally like hanging lanterns in a breeze at a safe distance, each parol slowly pulsing with warm golden light, golden star dust drifting and twinkling like fireflies around the outer edges, fairy lights twinkling naturally, family smiling with subtle natural breathing movement, Noche Buena steam rising naturally, soft bokeh blinking, warm lens flare drifting slowly.
+Parol-led village story: colorful Filipino parol star lanterns sway above the family, warm light pulses through capiz windows, golden star dust twinkles clear of faces. The final big glowing parol is the visual centerpiece; lantern reflections and sparkling snow surround the Noche Buena table.
 ```
 
 ### Snowfall Magic (`snow`)
+
 ```text
-Heavy layered snowfall falling naturally with gravity in the foreground and background, clear of faces, snowflakes spinning gently, sparkling and settling lightly on shoulders, breath vapor puffs rising and dissipating naturally below faces in cold air, soft Filipino parol-light bokeh glowing, foreground snow drifting past the camera with gentle parallax, person shivering slightly with natural cold movement, hair and clothes moving slightly in the wind, realistic snow textures with a luminous glow.
+Snow-led village story: heavy layered sparkling snowfall falls with gravity through the foreground and background, snowflakes settle on shoulders without covering faces, breath vapor dissipates below mouths. The family marvels at the snow; banana and coconut palms catch snow around the warm parol-lit Noche Buena table.
 ```
 
 ### Fairy Lights Magic (`bokeh`)
+
 ```text
-Warm golden Pinoy Christmas village fairy lights floating and dancing naturally like fireflies around the family, leaving soft delicate light trails, thousands of lights wrapping and unwrapping while twinkling to a Christmas beat, lights gathering into a heart-shaped halo pulsing warmly and Filipino parol star shapes forming behind the family, continually reforming, fine fairy dust floating naturally, soft golden-hour reflections moving in the eyes, bokeh adding gentle parallax.
+Fairy-light-led village story: warm golden fairy lights dance like fireflies around the family without covering faces, delicate light trails form a heart behind them, parol star shapes twinkle above capiz windows. Soft bokeh and sparkling snow lead toward a luminous heart of lights above the Noche Buena table.
 ```
 
 ### Santa Village Magic (`globe`)
+
 ```text
-A soft Filipino parol portal glow reveals a detailed storybook Pinoy Santa Village behind the unchanged family: Santa in a barong Tagalog waving and walking slowly toward the family beside a warmly lit toy workshop decorated with parols, tiny elves in barong walking, waving and carrying gifts, a toy train carrying gifts along a background track, reindeer turning their heads and walking with glowing noses, chimney smoke rising over parol-lit houses as gentle snow falls, a distant parol-decorated sleigh flying across the sky trailing stars, background parallax staying animated.
+Santa-led village story: exactly one jolly Santa Claus in a festive barong sways beside P1 without touching, while exactly one snowman in a woven salakot waves his stick arms. Parols light the bahay kubo and sari-sari store, sparkling snow drifts over palms, and Santa joins the family beside the Noche Buena table.
 ```
 
 ### Fireplace Noche Buena Magic (`fire`)
+
 ```text
-A cozy Filipino Noche Buena setting glows behind the family: a table with lechon, ham, queso de bola, bibingka, puto bumbong, Pinoy spaghetti, lumpia and pancit, realistic fireplace flames dancing and crackling while bright embers swirl and rise safely inside the hearth, food steam rising from the lechon and bibingka, parol-decorated stockings swaying in warm air, a Christmas tree with gifts, parols and twinkling fairy lights, gift ribbons fluttering subtly, warm firelight casting flickering shadows on faces, family smiling with natural breathing and a slight head nod, nostalgic Filipino family warmth.
+Noche Buena-led village story: a safely enclosed fireplace beside the covered bahay kubo veranda has realistic dancing flames and rising embers; warm firelight illuminates the family. Food steam rises from a whole lechon, bibingka and puto bumbong, with queso de bola and pancit on the table, glowing parols above and sparkling snow outside.
 ```
 
 ## Movement levels
 
-Only one of these is inserted, chosen by the slider. Default: **extreme**.
+Default: Extreme. Strength scales effects while human actions stay gentle.
 
+- **low**: Low movement: gentle slow realistic movement, subtle swaying and soft twinkling; a gentle continuous camera glide with slight parallax.
 
-- **low**: Low movement: gentle slow realistic movement, subtle natural floating and swaying, soft twinkling, slow camera push with slight parallax, calm peaceful Christmas atmosphere, minimal motion.
+- **medium**: Medium movement: moderate floating, pulsing and drifting effects; a gentle continuous camera glide with natural parallax.
 
-- **medium**: Medium movement: moderate realistic movement, natural floating and pulsing, gentle swirling and drifting, soft twinkling, moderate parallax dolly, warm joyful movement.
+- **high**: High movement: lively sparkling, floating and pulsing effects; one continuous camera glide with stronger parallax. Keep human actions gentle.
 
-- **high**: High movement: energetic realistic movement, dynamic floating, dancing and pulsing that fits the template, lively swirling, bright twinkling, strong parallax, dolly with gentle zoom in and out, festive energy.
+- **extreme**: Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic.
 
-- **extreme**: Extreme movement: highly dynamic realistic movement that fits the template, effects floating, pulsing, swirling and dancing energetically, characters and particles in continuous motion, fast camera dolly through the scene with parallax, gentle zoom in and out and a smooth slow orbit, high-motion continuous viral TikTok energy with no static moments, still realistic and fitting.
-
-
-## Christmas music (added to every prompt)
+## Music direction
 
 ```text
 Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm.
 ```
 
-Kling renders video only, so this mainly makes motion follow a musical rhythm; the app's own soundtrack is still added to downloads.
+The existing soundtrack is embedded separately; the prompt does not guarantee generated sound.
 
-## Full examples
+## Complete prompts (Extreme)
 
+### Parol Star Magic — 5s
 
-### 10s, Low — Parol Star Magic
-
-**Prompt** (1489 chars)
 ```text
-A 10 second cinematic Christmas video in one continuous shot that builds gently from start to finish. Use the uploaded photo as the starting frame and animate the existing scene; do not replace the people or create a new image. 20+ colorful Filipino parol star lanterns in red, yellow, blue and green gently floating and swaying naturally like hanging lanterns in a breeze at a safe distance, each parol slowly pulsing with warm golden light, golden star dust drifting and twinkling like fireflies around the outer edges, fairy lights twinkling naturally, family smiling with subtle natural breathing movement, Noche Buena steam rising naturally, soft bokeh blinking, warm lens flare drifting slowly. Low movement: gentle slow realistic movement, subtle natural floating and swaying, soft twinkling, slow camera push with slight parallax, calm peaceful Christmas atmosphere, minimal motion. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. One primary animation with subtle secondary effects. Steady camera: no orbiting, rapid zooming or camera shake. Natural movement, realistic lighting, smooth animation. Preserve the original people, faces, identity, skin tone, hairstyle, clothing and body proportions. Keep faces unobstructed and the family recognizable. No cuts, no text or logos.
+A 5 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Parol-led village story: colorful Filipino parol star lanterns sway above the family, warm light pulses through capiz windows, golden star dust twinkles clear of faces. The final big glowing parol is the visual centerpiece; lantern reflections and sparkling snow surround the Noche Buena table. 0–2s: whole family marvels at sparkling snow beside the bahay kubo, Santa and snowman already visible. 2–4s: Santa sways beside P1, snowman waves; family stays together. 4–5s: everyone waves under a glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 5 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
 ```
 
-**Negative prompt**
+### Parol Star Magic — 10s
+
 ```text
-blurred faces, face change, different faces, distorted faces, face morphing, body distortion, changed ethnicity, outfit transformation, extra limbs, warped hands, extra foreground people, obscured faces, scary, horror, dark, low quality, blurry, deformed, cartoon, excessive particles, unnatural motion, flickering, strobing lights, abrupt scene changes, hard cuts, camera shake, camera rotation, orbiting, rapid zoom, text, logo, watermark
+A 10 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Parol-led village story: colorful Filipino parol star lanterns sway above the family, warm light pulses through capiz windows, golden star dust twinkles clear of faces. The final big glowing parol is the visual centerpiece; lantern reflections and sparkling snow surround the Noche Buena table. 0–2s: whole family at an open bahay kubo window marveling at snow, Santa and snowman visible outside. 2–4s: family steps outside together; toddlers, if present, reach for snowflakes. 4–6s: Santa and P1 sway and turn independently. 6–8s: snowman hops and waves beside P2, if present, who copies without touching. 8–10s: everyone waves under a big glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 10 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
 ```
 
-### 10s, Extreme — Snowfall Magic
+### Snowfall Magic — 5s
 
-**Prompt** (1722 chars)
 ```text
-A 10 second cinematic Christmas video in one continuous shot that builds gently from start to finish. Use the uploaded photo as the starting frame and animate the existing scene; do not replace the people or create a new image. Heavy layered snowfall falling naturally with gravity in the foreground and background, clear of faces, snowflakes spinning gently, sparkling and settling lightly on shoulders, breath vapor puffs rising and dissipating naturally below faces in cold air, soft Filipino parol-light bokeh glowing, foreground snow drifting past the camera with gentle parallax, person shivering slightly with natural cold movement, hair and clothes moving slightly in the wind, realistic snow textures with a luminous glow. Extreme movement: highly dynamic realistic movement that fits the template, effects floating, pulsing, swirling and dancing energetically, characters and particles in continuous motion, fast camera dolly through the scene with parallax, gentle zoom in and out and a smooth slow orbit, high-motion continuous viral TikTok energy with no static moments, still realistic and fitting. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. One primary animation with subtle secondary effects. Smooth stabilized camera: zoom and orbit allowed, never camera shake. Natural movement, realistic lighting, smooth animation. Preserve the original people, faces, identity, skin tone, hairstyle, clothing and body proportions. Keep faces unobstructed and the family recognizable. No cuts, no text or logos.
+A 5 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Snow-led village story: heavy layered sparkling snowfall falls with gravity through the foreground and background, snowflakes settle on shoulders without covering faces, breath vapor dissipates below mouths. The family marvels at the snow; banana and coconut palms catch snow around the warm parol-lit Noche Buena table. 0–2s: whole family marvels at sparkling snow beside the bahay kubo, Santa and snowman already visible. 2–4s: Santa sways beside P1, snowman waves; family stays together. 4–5s: everyone waves under a glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 5 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
 ```
 
-**Negative prompt**
+### Snowfall Magic — 10s
+
 ```text
-blurred faces, face change, different faces, distorted faces, face morphing, body distortion, changed ethnicity, outfit transformation, extra limbs, warped hands, extra foreground people, obscured faces, scary, horror, dark, low quality, blurry, deformed, cartoon, excessive particles, unnatural motion, flickering, strobing lights, abrupt scene changes, hard cuts, camera shake, text, logo, watermark
+A 10 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Snow-led village story: heavy layered sparkling snowfall falls with gravity through the foreground and background, snowflakes settle on shoulders without covering faces, breath vapor dissipates below mouths. The family marvels at the snow; banana and coconut palms catch snow around the warm parol-lit Noche Buena table. 0–2s: whole family at an open bahay kubo window marveling at snow, Santa and snowman visible outside. 2–4s: family steps outside together; toddlers, if present, reach for snowflakes. 4–6s: Santa and P1 sway and turn independently. 6–8s: snowman hops and waves beside P2, if present, who copies without touching. 8–10s: everyone waves under a big glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 10 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
+```
+
+### Fairy Lights Magic — 5s
+
+```text
+A 5 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Fairy-light-led village story: warm golden fairy lights dance like fireflies around the family without covering faces, delicate light trails form a heart behind them, parol star shapes twinkle above capiz windows. Soft bokeh and sparkling snow lead toward a luminous heart of lights above the Noche Buena table. 0–2s: whole family marvels at sparkling snow beside the bahay kubo, Santa and snowman already visible. 2–4s: Santa sways beside P1, snowman waves; family stays together. 4–5s: everyone waves under a glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 5 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
+```
+
+### Fairy Lights Magic — 10s
+
+```text
+A 10 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Fairy-light-led village story: warm golden fairy lights dance like fireflies around the family without covering faces, delicate light trails form a heart behind them, parol star shapes twinkle above capiz windows. Soft bokeh and sparkling snow lead toward a luminous heart of lights above the Noche Buena table. 0–2s: whole family at an open bahay kubo window marveling at snow, Santa and snowman visible outside. 2–4s: family steps outside together; toddlers, if present, reach for snowflakes. 4–6s: Santa and P1 sway and turn independently. 6–8s: snowman hops and waves beside P2, if present, who copies without touching. 8–10s: everyone waves under a big glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 10 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
+```
+
+### Santa Village Magic — 5s
+
+```text
+A 5 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Santa-led village story: exactly one jolly Santa Claus in a festive barong sways beside P1 without touching, while exactly one snowman in a woven salakot waves his stick arms. Parols light the bahay kubo and sari-sari store, sparkling snow drifts over palms, and Santa joins the family beside the Noche Buena table. 0–2s: whole family marvels at sparkling snow beside the bahay kubo, Santa and snowman already visible. 2–4s: Santa sways beside P1, snowman waves; family stays together. 4–5s: everyone waves under a glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 5 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
+```
+
+### Santa Village Magic — 10s
+
+```text
+A 10 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Santa-led village story: exactly one jolly Santa Claus in a festive barong sways beside P1 without touching, while exactly one snowman in a woven salakot waves his stick arms. Parols light the bahay kubo and sari-sari store, sparkling snow drifts over palms, and Santa joins the family beside the Noche Buena table. 0–2s: whole family at an open bahay kubo window marveling at snow, Santa and snowman visible outside. 2–4s: family steps outside together; toddlers, if present, reach for snowflakes. 4–6s: Santa and P1 sway and turn independently. 6–8s: snowman hops and waves beside P2, if present, who copies without touching. 8–10s: everyone waves under a big glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 10 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
+```
+
+### Fireplace Noche Buena Magic — 5s
+
+```text
+A 5 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Noche Buena-led village story: a safely enclosed fireplace beside the covered bahay kubo veranda has realistic dancing flames and rising embers; warm firelight illuminates the family. Food steam rises from a whole lechon, bibingka and puto bumbong, with queso de bola and pancit on the table, glowing parols above and sparkling snow outside. 0–2s: whole family marvels at sparkling snow beside the bahay kubo, Santa and snowman already visible. 2–4s: Santa sways beside P1, snowman waves; family stays together. 4–5s: everyone waves under a glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 5 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
+```
+
+### Fireplace Noche Buena Magic — 10s
+
+```text
+A 10 second photorealistic Filipino Christmas video, ONE continuous camera glide, no cuts or crossfades. Use the uploaded photo as the first frame and only customer identity reference. Label its people P1, P2 and so on left to right. Exactly those family members remain visible from first to last frame; never invent a fictional family. Preserve each person's face geometry, eyes, nose, mouth, skin tone, hair, apparent age, clothing and body proportions, including babies. Never blend, merge, swap, duplicate or beautify identities; never copy a family face onto another figure. Keep faces unobstructed and recognizable. A snowy Philippine bahay kubo village with capiz windows, banana and coconut palms, a sari-sari store and glowing parols. No vehicles anywhere. Only the uploaded family, exactly one jolly Santa Claus and exactly one snowman in a woven salakot; no neighbors, crowds or other figures. Noche Buena-led village story: a safely enclosed fireplace beside the covered bahay kubo veranda has realistic dancing flames and rising embers; warm firelight illuminates the family. Food steam rises from a whole lechon, bibingka and puto bumbong, with queso de bola and pancit on the table, glowing parols above and sparkling snow outside. 0–2s: whole family at an open bahay kubo window marveling at snow, Santa and snowman visible outside. 2–4s: family steps outside together; toddlers, if present, reach for snowflakes. 4–6s: Santa and P1 sway and turn independently. 6–8s: snowman hops and waves beside P2, if present, who copies without touching. 8–10s: everyone waves under a big glowing parol beside a Noche Buena table with a whole lechon; hold the final group shot. Extreme movement: richly animated continuous snowfall, lights and particles; one continuous camera glide with pronounced parallax. Keep sways, turns and hops gentle, faces clear and bodies realistic. No orbiting, rapid zooming or camera shake. Gentle safe ground-level action; no clapping, hand-holding, hugging or touching, no face-obscuring motion blur. Hands relaxed, never in close-up. Accompanied by joyful Filipino Christmas music, a cheerful Pasko sa Nayon melody with jingle bells, warm festive carols, cozy Noche Buena celebration music and a soft Christmas choir with bells ringing; motion and twinkling follow the musical rhythm. End cleanly at 10 seconds. No generated text, brand names or logos; the app adds the Merry Christmas greeting afterward.
+```
+
+## Negative prompt (all levels)
+
+```text
+blurred faces, face change, different faces, distorted faces, face morphing, face swapping, merged baby, duplicated people, extra children, background people, crowds, vehicles, body distortion, changed ethnicity, outfit transformation, extra limbs, warped hands, obscured faces, hand-holding, hugging, touching, clapping, unsafe action, scary, horror, low quality, blurry, deformed, cartoon, unnatural motion, flickering, strobing lights, abrupt scene changes, hard cuts, crossfades, camera shake, camera rotation, orbiting, rapid zoom, text, logo, watermark
 ```
 
 ## Prompt lengths
 
-Every template / duration / movement combination stays under the 2500-character model ceiling.
-Longest observed: **1828** chars.
+Longest: **2443** characters (model ceiling: 2500).
 
-| Template | Length | Movement | Chars |
+| Template | Duration | Movement | Characters |
 | --- | --- | --- | --- |
-| parol | 5s | low | 1448 |
-| parol | 5s | medium | 1427 |
-| parol | 5s | high | 1479 |
-| parol | 5s | extreme | 1650 |
-| parol | 10s | low | 1489 |
-| parol | 10s | medium | 1468 |
-| parol | 10s | high | 1520 |
-| parol | 10s | extreme | 1691 |
-| snow | 5s | low | 1479 |
-| snow | 5s | medium | 1458 |
-| snow | 5s | high | 1510 |
-| snow | 5s | extreme | 1681 |
-| snow | 10s | low | 1520 |
-| snow | 10s | medium | 1499 |
-| snow | 10s | high | 1551 |
-| snow | 10s | extreme | 1722 |
-| bokeh | 5s | low | 1459 |
-| bokeh | 5s | medium | 1438 |
-| bokeh | 5s | high | 1490 |
-| bokeh | 5s | extreme | 1661 |
-| bokeh | 10s | low | 1500 |
-| bokeh | 10s | medium | 1479 |
-| bokeh | 10s | high | 1531 |
-| bokeh | 10s | extreme | 1702 |
-| globe | 5s | low | 1558 |
-| globe | 5s | medium | 1537 |
-| globe | 5s | high | 1589 |
-| globe | 5s | extreme | 1760 |
-| globe | 10s | low | 1599 |
-| globe | 10s | medium | 1578 |
-| globe | 10s | high | 1630 |
-| globe | 10s | extreme | 1801 |
-| fire | 5s | low | 1585 |
-| fire | 5s | medium | 1564 |
-| fire | 5s | high | 1616 |
-| fire | 5s | extreme | 1787 |
-| fire | 10s | low | 1626 |
-| fire | 10s | medium | 1605 |
-| fire | 10s | high | 1657 |
-| fire | 10s | extreme | 1828 |
+| parol | 5s | low | 2183 |
+| parol | 5s | medium | 2169 |
+| parol | 5s | high | 2189 |
+| parol | 5s | extreme | 2247 |
+| parol | 10s | low | 2332 |
+| parol | 10s | medium | 2318 |
+| parol | 10s | high | 2338 |
+| parol | 10s | extreme | 2396 |
+| snow | 5s | low | 2209 |
+| snow | 5s | medium | 2195 |
+| snow | 5s | high | 2215 |
+| snow | 5s | extreme | 2273 |
+| snow | 10s | low | 2358 |
+| snow | 10s | medium | 2344 |
+| snow | 10s | high | 2364 |
+| snow | 10s | extreme | 2422 |
+| bokeh | 5s | low | 2200 |
+| bokeh | 5s | medium | 2186 |
+| bokeh | 5s | high | 2206 |
+| bokeh | 5s | extreme | 2264 |
+| bokeh | 10s | low | 2349 |
+| bokeh | 10s | medium | 2335 |
+| bokeh | 10s | high | 2355 |
+| bokeh | 10s | extreme | 2413 |
+| globe | 5s | low | 2204 |
+| globe | 5s | medium | 2190 |
+| globe | 5s | high | 2210 |
+| globe | 5s | extreme | 2268 |
+| globe | 10s | low | 2353 |
+| globe | 10s | medium | 2339 |
+| globe | 10s | high | 2359 |
+| globe | 10s | extreme | 2417 |
+| fire | 5s | low | 2230 |
+| fire | 5s | medium | 2216 |
+| fire | 5s | high | 2236 |
+| fire | 5s | extreme | 2294 |
+| fire | 10s | low | 2379 |
+| fire | 10s | medium | 2365 |
+| fire | 10s | high | 2385 |
+| fire | 10s | extreme | 2443 |

@@ -1,3 +1,5 @@
+# Village-story prompt update
+- [x] Adapt all five templates to the supplied continuous village story with customer identity safeguards, gentle camera movement and existing music/greeting; refresh prompt documentation. All 13 template checks pass, longest prompt 2443 characters, build OK. Actual app render quality remains unverified; no paid generation submitted.
 # Five templates with movement control
 - [ ] Hide three extra templates; add Low/Medium/High/Extreme movement, default Extreme, shared customer/owner render prompts and draft preservation.
 - [ ] Verify five-template UI, motion payloads, included pricing, and regressions. Paid five-video review must respect three starts/hour and verified owner access.
