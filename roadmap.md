@@ -1,3 +1,5 @@
+# Village-story prompt update
+- [ ] Adapt all five templates to the supplied continuous village story, preserve customer identities, align safe movement and refresh prompt documentation/tests.
 # Five templates with movement control
 - [ ] Hide three extra templates; add Low/Medium/High/Extreme movement, default Extreme, shared customer/owner render prompts and draft preservation.
 - [ ] Verify five-template UI, motion payloads, included pricing, and regressions. Paid five-video review must respect three starts/hour and verified owner access.
