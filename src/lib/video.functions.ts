@@ -65,7 +65,8 @@ export const downloadVideo = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: order } = await context.supabase.from("video_payments").select("id").eq("user_id", context.userId).eq("video_url", data.videoUrl).eq("status", "COMPLETED").maybeSingle();
     const { data: test } = order ? { data: null } : await context.supabase.from("fal_test_runs").select("id").eq("user_id", context.userId).eq("video_url", data.videoUrl).eq("status", "COMPLETED").maybeSingle();
-    if (!order && !test) throw new Error("Your completed video was not found");
+    const { data: adminTest } = order || test ? { data: null } : await context.supabase.from("video_provider_jobs").select("id").eq("user_id", context.userId).eq("video_url", data.videoUrl).eq("status", "COMPLETED").maybeSingle();
+    if (!order && !test && !adminTest) throw new Error("Your completed video was not found");
     safeVideoUrl(data.videoUrl);
     const chunkSize = 3 * 1024 * 1024;
     const res = await fetch(data.videoUrl, { redirect: "error", signal: AbortSignal.timeout(30000), headers: { Range: `bytes=${data.offset}-${data.offset + chunkSize - 1}` } });

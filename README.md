@@ -21,7 +21,7 @@ All eight template images are generated examples, not customer results. The five
 - TanStack Start / TanStack Router, React 19, TypeScript
 - Tailwind CSS v4 and shared UI components
 - Lovable Cloud for accounts, private receipts, and payment records
-- Fal.ai for video generation
+- Free.ai REST API for image-to-video generation (API tokens required; free website videos do not include API video access).
 - Lovable AI Gateway through the Vercel AI SDK for personalized captions
 - Single-thread ffmpeg.wasm for browser-side music embedding
 - Vitest for automated tests
@@ -55,12 +55,14 @@ Keep secrets in Lovable’s secret settings or the hosting provider’s server e
 
 | Setting | Purpose |
 | --- | --- |
-| `FAL_KEY` | Server-side video generation credential; `FAL_API_KEY` remains a legacy fallback. |
+| `FREE_AI_API_KEY` | Server-only Free.ai Bearer credential for upload, generation and polling. |
 | `LOVABLE_API_KEY` | Server-side AI Gateway credential, provisioned through Lovable. |
 | `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` | Generated public connection settings for the Lovable Cloud browser client. |
 | `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` | Server connection settings where required by the generated Cloud integration. |
 
-The generated Cloud server client handles privileged operations. Its managed service credential is **not available for manual export from Lovable Cloud**; do not fabricate a replacement or expose it to browsers. Self-hosting must verify that authenticated and privileged Cloud operations are supported in the target environment. Setting only `FAL_KEY` is not enough for the complete application.
+The generated Cloud server client handles privileged operations. Its managed service credential is **not available for manual export from Lovable Cloud**; do not fabricate a replacement or expose it to browsers. Self-hosting must verify that authenticated and privileged Cloud operations are supported in the target environment. Setting only `FREE_AI_API_KEY` is not enough for the complete application.
+
+Free.ai transport is in `src/lib/free-ai.server.ts`; customer calls are in `video.functions.ts`, owner checks in `video-audit.functions.ts`, and administrator tests in `admin-dashboard.functions.ts`. TanStack authenticated server functions replace the requested Edge Function because this application uses TanStack Start. Polling uses documented `/v1/status/{job_id}/`, not the unavailable video-specific path. UI model aliases map to the advertised provider IDs. Only five-second offers can currently generate; ten-second credits and historical prompts remain preserved without silently shortening them. Dummy checks returned upload `401/signup_required` and video `429/not_in_tier`; a successful provider render remains unverified.
 
 Do not edit generated Cloud clients, auth middleware, connection files, or generated types manually. Apply schema changes using the project’s managed migration workflow.
 

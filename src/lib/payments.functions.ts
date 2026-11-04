@@ -35,15 +35,16 @@ export const adminPaymentReport = createServerFn({ method: "GET" }).middleware([
   if (!role) return { admin: false as const, payments: [], spending: 0, total: 0, dailyLimit: 10 };
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const today = new Date(); today.setUTCHours(0, 0, 0, 0);
-  const [rows, spend, tests, count, settings] = await Promise.all([
+  const [rows, spend, tests, count, settings, providerTests] = await Promise.all([
     supabaseAdmin.from("video_payments").select("*").order("created_at", { ascending: false }).limit(100),
     supabaseAdmin.from("video_payments").select("cost_usd").gte("started_at", today.toISOString()),
     supabaseAdmin.from("fal_test_runs").select("duration").gte("started_at", today.toISOString()),
     supabaseAdmin.from("video_payments").select("id", { count: "exact", head: true }).not("started_at", "is", null),
     supabaseAdmin.from("video_launch_settings").select("daily_limit").eq("id", true).maybeSingle(),
+    supabaseAdmin.from("video_provider_jobs").select("reserved_usd").gte("started_at", today.toISOString()),
   ]);
-  if (rows.error || spend.error || tests.error || count.error || settings.error) throw new Error("Could not load administrator records");
-  return { admin: true as const, payments: rows.data ?? [], spending: (spend.data ?? []).reduce((sum, row) => sum + row.cost_usd, 0) + (tests.data ?? []).reduce((sum, row) => sum + (row.duration === 5 ? 0.35 : 0.70), 0), total: count.count ?? 0, dailyLimit: settings.data?.daily_limit ?? 10 };
+  if (rows.error || spend.error || tests.error || count.error || settings.error || providerTests.error) throw new Error("Could not load administrator records");
+  return { admin: true as const, payments: rows.data ?? [], spending: (spend.data ?? []).reduce((sum, row) => sum + row.cost_usd, 0) + (tests.data ?? []).reduce((sum, row) => sum + (row.duration === 5 ? 0.35 : 0.70), 0) + (providerTests.data ?? []).reduce((sum, row) => sum + row.reserved_usd, 0), total: count.count ?? 0, dailyLimit: settings.data?.daily_limit ?? 10 };
 });
 
 export const updateDailyLimit = createServerFn({ method: "POST" }).middleware([requireGoogleAuth]).inputValidator((input) => z.object({ limit: z.number().min(0.35).max(100) }).parse(input)).handler(async ({ context, data }) => {

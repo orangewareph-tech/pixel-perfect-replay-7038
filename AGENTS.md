@@ -50,5 +50,5 @@
 - Use the hydration-safe shared online-status hook for non-blocking connection warnings and generation guards, never to replace the route or discard in-progress photo choices.
 - The /admin-dashboard free tests authorize via the server-verified Google email in ADMIN_EMAILS and keep history in browser storage only; never add client-side bypass codes or browser-exposed video-provider keys, because either would let anyone spend provider credits.
 
-- Route all image-to-video upload, submission and polling through free-ai.server.ts using server-only FREE_AI_API_KEY; authenticated TanStack server functions preserve payment ownership and reservations. Validate model aliases and reject unsupported durations before upload/claim; use the documented generic status endpoint, never silently truncate paid videos.
-- Keep legacy audit table names and budget amounts for historical compatibility, labeling them as reservations rather than current provider pricing; new dashboard jobs are server-reserved and owner-scoped so browser history cannot authorize spending or job access.
+- Use free-ai.server.ts with server-only FREE_AI_API_KEY and authenticated RPCs; validate models/durations before claims and use generic status polling. Never truncate paid videos.
+- Preserve legacy audit tables/budgets as historical reservations, not provider prices; server-reserve and owner-scope dashboard jobs because browser history cannot authorize spending or access.
