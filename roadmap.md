@@ -1,3 +1,6 @@
+# Free.ai replacement
+- [ ] Replace all active Fal.ai customer/admin submission, polling and diagnostics with server-only Free.ai upload/generation/status calls, preserving ownership and approved-payment reservations.
+- [ ] Verify documented free models/durations, safely configure FREE_AI_API_KEY, remove the old credential, show a source diff, and test a dummy image.
 # Village-story prompt update
 - [x] Adapt all five templates to the supplied continuous village story with customer identity safeguards, gentle camera movement and existing music/greeting; refresh prompt documentation. All 13 template checks pass, longest prompt 2443 characters, build OK. Actual app render quality remains unverified; no paid generation submitted.
 # Five templates with movement control
