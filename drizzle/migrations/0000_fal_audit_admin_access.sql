@@ -1,14 +1,25 @@
-CREATE TYPE public.app_role AS ENUM ('admin', 'user');
-CREATE TABLE public.user_roles (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, role public.app_role NOT NULL, UNIQUE(user_id, role));
-GRANT SELECT ON public.user_roles TO authenticated;
-GRANT ALL ON public.user_roles TO service_role;
-ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY read_own_role ON public.user_roles FOR SELECT TO authenticated USING (user_id = auth.uid());
-CREATE TABLE public.fal_test_runs (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, duration integer NOT NULL CHECK (duration IN (5,10)), request_id text UNIQUE, status text NOT NULL DEFAULT 'SUBMITTING', video_url text, error text, started_at timestamptz NOT NULL DEFAULT now(), finished_at timestamptz);
-GRANT SELECT, INSERT, UPDATE ON public.fal_test_runs TO authenticated;
-GRANT ALL ON public.fal_test_runs TO service_role;
-ALTER TABLE public.fal_test_runs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY admin_test_read ON public.fal_test_runs FOR SELECT TO authenticated USING (user_id = auth.uid() AND EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin'));
-CREATE POLICY admin_test_insert ON public.fal_test_runs FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid() AND EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin'));
-CREATE POLICY admin_test_update ON public.fal_test_runs FOR UPDATE TO authenticated USING (user_id = auth.uid() AND EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')) WITH CHECK (user_id = auth.uid());
-CREATE UNIQUE INDEX one_active_fal_test_per_user ON public.fal_test_runs(user_id) WHERE status IN ('SUBMITTING','IN_QUEUE','IN_PROGRESS');
+-- Rename the table to reflect the new provider (optional but recommended)
+ALTER TABLE public.fal_test_runs RENAME TO freeai_test_runs;
+ALTER INDEX one_active_fal_test_per_user RENAME TO one_active_freeai_test_per_user;
+ALTER POLICY admin_test_read   ON public.freeai_test_runs RENAME TO admin_test_read;
+ALTER POLICY admin_test_insert ON public.freeai_test_runs RENAME TO admin_test_insert;
+ALTER POLICY admin_test_update ON public.freeai_test_runs RENAME TO admin_test_update;
+
+-- status: add terminal states + Free.ai's documented status shape
+ALTER TABLE public.freeai_test_runs
+  DROP CONSTRAINT IF EXISTS freeai_test_runs_status_check;
+ALTER TABLE public.freeai_test_runs
+  ADD CONSTRAINT freeai_test_runs_status_check
+  CHECK (status IN ('SUBMITTING','PENDING','IN_PROGRESS','COMPLETED','FAILED','CANCELED'));
+
+-- Free.ai returns video_url; keep error / finished_at. Optionally add:
+ALTER TABLE public.freeai_test_runs
+  ADD COLUMN IF NOT EXISTS model text,
+  ADD COLUMN IF NOT EXISTS tokens_used integer,
+  ADD COLUMN IF NOT EXISTS free_ai_usage jsonb;
+
+-- Keep the partial unique index but update status set to match new states
+DROP INDEX IF EXISTS public.one_active_freeai_test_per_user;
+CREATE UNIQUE INDEX one_active_freeai_test_per_user
+  ON public.freeai_test_runs(user_id)
+  WHERE status IN ('SUBMITTING','PENDING','IN_PROGRESS');
