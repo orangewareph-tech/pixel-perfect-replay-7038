@@ -5,6 +5,7 @@ import { authReturnPath } from "@/lib/google-auth";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/callback")({
+  head: () => ({ meta: [{ title: "Completing Google Sign-in — MagicPh AI" }, { name: "description", content: "Complete your secure Google sign-in to MagicPh AI." }, { property: "og:title", content: "MagicPh AI Google Sign-in Callback" }, { property: "og:description", content: "Securely returning to your Christmas video account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: AuthCallback,
 });
 

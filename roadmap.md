@@ -1,6 +1,7 @@
 # Free.ai replacement
-- [ ] Replace all active Fal.ai customer/admin submission, polling and diagnostics with server-only Free.ai upload/generation/status calls, preserving ownership and approved-payment reservations.
-- [ ] Verify documented free models/durations, safely configure FREE_AI_API_KEY, remove the old credential, show a source diff, and test a dummy image.
+- [x] Replace all active Fal.ai customer/admin submission, polling and diagnostics with server-only Free.ai calls, preserving ownership and approved-payment reservations; server-reserve admin tests with shared budget accounting.
+- [x] Configure FREE_AI_API_KEY, delete FAL_KEY, validate non-premium model aliases, reject unsupported ten-second requests before payment/claim, and test a dummy image signed in as the requesting administrator. 105 tests pass; desktop/mobile checks show no browser errors or overflow; source diff provided.
+- [ ] Successful Free.ai upload and completed render: blocked by provider upload 401/signup_required and video 429/not_in_tier. Provider account upload authorization and API video tokens are required; queued response shapes and output media remain unverified against a real successful job.
 # Village-story prompt update
 - [x] Adapt all five templates to the supplied continuous village story with customer identity safeguards, gentle camera movement and existing music/greeting; refresh prompt documentation. All 13 template checks pass, longest prompt 2443 characters, build OK. Actual app render quality remains unverified; no paid generation submitted.
 # Five templates with movement control
