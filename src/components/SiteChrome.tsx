@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CacheRecovery } from "@/components/CacheRecovery";
 import { hasGoogleIdentity } from "@/lib/google-auth";
 import { useServerFn } from "@tanstack/react-start";
-import { ownerTestReport } from "@/lib/fal-audit.functions";
+import { ownerTestReport } from "@/lib/video-audit.functions";
 
 export function Header({ sticky = true }: { sticky?: boolean }) {
   const online = useOnlineStatus();
@@ -58,7 +58,7 @@ export function Footer() {
           <a className="block hover:text-gold" href="https://tiktok.com/@magicphai" target="_blank" rel="noreferrer">TikTok</a>
           <a className="block hover:text-gold" href="mailto:hello@magicph.ai">hello@magicph.ai</a>
         </div>
-        <p className="self-end text-xs opacity-70 md:text-right">Powered by Fal.ai Kling v2.5 Turbo + Google Flow 10s<br />© 2026 MagicPh AI</p>
+        <p className="self-end text-xs opacity-70 md:text-right">Powered by Free.ai<br />© 2026 MagicPh AI</p>
       </div>
     </footer>
   );
