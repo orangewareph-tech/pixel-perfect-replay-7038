@@ -16,6 +16,7 @@ export function PaymentPanel({ choices, onApproved, payments, onRefresh }: { cho
   const matching = payments.filter((payment) => payment.duration === choices.duration && payment.template === choices.template);
   async function upload(file?: File) {
     if (!file) return;
+    if (choices.duration === 10) { setMessage("10 seconds is unavailable with Free.ai; do not send a new payment."); return; }
     if (!["image/jpeg", "image/png"].includes(file.type) || file.size > 2 * 1024 * 1024) { setMessage("Use a JPG or PNG receipt, max 2MB."); return; }
     setBusy(true); setMessage("");
     try {
@@ -26,6 +27,7 @@ export function PaymentPanel({ choices, onApproved, payments, onRefresh }: { cho
     } catch (error) { setMessage(error instanceof Error ? error.message : "Receipt could not be submitted. Sign in first."); }
     finally { setBusy(false); }
   }
+  if (choices.duration === 10) return <section className="mt-6 border-t py-6"><p role="status">10-second checkout is unavailable with Free.ai. Existing credits are preserved; do not send payment for this duration.</p></section>;
   return <section className="mt-6 border-t py-6">
     <h2 className="text-xl font-bold text-primary">GCash / InstaPay · ₱{total}</h2>
     <p className="mt-2 text-sm">{choices.duration} seconds{choices.music !== "no-music" ? " + Music" : ""} · one video credit</p>

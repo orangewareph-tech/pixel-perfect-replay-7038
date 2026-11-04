@@ -16,8 +16,7 @@ describe("enhanced Christmas template payloads", () => {
         const input = buildVideoInput("photo", template.scene, duration);
         for (const effect of requiredEffects[template.id]) expect(input.prompt.toLowerCase()).toContain(effect);
         expect(input.image_url).toBe("photo");
-        expect(input.duration).toBe(String(duration));
-        expect(input.cfg_scale).toBe(0.5);
+        expect(input.duration).toBe(duration);
       }
     });
   }
@@ -35,7 +34,7 @@ describe("enhanced Christmas template payloads", () => {
     expect(input.negative_prompt).toContain("outfit transformation");
     expect(input.prompt).not.toContain("fireplace");
     expect(input.prompt).not.toContain("toy train");
-    expect(VIDEO_MODEL).toBe("fal-ai/kling-video/v2.5-turbo/pro/image-to-video");
+    expect(VIDEO_MODEL).toBe("wan-2.2");
   });
   it("keeps base scenes neutral so the movement slider decides speed", () => {
     for (const t of TEMPLATES) expect(t.scene).not.toMatch(/EXTREME|RAPIDLY|FAST|shak|ORBIT|360/);

@@ -1,6 +1,6 @@
 # MagicPh AI — Template Prompts
 
-Model: `fal-ai/kling-video/v2.5-turbo/pro/image-to-video`. Existing 5s/10s offers and provider are unchanged; this is a wording update, not a switch to Omni or forced portrait output.
+Provider: Free.ai. Default model alias `wan-2.2` maps to its listed `wan22-ti2v-5b` ID; `cogvideox` and `hunyuan` are the only alternatives. API video generation requires provider tokens. Active generation is limited to five seconds within the integration's 2–6 second range; ten-second prompts below are retained historical references, not enabled requests. Music and greeting still use the existing download process.
 
 All templates share the continuous Filipino village story and customer-photo identity safeguards. Template effects remain distinct. One camera glide at every movement level; no cuts, crossfades, vehicles or extra people. Christmas music and the Merry Christmas greeting remain added by the existing preview/download process, not generated lettering. These are model instructions, not guarantees of face preservation or visual quality.
 

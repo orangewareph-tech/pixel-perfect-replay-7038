@@ -8,9 +8,9 @@ describe("video duration rules", () => {
   it("uses the actual listed costs", () => { expect(DURATION_OFFERS[5].falCost).toBe(0.35); expect(DURATION_OFFERS[10].falCost).toBe(0.70); });
   it("calculates 5 second profit with FX 58 and P2 fee", () => { expect(durationProfit(5)).toBe(126.70); });
   it("calculates 10 second profit with FX 58 and P2 fee", () => { expect(durationProfit(10)).toBe(256.40); });
-  it("passes 5 seconds to Kling", () => { expect(buildVideoInput("photo", "snow", 5).duration).toBe("5"); });
-  it("passes 10 seconds and longer motion to Kling", () => { const input = buildVideoInput("photo", "parol", 10); expect(input.duration).toBe("10"); expect(input.prompt).toContain("10 second"); });
+  it("builds a numeric 5-second duration", () => { expect(buildVideoInput("photo", "snow", 5).duration).toBe(5); });
+  it("preserves legacy 10-second story data", () => { const input = buildVideoInput("photo", "parol", 10); expect(input.duration).toBe(10); expect(input.prompt).toContain("10 second"); });
   it("rejects durations outside 5 and 10", () => { expect(videoDurationSchema.safeParse(6).success).toBe(false); expect(videoDurationSchema.safeParse(10).success).toBe(true); });
-  it("uses the existing model", () => { expect(VIDEO_MODEL).toBe("fal-ai/kling-video/v2.5-turbo/pro/image-to-video"); });
+  it("uses the requested free-model alias", () => { expect(VIDEO_MODEL).toBe("wan-2.2"); });
   it("sets requested rendering times", () => { expect(DURATION_OFFERS[5].renderTime).toBe("30-60 seconds"); expect(DURATION_OFFERS[10].renderTime).toBe("2-3 minutes"); });
 });

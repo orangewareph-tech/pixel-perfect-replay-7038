@@ -191,6 +191,51 @@ export type Database = {
         }
         Relationships: []
       }
+      video_provider_jobs: {
+        Row: {
+          duration: number
+          error: string | null
+          finished_at: string | null
+          id: string
+          model: string
+          request_id: string | null
+          reserved_usd: number
+          started_at: string
+          status: string
+          template: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          duration: number
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          model: string
+          request_id?: string | null
+          reserved_usd?: number
+          started_at?: string
+          status?: string
+          template: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          duration?: number
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          model?: string
+          request_id?: string | null
+          reserved_usd?: number
+          started_at?: string
+          status?: string
+          template?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -267,6 +312,29 @@ export type Database = {
         }
       }
       ensure_magicph_owner_role: { Args: never; Returns: boolean }
+      reserve_free_ai_admin_test: {
+        Args: { p_duration: number; p_model: string; p_template: string }
+        Returns: {
+          duration: number
+          error: string | null
+          finished_at: string | null
+          id: string
+          model: string
+          request_id: string | null
+          reserved_usd: number
+          started_at: string
+          status: string
+          template: string
+          user_id: string
+          video_url: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "video_provider_jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       review_video_payment: {
         Args: { p_approve: boolean; p_id: string }
         Returns: undefined

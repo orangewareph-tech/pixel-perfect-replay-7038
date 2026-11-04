@@ -12,7 +12,7 @@ export function DurationSelector({ duration, onChange, inverse = false, music = 
         {([5, 10] as const).map((value) => {
           const item = DURATION_OFFERS[value];
           return (
-            <Button key={value} variant="ghost" type="button" aria-label={`${value} seconds`} aria-pressed={duration === value} onClick={() => onChange(value)} className={`flex h-auto min-w-0 flex-col items-stretch gap-0 whitespace-normal rounded-lg border-2 bg-card p-4 text-left text-card-foreground hover:bg-card ${duration === value ? "border-gold shadow-glow" : "border-input"}`}>
+            <Button key={value} variant="ghost" type="button" aria-label={`${value} seconds`} aria-pressed={duration === value} disabled={value === 10} onClick={() => onChange(value)} className={`flex h-auto min-w-0 flex-col items-stretch gap-0 whitespace-normal rounded-lg border-2 bg-card p-4 text-left text-card-foreground hover:bg-card ${duration === value ? "border-gold shadow-glow" : "border-input"}`}>
               <span className="flex items-center justify-between gap-2">
                 <span className={`rounded-full px-2 py-1 text-xs font-bold ${value === 5 ? "bg-primary text-primary-foreground" : "bg-gold text-gold-foreground"}`}>{item.badge}</span>
                 {duration === value ? <Check className="text-primary" aria-hidden="true" /> : <Circle className="text-muted-foreground" aria-hidden="true" />}
@@ -25,6 +25,7 @@ export function DurationSelector({ duration, onChange, inverse = false, music = 
           );
         })}
       </div>
+      <p className="mt-3 text-sm text-muted-foreground">10 seconds temporarily unavailable — Free.ai integration supports 2–6 seconds. Existing 10-second credits are preserved.</p>
       <p className="mt-4 font-bold text-gold">{offer.delivery}</p>
       <p aria-live="polite" className={`mt-2 ${compact ? "font-display text-2xl text-primary" : "text-sm"}`}>Total: <b>₱{christmasTotal(duration, music)}</b> · Christmas music included 🎵</p>
       <p className="mt-1 text-xs">{musicReady ? "Automatic Christmas soundtrack · no extra charge" : "Loading included soundtrack…"}</p>

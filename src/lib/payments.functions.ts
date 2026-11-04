@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireGoogleAuth } from "@/lib/google-auth.functions";
 import { z } from "zod";
+import { requireFreeDuration } from "./free-ai";
 import { paymentChoicesSchema } from "@/lib/payment-rules";
 
 export const listMyPayments = createServerFn({ method: "GET" }).middleware([requireGoogleAuth]).handler(async ({ context }) => {
@@ -12,6 +13,7 @@ export const listMyPayments = createServerFn({ method: "GET" }).middleware([requ
 export const submitReceipt = createServerFn({ method: "POST" }).middleware([requireGoogleAuth])
   .inputValidator((input) => paymentChoicesSchema.extend({ receipt: z.string().regex(/^data:image\/(jpeg|png);base64,/).max(2_800_000) }).parse(input))
   .handler(async ({ context, data }) => {
+    requireFreeDuration(data.duration);
     const result = await context.supabase.rpc("create_video_payment", { p_duration: data.duration, p_music: data.music, p_template: data.template, p_provider: "manual", p_receipt: data.receipt });
     if (result.error) throw new Error(result.error.message);
     return { id: result.data.id };

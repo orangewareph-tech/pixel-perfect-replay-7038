@@ -24,7 +24,7 @@ export async function checkStaticPreviews(): Promise<FreeCheck> {
         video.src = url;
       });
     }
-    return { name: "Three-second previews", status: "PASS", detail: "Five original animated samples loaded; three new templates have sample images only. No generation endpoint used; no Fal.ai generation charge." };
+    return { name: "Three-second previews", status: "PASS", detail: "Five original animated samples loaded; three new templates have sample images only. No generation endpoint used; no Free.ai generation charge." };
   } catch (e) { return { name: "Three-second previews", status: "FAIL", detail: e instanceof Error ? e.message : "Preview unavailable" }; }
 }
 export async function runFreeChecks(): Promise<FreeCheck[]> {
