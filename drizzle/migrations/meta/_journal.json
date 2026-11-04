@@ -50,6 +50,13 @@
       "when": 1793789227827,
       "tag": "0006_free_ai_admin_reservations",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793789370845,
+      "tag": "0007_count_free_ai_shared_budget",
+      "breakpoints": true
     }
   ]
 }
