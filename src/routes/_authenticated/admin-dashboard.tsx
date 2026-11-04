@@ -5,15 +5,17 @@ import { useEffect, useState } from "react";
 import { adminCheckTest, adminDashboardStatus, adminStartTest } from "@/lib/admin-dashboard.functions";
 import { Header, Footer } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
+import { VideoModelSelector } from "@/components/VideoModelSelector";
+import { type FreeVideoModel } from "@/lib/free-ai";
 import { MovementSelector } from "@/components/MovementSelector";
 import { TEMPLATES } from "@/lib/site";
 import { DEFAULT_MOVEMENT, type VideoMovement } from "@/lib/video-movement";
 import { ADMIN_LIMITS, adminTestQuota, canAdminTest } from "@/lib/owner-tests";
-import { FAL_LISTED_COST, type VideoDuration } from "@/lib/video-duration";
+import { VIDEO_BUDGET_RESERVATION, type VideoDuration } from "@/lib/video-duration";
 
 type TestLog = { id: string; email: string; template: string; movement: VideoMovement; duration: VideoDuration; cost: number; timestamp: string; videoUrl: string | null; status: string };
 type Batch = { phase: "submitting" | "rendering"; total: number; done: number };
-const STORE = "fal_admin_tests";
+const STORE = "freeai_admin_tests";
 const readLogs = (): TestLog[] => { try { return JSON.parse(localStorage.getItem(STORE) ?? "[]"); } catch { return []; } };
 const toRecords = (logs: TestLog[]) => logs.map((l) => ({ email: l.email, templateId: l.template, cost: l.cost, duration: l.duration, timestamp: l.timestamp }));
 
@@ -34,6 +36,7 @@ function AdminDashboard() {
   const [template, setTemplate] = useState<(typeof TEMPLATES)[number]["id"]>("parol");
   const [movement, setMovement] = useState<VideoMovement>(DEFAULT_MOVEMENT);
   const [duration, setDuration] = useState<VideoDuration>(5);
+  const [model, setModel] = useState<FreeVideoModel>("wan-2.2");
   const [busy, setBusy] = useState(false);
   const [batch, setBatch] = useState<Batch | null>(null);
   const [fileName, setFileName] = useState("");
@@ -45,7 +48,7 @@ function AdminDashboard() {
   const updateMany = (patches: { id: string; patch: Partial<TestLog> }[]) => {
     if (!patches.length) return;
     const byId = new Map(patches.map((p) => [p.id, p.patch]));
-    save(readLogs().map((l) => (byId.has(l.id) ? { ...l, ...byId.get(l.id)! } : l)));
+    save(readLogs().map((l) => (byId.has(l.id) ? { ...l, ...(byId.get(l.id) ?? {}) } : l)));
   };
 
   if (!status.admin) {
@@ -54,7 +57,7 @@ function AdminDashboard() {
 
   const quota = adminTestQuota(status.email, toRecords(logs));
   const limit = canAdminTest(status.email, toRecords(logs));
-  const unitCost = FAL_LISTED_COST[duration];
+  const unitCost = VIDEO_BUDGET_RESERVATION[duration];
   const batchCount = quota.allowed ? Math.min(TEMPLATES.length, quota.videosLeft, Math.floor(quota.costLeft / unitCost)) : 0;
 
   async function onFile(f: File | undefined) {
@@ -68,7 +71,7 @@ function AdminDashboard() {
     if (!photo) return;
     setBusy(true); setError("");
     try {
-      const { requestId, cost } = await start({ data: { template, movement, duration, imageUrl: photo } });
+      const { requestId, cost } = await start({ data: { template, movement, duration, model, imageUrl: photo } });
       const log: TestLog = { id: requestId, email: status.email, template, movement, duration, cost, timestamp: new Date().toISOString(), videoUrl: null, status: "IN_QUEUE" };
       save([log, ...readLogs()]);
       for (let i = 0; i < 120; i++) {
@@ -83,7 +86,7 @@ function AdminDashboard() {
 
   // One photo, one movement, one length — all five templates rendered and compared side by side.
   async function generateAll() {
-    if (!photo || busy || !status.falKey || batchCount <= 0) return;
+    if (!photo || duration === 10 || busy || !status.videoKey || batchCount <= 0) return;
     setBusy(true); setError("");
     const targets = TEMPLATES.slice(0, batchCount);
     setBatch({ phase: "submitting", total: targets.length, done: 0 });
@@ -91,7 +94,7 @@ function AdminDashboard() {
     const failed: string[] = [];
     for (const t of targets) {
       try {
-        const { requestId, cost } = await start({ data: { template: t.id, movement, duration, imageUrl: photo } });
+        const { requestId, cost } = await start({ data: { template: t.id, movement, duration, model, imageUrl: photo } });
         const log: TestLog = { id: requestId, email: status.email, template: t.id, movement, duration, cost, timestamp: new Date().toISOString(), videoUrl: null, status: "IN_QUEUE" };
         started.push(log);
         save([log, ...readLogs()]);
@@ -132,9 +135,9 @@ function AdminDashboard() {
         <h1 className="text-3xl font-bold">👑 MagicPh Admin Test Dashboard</h1>
         <section className="grid gap-3 rounded-xl border bg-card p-5 text-sm sm:grid-cols-2">
           <p>Signed in: <b>{status.email}</b></p>
-          <p>FAL_KEY: <b className={status.falKey ? "text-primary" : "text-destructive"}>{status.falKey ? "Connected" : "Missing — add FAL_KEY in project secrets"}</b></p>
+          <p>FREE_AI_API_KEY: <b className={status.videoKey ? "text-primary" : "text-destructive"}>{status.videoKey ? "Configured — access not verified" : "Missing — add FREE_AI_API_KEY in project secrets"}</b></p>
           <p>Model: <code>{status.model}</code></p>
-          <p>Cost: 5s ${ADMIN_LIMITS.costPer5s} · 10s ${ADMIN_LIMITS.costPer10s}</p>
+          <p>Legacy reservation (not Free.ai pricing): 5s ${ADMIN_LIMITS.costPer5s} · 10s ${ADMIN_LIMITS.costPer10s}</p>
           <p>Limits: {ADMIN_LIMITS.maxPerDay}/day</p>
           <p>Room left today: <b>{quota.videosLeft} videos</b> · <b>${quota.costLeft.toFixed(2)}</b></p>
         </section>
@@ -158,12 +161,15 @@ function AdminDashboard() {
             {TEMPLATES.map((t) => <Button key={t.id} variant={template === t.id ? "default" : "outline"} aria-pressed={template === t.id} onClick={() => setTemplate(t.id)}>{t.icon} {t.name}</Button>)}
           </div>
           <MovementSelector value={movement} onChange={setMovement} />
+          <VideoModelSelector value={model} onChange={setModel} disabled={busy} />
+          <p className="text-sm text-muted-foreground">Free.ai API video generation requires tokens. These are non-premium models; website free videos do not include API access.</p>
           <div className="flex gap-2">
-            {([5, 10] as const).map((d) => <Button key={d} variant={duration === d ? "default" : "outline"} aria-pressed={duration === d} onClick={() => setDuration(d)}>{d}s</Button>)}
+            {([5, 10] as const).map((d) => <Button key={d} variant={duration === d ? "default" : "outline"} aria-pressed={duration === d} disabled={d === 10} onClick={() => setDuration(d)}>{d}s</Button>)}
           </div>
+          <p className="text-sm text-muted-foreground">10 seconds unavailable with the 2–6 second Free.ai integration.</p>
           <div className="flex flex-wrap gap-3">
-            <Button size="lg" disabled={!photo || busy || !limit.allowed || !status.falKey} onClick={generate}>{busy ? "Working…" : "Generate FREE Admin Test (Bypass ₱149)"}</Button>
-            <Button size="lg" variant="secondary" disabled={!photo || busy || !status.falKey || batchCount <= 0} onClick={generateAll}>
+            <Button size="lg" disabled={!photo || duration === 10 || busy || !limit.allowed || !status.videoKey} onClick={generate}>{busy ? "Working…" : "Generate FREE Admin Test (Bypass ₱149)"}</Button>
+            <Button size="lg" variant="secondary" disabled={!photo || duration === 10 || busy || !status.videoKey || batchCount <= 0} onClick={generateAll}>
               {batch?.phase === "submitting" ? "Starting…" : `Run all five templates free (${batchCount})`}
             </Button>
           </div>

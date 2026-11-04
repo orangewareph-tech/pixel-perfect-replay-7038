@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Header, Footer, Snow } from "@/components/SiteChrome";
 import { TEMPLATES, isAllowedPhoto } from "@/lib/site";
-import { startVideo, checkVideo, downloadVideo } from "@/lib/fal.functions";
+import { startVideo, checkVideo, downloadVideo } from "@/lib/video.functions";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { DurationSelector } from "@/components/DurationSelector";
@@ -153,6 +153,7 @@ function Create() {
   }
 
   async function generate(paymentId?: string) {
+    if (duration === 10) { setErr("10 seconds is unavailable with Free.ai. Your credit has not been used."); return; }
     if (!canGenerateVideo(online)) { setErr("Need internet to generate video"); return; }
     if (!photo) { setErr("Please upload a family photo first."); setStep(0); return; }
     if (!musicReady) { setErr("Music is still loading. Please wait and try again."); return; }
@@ -166,6 +167,7 @@ function Create() {
       for (let i = 0; i < 90; i++) {
         await new Promise((r) => setTimeout(r, 4000));
         const s = await check({ data: { requestId } });
+        if (s.status === "FAILED") throw new Error("Free.ai generation failed. Administrator review required before retrying.");
         if (s.status === "COMPLETED") {
           if (!s.videoUrl) throw new Error("No video returned");
           setVideoUrl(s.videoUrl); setProgress(100); return;
@@ -271,7 +273,7 @@ function Create() {
             <ChristmasMessageWriter value={christmasMessage} onChange={setChristmasMessage} template={tpl} templateName={template.name} signedIn={signedIn} online={online} onSignIn={() => void signInToPay()} />
             <OwnerTestPanel photo={photo} template={tpl} duration={duration} movement={movement} onVideo={(url) => { setStep(4); setGenErr(null); setVideoUrl(url); setProgress(100); }} />
             <p className="mt-4 text-center text-xs text-muted-foreground">Gipaningkamotan nga mapreserbar ang mga nawong · Gibanabana: {duration === 5 ? "30–60 segundos" : "2–3 minutos"} human ma-approve ang bayad.</p>
-            <Button onClick={() => setPaymentOpen(true)} className="mt-5 h-12 w-full text-base" disabled={!musicReady}>Pay with GCash / Maya · ₱{total}</Button>
+            <Button onClick={() => setPaymentOpen(true)} className="mt-5 h-12 w-full text-base" disabled={!musicReady || duration === 10}>Pay with GCash / Maya · ₱{total}</Button>
             {paymentOpen && (!signedIn ? <div className="mt-6 border-t py-6"><p className="font-bold">🔒 Sign in una sa pagbayad. Usa ka approved payment para sa usa ka video.</p><Button onClick={() => void signInToPay()} className="mt-4">Sign in to pay</Button></div> : <><p className="mt-4 text-sm">{accountEmail} · Max 3 generations per hour</p><PaymentPanel choices={paymentChoicesSchema.parse({ duration, music, template: tpl })} payments={payments} onRefresh={refreshPayments} onApproved={(payment) => { if (!online || !musicReady) { setErr(!online ? "Need internet to generate video" : "Wait for music to load"); return; } void generate(payment.id); }} /></>)}
             {err && <p role="alert" className="mt-3 text-destructive">{err}</p>}
             <Button variant="ghost" onClick={() => setStep(2)} className="mt-4"><ArrowLeft />Balik</Button>
